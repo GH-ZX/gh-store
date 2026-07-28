@@ -74,15 +74,13 @@ export function CheckoutForm({ fields, onSubmit, isSubmitting, className }: Chec
         <div key={field.key} className="space-y-2">
           <Label htmlFor={field.key}>
             {isRtl ? field.labelAr : field.labelEn}
-            {field.isRequired && <span className="mr-1 text-destructive">*</span>}
+            {field.isRequired && <span className="text-destructive mr-1">*</span>}
           </Label>
 
           {field.type === "select" ? (
             <Select>
               <SelectTrigger id={field.key}>
-                <SelectValue
-                  placeholder={isRtl ? field.placeholderAr : field.placeholderEn}
-                />
+                <SelectValue placeholder={isRtl ? field.placeholderAr : field.placeholderEn} />
               </SelectTrigger>
               <SelectContent>
                 {field.options?.map((opt) => (
@@ -103,9 +101,7 @@ export function CheckoutForm({ fields, onSubmit, isSubmitting, className }: Chec
           )}
 
           {errors[field.key] && (
-            <p className="text-xs text-destructive">
-              {errors[field.key]?.message as string}
-            </p>
+            <p className="text-destructive text-xs">{errors[field.key]?.message as string}</p>
           )}
         </div>
       ))}

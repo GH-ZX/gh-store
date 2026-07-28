@@ -23,12 +23,7 @@ interface ProductGridProps {
   className?: string;
 }
 
-export function ProductGrid({
-  products,
-  isLoading,
-  columns = 4,
-  className,
-}: ProductGridProps) {
+export function ProductGrid({ products, isLoading, columns = 4, className }: ProductGridProps) {
   const gridCols = {
     2: "grid-cols-2 sm:grid-cols-2 lg:grid-cols-2",
     3: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-3",

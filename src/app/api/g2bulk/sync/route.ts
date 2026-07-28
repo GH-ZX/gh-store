@@ -29,7 +29,9 @@ import type { G2BulkGame } from "@/providers/g2bulk/types";
 
 // ─── Helpers ──────────────────────────────────────────
 
-async function testG2BulkConnection(apiKey: string): Promise<{ success: boolean; message: string }> {
+async function testG2BulkConnection(
+  apiKey: string,
+): Promise<{ success: boolean; message: string }> {
   try {
     const res = await fetch("https://api.g2bulk.com/v1/getMe", {
       headers: { "X-API-Key": apiKey, Accept: "application/json" },
@@ -134,11 +136,14 @@ export async function POST(request: NextRequest) {
         const selectedProducts = allProducts.filter((p) => categories.includes(p.category_id));
 
         // Group by category_id
-        const catMap = new Map<number, {
-          id: number;
-          title: string;
-          products: typeof selectedProducts;
-        }>();
+        const catMap = new Map<
+          number,
+          {
+            id: number;
+            title: string;
+            products: typeof selectedProducts;
+          }
+        >();
 
         for (const p of selectedProducts) {
           if (!catMap.has(p.category_id)) {
@@ -157,10 +162,7 @@ export async function POST(request: NextRequest) {
             const slug = `g2bulk-voucher-${catId}`;
             const category = catGroup.products[0];
             const minPrice = Math.min(...catGroup.products.map((p) => p.unit_price));
-            const maxFaceValue = Math.max(
-              ...catGroup.products.map((p) => p.face_value ?? 0),
-              0,
-            );
+            const maxFaceValue = Math.max(...catGroup.products.map((p) => p.face_value ?? 0), 0);
 
             // Sort amounts by unit_price
             const amounts = catGroup.products
@@ -218,15 +220,19 @@ export async function POST(request: NextRequest) {
     // ─── 2. Sync Individual Products ────────────────
     if (productIds && productIds.length > 0) {
       try {
-        const defaultCat = await getOrCreateCategory(supabase, "g2bulk-products", "منتجات G2Bulk", "G2Bulk Products");
+        const defaultCat = await getOrCreateCategory(
+          supabase,
+          "g2bulk-products",
+          "منتجات G2Bulk",
+          "G2Bulk Products",
+        );
         if (defaultCat.created) results.categoriesCreated++;
 
         for (const pid of productIds) {
           try {
-            const productRes = await fetch(
-              `https://api.g2bulk.com/v1/products/${pid}`,
-              { headers: { "X-API-Key": apiKey } },
-            );
+            const productRes = await fetch(`https://api.g2bulk.com/v1/products/${pid}`, {
+              headers: { "X-API-Key": apiKey },
+            });
             if (!productRes.ok) {
               results.errors.push(`Product ${pid}: HTTP ${productRes.status}`);
               continue;
@@ -260,11 +266,15 @@ export async function POST(request: NextRequest) {
             if (created) results.productsCreated++;
             else results.productsUpdated++;
           } catch (err) {
-            results.errors.push(`Product ${pid}: ${err instanceof Error ? err.message : "Unknown"}`);
+            results.errors.push(
+              `Product ${pid}: ${err instanceof Error ? err.message : "Unknown"}`,
+            );
           }
         }
       } catch (err) {
-        results.errors.push(`Product sync error: ${err instanceof Error ? err.message : "Unknown"}`);
+        results.errors.push(
+          `Product sync error: ${err instanceof Error ? err.message : "Unknown"}`,
+        );
       }
     }
 
@@ -292,10 +302,9 @@ export async function POST(request: NextRequest) {
             }
 
             // Fetch catalogue — API returns { catalogues: [...], game, success }
-            const catRes = await fetch(
-              `https://api.g2bulk.com/v1/games/${gameCode}/catalogue`,
-              { headers: { "X-API-Key": apiKey } },
-            );
+            const catRes = await fetch(`https://api.g2bulk.com/v1/games/${gameCode}/catalogue`, {
+              headers: { "X-API-Key": apiKey },
+            });
             if (!catRes.ok) {
               results.errors.push(`Game ${gameCode}: failed to fetch catalogue (${catRes.status})`);
               continue;
@@ -306,12 +315,10 @@ export async function POST(request: NextRequest) {
             const catalogue: Array<{ id: number; name: string; amount: number }> =
               catalogueResult?.catalogues || [];
 
-            const minPrice = catalogue.length > 0
-              ? Math.min(...catalogue.map((item) => item.amount))
-              : 0;
-            const maxPrice = catalogue.length > 0
-              ? Math.max(...catalogue.map((item) => item.amount))
-              : 0;
+            const minPrice =
+              catalogue.length > 0 ? Math.min(...catalogue.map((item) => item.amount)) : 0;
+            const maxPrice =
+              catalogue.length > 0 ? Math.max(...catalogue.map((item) => item.amount)) : 0;
 
             const slug = `g2bulk-game-${gameCode}`;
 
@@ -343,9 +350,27 @@ export async function POST(request: NextRequest) {
                 // Standard top-up fields required by G2Bulk for ordering
                 // Use camelCase keys to match StoreProduct.fields interface
                 fields: [
-                  { key: "player_id", labelAr: "معرف اللاعب (UID)", labelEn: "Player ID (UID)", type: "text", required: true },
-                  { key: "server_id", labelAr: "الخادم (اختياري)", labelEn: "Server (optional)", type: "text", required: false },
-                  { key: "charname", labelAr: "اسم الشخصية (اختياري)", labelEn: "Character Name (optional)", type: "text", required: false },
+                  {
+                    key: "player_id",
+                    labelAr: "معرف اللاعب (UID)",
+                    labelEn: "Player ID (UID)",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    key: "server_id",
+                    labelAr: "الخادم (اختياري)",
+                    labelEn: "Server (optional)",
+                    type: "text",
+                    required: false,
+                  },
+                  {
+                    key: "charname",
+                    labelAr: "اسم الشخصية (اختياري)",
+                    labelEn: "Character Name (optional)",
+                    type: "text",
+                    required: false,
+                  },
                 ],
               },
             });
@@ -353,7 +378,9 @@ export async function POST(request: NextRequest) {
             if (created) results.productsCreated++;
             else results.productsUpdated++;
           } catch (err) {
-            results.errors.push(`Game ${gameCode}: ${err instanceof Error ? err.message : "Unknown"}`);
+            results.errors.push(
+              `Game ${gameCode}: ${err instanceof Error ? err.message : "Unknown"}`,
+            );
           }
         }
       } catch (err) {

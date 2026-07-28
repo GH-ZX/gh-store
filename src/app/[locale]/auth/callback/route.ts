@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 
   // Extract locale from the URL path (e.g. /ar/auth/callback → "ar")
   const pathSegment = pathname.split("/")[1];
-  const locale = SUPPORTED_LOCALES.includes(pathSegment as typeof SUPPORTED_LOCALES[number])
+  const locale = SUPPORTED_LOCALES.includes(pathSegment as (typeof SUPPORTED_LOCALES)[number])
     ? pathSegment
     : DEFAULT_LOCALE;
 
@@ -63,9 +63,7 @@ export async function GET(request: NextRequest) {
             return request.cookies.getAll();
           },
           setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) =>
-              request.cookies.set(name, value),
-            );
+            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
             response = NextResponse.redirect(new URL(next, origin));
             cookiesToSet.forEach(({ name, value, options }) =>
               response.cookies.set(name, value, options),
@@ -90,7 +88,5 @@ export async function GET(request: NextRequest) {
   }
 
   // No code found — redirect to login
-  return NextResponse.redirect(
-    new URL(`/${locale}/auth/login`, origin),
-  );
+  return NextResponse.redirect(new URL(`/${locale}/auth/login`, origin));
 }

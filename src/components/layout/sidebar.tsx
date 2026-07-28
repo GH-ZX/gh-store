@@ -43,63 +43,138 @@ const navSections: NavSection[] = [
     title: "Overview",
     titleAr: "نظرة عامة",
     items: [
-      { label: "Dashboard", labelAr: "لوحة التحكم", href: "/dashboard", icon: <LayoutDashboard className="size-4" /> },
+      {
+        label: "Dashboard",
+        labelAr: "لوحة التحكم",
+        href: "/dashboard",
+        icon: <LayoutDashboard className="size-4" />,
+      },
     ],
   },
   {
     title: "Website",
     titleAr: "الموقع",
     items: [
-      { label: "Settings", labelAr: "الإعدادات", href: "/dashboard/website/settings", icon: <Settings className="size-4" /> },
-      { label: "Homepage", labelAr: "الصفحة الرئيسية", href: "/dashboard/website/homepage", icon: <Globe className="size-4" /> },
-      { label: "SEO", labelAr: "تحسين محركات البحث", href: "/dashboard/website/seo", icon: <ScrollText className="size-4" /> },
-      { label: "Themes", labelAr: "المظاهر", href: "/dashboard/website/themes", icon: <Package className="size-4" /> },
+      {
+        label: "Settings",
+        labelAr: "الإعدادات",
+        href: "/dashboard/website/settings",
+        icon: <Settings className="size-4" />,
+      },
+      {
+        label: "Homepage",
+        labelAr: "الصفحة الرئيسية",
+        href: "/dashboard/website/homepage",
+        icon: <Globe className="size-4" />,
+      },
+      {
+        label: "SEO",
+        labelAr: "تحسين محركات البحث",
+        href: "/dashboard/website/seo",
+        icon: <ScrollText className="size-4" />,
+      },
+      {
+        label: "Themes",
+        labelAr: "المظاهر",
+        href: "/dashboard/website/themes",
+        icon: <Package className="size-4" />,
+      },
     ],
   },
   {
     title: "Store",
     titleAr: "المتجر",
     items: [
-      { label: "Products", labelAr: "المنتجات", href: "/dashboard/store/products", icon: <Package className="size-4" /> },
-      { label: "Categories", labelAr: "التصنيفات", href: "/dashboard/store/categories", icon: <ShoppingBag className="size-4" /> },
-      { label: "Inventory", labelAr: "المخزون", href: "/dashboard/store/inventory", icon: <Package className="size-4" /> },
+      {
+        label: "Products",
+        labelAr: "المنتجات",
+        href: "/dashboard/store/products",
+        icon: <Package className="size-4" />,
+      },
+      {
+        label: "Categories",
+        labelAr: "التصنيفات",
+        href: "/dashboard/store/categories",
+        icon: <ShoppingBag className="size-4" />,
+      },
+      {
+        label: "Inventory",
+        labelAr: "المخزون",
+        href: "/dashboard/store/inventory",
+        icon: <Package className="size-4" />,
+      },
     ],
   },
   {
     title: "Orders",
     titleAr: "الطلبات",
     items: [
-      { label: "All Orders", labelAr: "جميع الطلبات", href: "/dashboard/orders", icon: <ShoppingBag className="size-4" /> },
+      {
+        label: "All Orders",
+        labelAr: "جميع الطلبات",
+        href: "/dashboard/orders",
+        icon: <ShoppingBag className="size-4" />,
+      },
     ],
   },
   {
     title: "Customers",
     titleAr: "العملاء",
     items: [
-      { label: "All Customers", labelAr: "جميع العملاء", href: "/dashboard/customers", icon: <Users className="size-4" /> },
+      {
+        label: "All Customers",
+        labelAr: "جميع العملاء",
+        href: "/dashboard/customers",
+        icon: <Users className="size-4" />,
+      },
     ],
   },
   {
     title: "Marketing",
     titleAr: "التسويق",
     items: [
-      { label: "Coupons", labelAr: "الكوبونات", href: "/dashboard/coupons", icon: <TicketPercent className="size-4" /> },
+      {
+        label: "Coupons",
+        labelAr: "الكوبونات",
+        href: "/dashboard/coupons",
+        icon: <TicketPercent className="size-4" />,
+      },
     ],
   },
   {
     title: "Analytics",
     titleAr: "التحليلات",
     items: [
-      { label: "Sales", labelAr: "المبيعات", href: "/dashboard/analytics/sales", icon: <BarChart3 className="size-4" /> },
-      { label: "Revenue", labelAr: "الإيرادات", href: "/dashboard/analytics/revenue", icon: <BarChart3 className="size-4" /> },
+      {
+        label: "Sales",
+        labelAr: "المبيعات",
+        href: "/dashboard/analytics/sales",
+        icon: <BarChart3 className="size-4" />,
+      },
+      {
+        label: "Revenue",
+        labelAr: "الإيرادات",
+        href: "/dashboard/analytics/revenue",
+        icon: <BarChart3 className="size-4" />,
+      },
     ],
   },
   {
     title: "System",
     titleAr: "النظام",
     items: [
-      { label: "Providers", labelAr: "المزوّدون", href: "/dashboard/providers", icon: <Cable className="size-4" /> },
-      { label: "Logs", labelAr: "السجلات", href: "/dashboard/logs/audit", icon: <ScrollText className="size-4" /> },
+      {
+        label: "Providers",
+        labelAr: "المزوّدون",
+        href: "/dashboard/providers",
+        icon: <Cable className="size-4" />,
+      },
+      {
+        label: "Logs",
+        labelAr: "السجلات",
+        href: "/dashboard/logs/audit",
+        icon: <ScrollText className="size-4" />,
+      },
     ],
   },
 ];
@@ -123,7 +198,7 @@ export function DashboardSidebar({ className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "flex flex-col border-l bg-sidebar transition-all duration-300",
+        "bg-sidebar flex flex-col border-l transition-all duration-300",
         collapsed ? "w-[60px]" : "w-[260px]",
         className,
       )}
@@ -131,10 +206,7 @@ export function DashboardSidebar({ className }: SidebarProps) {
       {/* Logo */}
       <div className="flex h-16 items-center justify-between border-b px-4">
         {!collapsed && (
-          <Link
-            href={`/${locale}`}
-            className="font-bold text-sm tracking-tight"
-          >
+          <Link href={`/${locale}`} className="text-sm font-bold tracking-tight">
             {APP_NAME}
           </Link>
         )}
@@ -160,7 +232,7 @@ export function DashboardSidebar({ className }: SidebarProps) {
           {navSections.map((section) => (
             <div key={section.title}>
               {!collapsed && (
-                <h4 className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <h4 className="text-muted-foreground mb-1 px-3 text-[10px] font-semibold tracking-wider uppercase">
                   {isRtl ? section.titleAr : section.title}
                 </h4>
               )}
@@ -186,7 +258,7 @@ export function DashboardSidebar({ className }: SidebarProps) {
                             {isRtl ? item.labelAr : item.label}
                           </span>
                           {item.badge && (
-                            <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
+                            <span className="bg-primary text-primary-foreground flex h-5 min-w-[20px] items-center justify-center rounded-full px-1 text-[10px] font-medium">
                               {item.badge}
                             </span>
                           )}
@@ -206,7 +278,7 @@ export function DashboardSidebar({ className }: SidebarProps) {
         <Link
           href={`/${locale}`}
           className={cn(
-            "inline-flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm font-normal text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
+            "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground inline-flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm font-normal transition-colors",
             collapsed && "justify-center px-0",
           )}
         >

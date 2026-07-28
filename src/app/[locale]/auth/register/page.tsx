@@ -9,7 +9,14 @@ import { useForm } from "react-hook-form";
 import { LoadingPage } from "@/components/shared/loading";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
@@ -76,7 +83,7 @@ function RegisterPageInner() {
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
       </div>
     );
   }
@@ -94,13 +101,11 @@ function RegisterPageInner() {
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
               <CheckCircle2 className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
-            <CardTitle className="text-2xl font-bold mt-4">{t("register.title")}</CardTitle>
-            <CardDescription className="text-base">
-              {t("register.success")}
-            </CardDescription>
+            <CardTitle className="mt-4 text-2xl font-bold">{t("register.title")}</CardTitle>
+            <CardDescription className="text-base">{t("register.success")}</CardDescription>
           </CardHeader>
           <CardContent className="text-center">
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className="text-muted-foreground mb-4 text-sm">
               {isRtl
                 ? "لم تستلم البريد؟ تحقق من مجلد البريد المهمل أو حاول مرة أخرى"
                 : "Didn't receive the email? Check your spam folder or try again."}
@@ -110,7 +115,7 @@ function RegisterPageInner() {
             </Button>
           </CardContent>
           <CardFooter className="justify-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               {t("register.has_account")}{" "}
               <Link
                 href={`/${locale}/auth/login`}
@@ -139,19 +144,13 @@ function RegisterPageInner() {
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                {signUpError instanceof Error
-                  ? signUpError.message
-                  : t("register.error")}
+                {signUpError instanceof Error ? signUpError.message : t("register.error")}
               </AlertDescription>
             </Alert>
           )}
 
           {/* Google sign-up button */}
-          <Button
-            variant="outline"
-            className="w-full gap-2"
-            onClick={handleGoogleSignUp}
-          >
+          <Button variant="outline" className="w-full gap-2" onClick={handleGoogleSignUp}>
             <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
@@ -179,9 +178,7 @@ function RegisterPageInner() {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">
-                {isRtl ? "أو" : "or"}
-              </span>
+              <span className="bg-card text-muted-foreground px-2">{isRtl ? "أو" : "or"}</span>
             </div>
           </div>
 
@@ -198,7 +195,7 @@ function RegisterPageInner() {
                 aria-invalid={!!errors.fullName}
               />
               {errors.fullName && (
-                <p className="text-sm text-destructive">{errors.fullName.message}</p>
+                <p className="text-destructive text-sm">{errors.fullName.message}</p>
               )}
             </div>
 
@@ -212,9 +209,7 @@ function RegisterPageInner() {
                 {...register("email")}
                 aria-invalid={!!errors.email}
               />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-destructive text-sm">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -228,7 +223,7 @@ function RegisterPageInner() {
                 aria-invalid={!!errors.password}
               />
               {errors.password && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
+                <p className="text-destructive text-sm">{errors.password.message}</p>
               )}
             </div>
 
@@ -243,7 +238,7 @@ function RegisterPageInner() {
                 aria-invalid={!!errors.confirmPassword}
               />
               {errors.confirmPassword && (
-                <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+                <p className="text-destructive text-sm">{errors.confirmPassword.message}</p>
               )}
             </div>
 
@@ -264,7 +259,7 @@ function RegisterPageInner() {
         </CardContent>
 
         <CardFooter className="justify-center">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {t("register.has_account")}{" "}
             <Link
               href={`/${locale}/auth/login`}

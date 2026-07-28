@@ -3,7 +3,17 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Star, ShoppingCart, Check, Shield, Truck, ArrowLeft, ArrowRight, Gamepad2, Gift } from "lucide-react";
+import {
+  Star,
+  ShoppingCart,
+  Check,
+  Shield,
+  Truck,
+  ArrowLeft,
+  ArrowRight,
+  Gamepad2,
+  Gift,
+} from "lucide-react";
 import { ProductGrid } from "@/components/store/product-grid";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,7 +54,12 @@ interface AmountOption {
   stock: number;
 }
 
-export function ProductDetailClient({ product, relatedProducts, locale, isRtl }: ProductDetailClientProps) {
+export function ProductDetailClient({
+  product,
+  relatedProducts,
+  locale,
+  isRtl,
+}: ProductDetailClientProps) {
   const addItem = useCartStore((s) => s.addItem);
   const [addedToCart, setAddedToCart] = useState(false);
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
@@ -85,14 +100,14 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
 
   // ─── Price ─────────────────────────────────────────
   const displayPrice = isTopup
-    ? selectedItem?.amount ?? product.basePrice
+    ? (selectedItem?.amount ?? product.basePrice)
     : isGiftCard
-      ? selectedAmount?.unit_price ?? product.basePrice
+      ? (selectedAmount?.unit_price ?? product.basePrice)
       : product.basePrice;
 
   const displayOriginalPrice = isGiftCard
-    ? selectedAmount?.face_value ?? product.originalPrice ?? undefined
-    : product.originalPrice ?? undefined;
+    ? (selectedAmount?.face_value ?? product.originalPrice ?? undefined)
+    : (product.originalPrice ?? undefined);
 
   const hasDiscount = displayOriginalPrice != null && displayOriginalPrice > displayPrice;
 
@@ -111,18 +126,23 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
   };
 
   const handleAddToCart = () => {
-    const label = isTopup && selectedItem
-      ? `${product.nameEn} - ${selectedItem.name}`
-      : isGiftCard && selectedAmount
-        ? `${product.nameEn} - ${selectedAmount.title}`
-        : product.nameEn;
+    const label =
+      isTopup && selectedItem
+        ? `${product.nameEn} - ${selectedItem.name}`
+        : isGiftCard && selectedAmount
+          ? `${product.nameEn} - ${selectedAmount.title}`
+          : product.nameEn;
 
     // The variant id is what the server uses to price this line; unitPrice
     // below is for display only.
     const variantId = isTopup
-      ? (selectedItem?.id != null ? String(selectedItem.id) : null)
+      ? selectedItem?.id != null
+        ? String(selectedItem.id)
+        : null
       : isGiftCard
-        ? (selectedAmount?.id != null ? String(selectedAmount.id) : null)
+        ? selectedAmount?.id != null
+          ? String(selectedAmount.id)
+          : null
         : null;
 
     addItem({
@@ -147,7 +167,7 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
     <main className="min-h-screen">
       <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
         {/* ─── Breadcrumb ───────────────────────────── */}
-        <nav className="mb-8 flex items-center gap-2 text-sm text-muted-foreground">
+        <nav className="text-muted-foreground mb-8 flex items-center gap-2 text-sm">
           <Link href={`/${locale}`} className="hover:text-foreground transition-colors">
             {isRtl ? "الرئيسية" : "Home"}
           </Link>
@@ -156,33 +176,33 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
             {isRtl ? "المتجر" : "Store"}
           </Link>
           <span>/</span>
-          <span className="text-foreground font-medium truncate max-w-[200px]">
+          <span className="text-foreground max-w-[200px] truncate font-medium">
             {isRtl ? product.nameAr : product.nameEn}
           </span>
         </nav>
 
         {/* ─── Game/Voucher Hero ────────────────────── */}
-        <div className="relative overflow-hidden rounded-2xl mb-10">
-          <div className="relative aspect-[21/9] md:aspect-[3/1] bg-gradient-to-br from-primary/20 to-background flex items-center">
+        <div className="relative mb-10 overflow-hidden rounded-2xl">
+          <div className="from-primary/20 to-background relative flex aspect-[21/9] items-center bg-gradient-to-br md:aspect-[3/1]">
             {/* Background image */}
             {product.imageUrl && (
               <img
                 src={product.imageUrl}
                 alt=""
-                className="absolute inset-0 w-full h-full object-contain object-center opacity-30 md:opacity-20 pointer-events-none"
+                className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center opacity-30 md:opacity-20"
               />
             )}
             {/* Content */}
             <div className="relative z-10 px-8 md:px-16 lg:px-24">
-              <Badge variant="secondary" className="w-fit mb-4 text-xs font-medium gap-1.5">
+              <Badge variant="secondary" className="mb-4 w-fit gap-1.5 text-xs font-medium">
                 {isTopup ? <Gamepad2 className="size-3" /> : <Gift className="size-3" />}
                 {isRtl ? product.categoryAr : product.categoryEn}
               </Badge>
-              <h1 className="text-3xl md:text-5xl font-bold tracking-tight max-w-xl">
+              <h1 className="max-w-xl text-3xl font-bold tracking-tight md:text-5xl">
                 {isRtl ? product.nameAr : product.nameEn}
               </h1>
               {(product.descriptionAr || product.descriptionEn) && (
-                <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-lg line-clamp-2">
+                <p className="text-muted-foreground mt-3 line-clamp-2 max-w-lg text-sm md:text-base">
                   {isRtl ? product.descriptionAr : product.descriptionEn}
                 </p>
               )}
@@ -193,11 +213,11 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
         {/* ─── Options + Purchase ───────────────────── */}
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Left: Options list */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="space-y-6 lg:col-span-2">
             {/* Topup: Catalogue selection */}
             {isTopup && catalogue.length > 0 && (
               <div>
-                <h2 className="text-xl font-bold mb-4">
+                <h2 className="mb-4 text-xl font-bold">
                   {isRtl ? "اختر الكمية" : "Select Amount"}
                 </h2>
                 <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -208,12 +228,12 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
                       className={cn(
                         "rounded-xl border p-4 text-left transition-all hover:shadow-md",
                         idx === selectedCatalogueIdx
-                          ? "border-primary ring-1 ring-primary bg-primary/5"
+                          ? "border-primary ring-primary bg-primary/5 ring-1"
                           : "hover:border-border",
                       )}
                     >
-                      <p className="font-semibold text-lg">{item.name}</p>
-                      <p className="text-2xl font-bold text-primary mt-1">
+                      <p className="text-lg font-semibold">{item.name}</p>
+                      <p className="text-primary mt-1 text-2xl font-bold">
                         ${item.amount.toFixed(2)}
                       </p>
                     </button>
@@ -225,9 +245,7 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
             {/* GiftCard: Amount selection */}
             {isGiftCard && amounts.length > 0 && (
               <div>
-                <h2 className="text-xl font-bold mb-4">
-                  {isRtl ? "اختر الفئة" : "Select Amount"}
-                </h2>
+                <h2 className="mb-4 text-xl font-bold">{isRtl ? "اختر الفئة" : "Select Amount"}</h2>
                 <div className="space-y-2">
                   {amounts.map((amt, idx) => {
                     const discount = amt.face_value != null && amt.face_value > amt.unit_price;
@@ -239,38 +257,40 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
                         key={amt.id}
                         onClick={() => setSelectedAmountIdx(idx)}
                         className={cn(
-                          "flex items-center justify-between rounded-xl border p-4 transition-all hover:shadow-md w-full text-left",
+                          "flex w-full items-center justify-between rounded-xl border p-4 text-left transition-all hover:shadow-md",
                           idx === selectedAmountIdx
-                            ? "border-primary ring-1 ring-primary bg-primary/5"
+                            ? "border-primary ring-primary bg-primary/5 ring-1"
                             : "hover:border-border",
                         )}
                       >
                         <div className="flex items-center gap-3">
-                          <div className={cn(
-                            "flex size-6 items-center justify-center rounded-full border-2 transition-colors",
-                            idx === selectedAmountIdx
-                              ? "border-primary bg-primary text-primary-foreground"
-                              : "border-muted-foreground/30",
-                          )}>
+                          <div
+                            className={cn(
+                              "flex size-6 items-center justify-center rounded-full border-2 transition-colors",
+                              idx === selectedAmountIdx
+                                ? "border-primary bg-primary text-primary-foreground"
+                                : "border-muted-foreground/30",
+                            )}
+                          >
                             {idx === selectedAmountIdx && <Check className="size-3.5" />}
                           </div>
                           <div>
                             <p className="font-medium">{amt.title}</p>
                             {amt.stock >= 0 && amt.stock < 10 && (
-                              <p className="text-xs text-destructive">
+                              <p className="text-destructive text-xs">
                                 {isRtl ? `متبقي ${amt.stock} فقط` : `Only ${amt.stock} left`}
                               </p>
                             )}
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-xl font-bold text-primary">
+                          <p className="text-primary text-xl font-bold">
                             ${amt.unit_price.toFixed(2)}
                           </p>
                           {discount && (
-                            <p className="text-xs text-muted-foreground line-through">
+                            <p className="text-muted-foreground text-xs line-through">
                               ${amt.face_value!.toFixed(2)}
-                              <span className="text-destructive mr-1.5 line-through-none">
+                              <span className="text-destructive line-through-none mr-1.5">
                                 -{pct}%
                               </span>
                             </p>
@@ -285,24 +305,28 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
 
             {/* No options available */}
             {!hasOptions && !isTopup && !isGiftCard && (
-              <div className="text-center py-12 text-muted-foreground">
-                <ShoppingCart className="size-12 mx-auto mb-3 opacity-30" />
-                <p>{isRtl ? "لا توجد خيارات متاحة لهذا المنتج" : "No options available for this product"}</p>
+              <div className="text-muted-foreground py-12 text-center">
+                <ShoppingCart className="mx-auto mb-3 size-12 opacity-30" />
+                <p>
+                  {isRtl
+                    ? "لا توجد خيارات متاحة لهذا المنتج"
+                    : "No options available for this product"}
+                </p>
               </div>
             )}
 
             {/* Dynamic Fields (for topup) */}
             {dynamicFields.length > 0 && (
               <div className="border-t pt-6">
-                <h3 className="font-semibold text-lg mb-4">
+                <h3 className="mb-4 text-lg font-semibold">
                   {isRtl ? "معلومات الطلب" : "Order Information"}
                 </h3>
-                <div className="space-y-4 max-w-lg">
+                <div className="max-w-lg space-y-4">
                   {dynamicFields.map((field) => (
                     <div key={field.key} className="space-y-2">
                       <Label htmlFor={`field-${field.key}`}>
                         {isRtl ? field.labelAr : field.labelEn}
-                        {field.required && <span className="mr-1 text-destructive">*</span>}
+                        {field.required && <span className="text-destructive mr-1">*</span>}
                       </Label>
                       {field.type === "select" ? (
                         <Select
@@ -314,7 +338,9 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
                           </SelectTrigger>
                           <SelectContent>
                             {(field.options || ["server-1", "server-2", "server-3"]).map((opt) => (
-                              <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                              <SelectItem key={opt} value={opt}>
+                                {opt}
+                              </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -336,18 +362,14 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
 
           {/* Right: Purchase card */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 rounded-xl border bg-card p-6 space-y-5">
+            <div className="bg-card sticky top-24 space-y-5 rounded-xl border p-6">
               {/* Price */}
               <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-1">
-                  {isRtl ? "السعر" : "Price"}
-                </p>
-                <p className="text-4xl font-bold text-primary">
-                  ${displayPrice.toFixed(2)}
-                </p>
+                <p className="text-muted-foreground mb-1 text-sm">{isRtl ? "السعر" : "Price"}</p>
+                <p className="text-primary text-4xl font-bold">${displayPrice.toFixed(2)}</p>
                 {hasDiscount && (
                   <>
-                    <p className="text-lg text-muted-foreground line-through mt-1">
+                    <p className="text-muted-foreground mt-1 text-lg line-through">
                       ${displayOriginalPrice!.toFixed(2)}
                     </p>
                     <Badge variant="destructive" className="mt-2">
@@ -361,15 +383,15 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
 
               {/* Selected item info */}
               {isTopup && selectedItem && (
-                <div className="text-center text-sm text-muted-foreground border-t pt-4">
+                <div className="text-muted-foreground border-t pt-4 text-center text-sm">
                   {isRtl ? "الكمية المختارة:" : "Selected amount:"}{" "}
-                  <span className="font-semibold text-foreground">{selectedItem.name}</span>
+                  <span className="text-foreground font-semibold">{selectedItem.name}</span>
                 </div>
               )}
               {isGiftCard && selectedAmount && (
-                <div className="text-center text-sm text-muted-foreground border-t pt-4">
+                <div className="text-muted-foreground border-t pt-4 text-center text-sm">
                   {isRtl ? "البطاقة المختارة:" : "Selected card:"}{" "}
-                  <span className="font-semibold text-foreground">{selectedAmount.title}</span>
+                  <span className="text-foreground font-semibold">{selectedAmount.title}</span>
                 </div>
               )}
 
@@ -377,7 +399,7 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
               <Button
                 size="lg"
                 className={cn(
-                  "w-full gap-2 transition-all text-base",
+                  "w-full gap-2 text-base transition-all",
                   addedToCart && "bg-green-600 hover:bg-green-600",
                 )}
                 onClick={handleAddToCart}
@@ -399,20 +421,20 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
               {/* Trust badges */}
               <div className="grid grid-cols-3 gap-2 border-t pt-4">
                 <div className="flex flex-col items-center gap-1.5 text-center">
-                  <Shield className="size-5 text-primary" />
-                  <span className="text-[11px] text-muted-foreground">
+                  <Shield className="text-primary size-5" />
+                  <span className="text-muted-foreground text-[11px]">
                     {isRtl ? "دفع آمن" : "Secure"}
                   </span>
                 </div>
                 <div className="flex flex-col items-center gap-1.5 text-center">
-                  <Truck className="size-5 text-primary" />
-                  <span className="text-[11px] text-muted-foreground">
+                  <Truck className="text-primary size-5" />
+                  <span className="text-muted-foreground text-[11px]">
                     {isRtl ? "توصيل فوري" : "Instant"}
                   </span>
                 </div>
                 <div className="flex flex-col items-center gap-1.5 text-center">
-                  <Check className="size-5 text-primary" />
-                  <span className="text-[11px] text-muted-foreground">
+                  <Check className="text-primary size-5" />
+                  <span className="text-muted-foreground text-[11px]">
                     {isRtl ? "مضمون" : "Guaranteed"}
                   </span>
                 </div>
@@ -424,25 +446,32 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
         {/* ─── Reviews Section ───────────────────────── */}
         {product.reviewCount && product.reviewCount > 0 && product.rating ? (
           <section className="mt-16 border-t pt-12">
-            <h2 className="text-2xl font-bold tracking-tight mb-8">
+            <h2 className="mb-8 text-2xl font-bold tracking-tight">
               {isRtl ? "التقييمات" : "Customer Reviews"}
             </h2>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {generatedReviews.slice(0, 3).map((review, i) => (
-                <div key={i} className="rounded-xl border p-5 space-y-3">
+                <div key={i} className="space-y-3 rounded-xl border p-5">
                   <div className="flex items-center gap-2">
                     <div className="flex">
                       {Array.from({ length: 5 }).map((_, j) => (
-                        <Star key={j} className={cn("size-3.5",
-                          j < review.rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30")} />
+                        <Star
+                          key={j}
+                          className={cn(
+                            "size-3.5",
+                            j < review.rating
+                              ? "fill-amber-400 text-amber-400"
+                              : "text-muted-foreground/30",
+                          )}
+                        />
                       ))}
                     </div>
-                    <span className="text-xs text-muted-foreground">{review.date}</span>
+                    <span className="text-muted-foreground text-xs">{review.date}</span>
                   </div>
                   <p className="text-sm leading-relaxed">
                     {isRtl ? review.contentAr : review.contentEn}
                   </p>
-                  <p className="text-xs font-medium text-muted-foreground">— {review.author}</p>
+                  <p className="text-muted-foreground text-xs font-medium">— {review.author}</p>
                 </div>
               ))}
             </div>
@@ -452,12 +481,12 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
         {/* ─── Related Products ──────────────────────── */}
         {relatedProducts.length > 0 && (
           <section className="mt-16 border-t pt-12">
-            <div className="flex items-center justify-between mb-8">
+            <div className="mb-8 flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold tracking-tight">
                   {isRtl ? "منتجات مشابهة" : "Related Products"}
                 </h2>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-muted-foreground mt-1 text-sm">
                   {isRtl ? "قد تعجبك هذه المنتجات أيضاً" : "You might also like these products"}
                 </p>
               </div>
@@ -486,9 +515,39 @@ interface Review {
 }
 
 const generatedReviews: Review[] = [
-  { author: "Ahmed M.", rating: 5, contentAr: "توصيل سريع جداً! استلمت الطلب فوراً بعد الدفع. خدمة ممتازة.", contentEn: "Very fast delivery! Received immediately after payment. Excellent service.", date: "2 days ago" },
-  { author: "Sara K.", rating: 4, contentAr: "منتج جيد وسعر مناسب. أنصح بالتعامل معهم.", contentEn: "Good product at a fair price. I recommend dealing with them.", date: "1 week ago" },
-  { author: "Mohammed A.", rating: 5, contentAr: "أفضل موقع لشحن الألعاب. أسعار منافسة ودعم ممتاز.", contentEn: "Best site for game top-ups. Competitive prices and great support.", date: "2 weeks ago" },
-  { author: "Layla H.", rating: 5, contentAr: "اشتريت عدة مرات ولم أواجه أي مشكلة. موقع موثوق.", contentEn: "I've bought multiple times with no issues. Trustworthy site.", date: "3 weeks ago" },
-  { author: "Khalid R.", rating: 4, contentAr: "سريع وسهل. سأطلب مرة أخرى بالتأكيد.", contentEn: "Fast and easy. I'll definitely order again.", date: "1 month ago" },
+  {
+    author: "Ahmed M.",
+    rating: 5,
+    contentAr: "توصيل سريع جداً! استلمت الطلب فوراً بعد الدفع. خدمة ممتازة.",
+    contentEn: "Very fast delivery! Received immediately after payment. Excellent service.",
+    date: "2 days ago",
+  },
+  {
+    author: "Sara K.",
+    rating: 4,
+    contentAr: "منتج جيد وسعر مناسب. أنصح بالتعامل معهم.",
+    contentEn: "Good product at a fair price. I recommend dealing with them.",
+    date: "1 week ago",
+  },
+  {
+    author: "Mohammed A.",
+    rating: 5,
+    contentAr: "أفضل موقع لشحن الألعاب. أسعار منافسة ودعم ممتاز.",
+    contentEn: "Best site for game top-ups. Competitive prices and great support.",
+    date: "2 weeks ago",
+  },
+  {
+    author: "Layla H.",
+    rating: 5,
+    contentAr: "اشتريت عدة مرات ولم أواجه أي مشكلة. موقع موثوق.",
+    contentEn: "I've bought multiple times with no issues. Trustworthy site.",
+    date: "3 weeks ago",
+  },
+  {
+    author: "Khalid R.",
+    rating: 4,
+    contentAr: "سريع وسهل. سأطلب مرة أخرى بالتأكيد.",
+    contentEn: "Fast and easy. I'll definitely order again.",
+    date: "1 month ago",
+  },
 ];

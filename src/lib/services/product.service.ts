@@ -50,14 +50,16 @@ export interface StoreCategory {
 function toStoreProduct(p: ProductRow, cat?: CategoryRow | null): StoreProduct {
   // Extract fields from metadata (stored by G2Bulk sync for topup/gift_card products)
   const meta = p.metadata as Record<string, unknown> | null;
-  const metaFields = meta?.fields as Array<{
-    key: string;
-    labelAr: string;
-    labelEn: string;
-    type: string;
-    required: boolean;
-    options?: string[];
-  }> | undefined;
+  const metaFields = meta?.fields as
+    | Array<{
+        key: string;
+        labelAr: string;
+        labelEn: string;
+        type: string;
+        required: boolean;
+        options?: string[];
+      }>
+    | undefined;
 
   return {
     id: p.id,

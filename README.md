@@ -14,16 +14,16 @@
 
 ## ✨ Key Features
 
-| Feature | Description |
-|---------|-------------|
+| Feature                              | Description                                                                               |
+| ------------------------------------ | ----------------------------------------------------------------------------------------- |
 | **🔄 Provider Adapter Architecture** | Add unlimited providers (G2Bulk, SAM, Telegram, VPN APIs) without changing business logic |
-| **🌐 RTL-First Design** | Arabic-native interface with full English localization support |
-| **📦 Dynamic Product Fields** | Admins create custom input fields (UID, server, region, email, password) without coding |
-| **🤖 Automatic Synchronization** | Manual & scheduled sync from providers — updates, inserts, and deactivates products |
-| **💳 Dual Payment** | Wallet balance + SAM API payment processing |
-| **🏪 Admin Dashboard** | Full CRUD for products, orders, customers, coupons, providers, analytics, logs |
-| **🎨 Theme System** | 5 built-in themes switchable from dashboard — zero code changes |
-| **🔒 Enterprise Security** | RBAC, RLS, rate limiting, audit logs, encrypted credentials |
+| **🌐 RTL-First Design**              | Arabic-native interface with full English localization support                            |
+| **📦 Dynamic Product Fields**        | Admins create custom input fields (UID, server, region, email, password) without coding   |
+| **🤖 Automatic Synchronization**     | Manual & scheduled sync from providers — updates, inserts, and deactivates products       |
+| **💳 Dual Payment**                  | Wallet balance + SAM API payment processing                                               |
+| **🏪 Admin Dashboard**               | Full CRUD for products, orders, customers, coupons, providers, analytics, logs            |
+| **🎨 Theme System**                  | 5 built-in themes switchable from dashboard — zero code changes                           |
+| **🔒 Enterprise Security**           | RBAC, RLS, rate limiting, audit logs, encrypted credentials                               |
 
 ---
 
@@ -65,34 +65,34 @@
 
 ## 🧰 Tech Stack
 
-| Layer | Technology | Version |
-|-------|-----------|---------|
-| **Framework** | Next.js | 16.2.12 (Active LTS) |
-| **UI Library** | React | 19.2.8 |
-| **Language** | TypeScript | 7.0.2 |
-| **Styling** | Tailwind CSS | 4.3.3 |
-| **Components** | shadcn/ui + Base UI | CLI 4.x |
-| **State (Server)** | TanStack Query | 5.101.4 |
-| **Validation** | Zod | 4.4.3 |
-| **Forms** | React Hook Form | 7.83.0 |
-| **i18n** | next-intl | 4.13.3 |
-| **Client State** | zustand | 5.0.14 |
-| **Charts** | recharts | 3.10.1 |
-| **Icons** | lucide-react | 1.27.0 |
+| Layer              | Technology          | Version              |
+| ------------------ | ------------------- | -------------------- |
+| **Framework**      | Next.js             | 16.2.12 (Active LTS) |
+| **UI Library**     | React               | 19.2.8               |
+| **Language**       | TypeScript          | 7.0.2                |
+| **Styling**        | Tailwind CSS        | 4.3.3                |
+| **Components**     | shadcn/ui + Base UI | CLI 4.x              |
+| **State (Server)** | TanStack Query      | 5.101.4              |
+| **Validation**     | Zod                 | 4.4.3                |
+| **Forms**          | React Hook Form     | 7.83.0               |
+| **i18n**           | next-intl           | 4.13.3               |
+| **Client State**   | zustand             | 5.0.14               |
+| **Charts**         | recharts            | 3.10.1               |
+| **Icons**          | lucide-react        | 1.27.0               |
 
-| Backend | Technology | Version |
-|---------|-----------|---------|
-| **Database** | PostgreSQL (Supabase) | 16.x managed |
-| **Auth** | Supabase Auth | — |
-| **Realtime** | Supabase Realtime | — |
-| **Edge Functions** | Supabase (Deno 2.x) | Runtime 1.74.2 |
-| **CLI** | Supabase CLI | 2.110.0 |
+| Backend            | Technology            | Version        |
+| ------------------ | --------------------- | -------------- |
+| **Database**       | PostgreSQL (Supabase) | 16.x managed   |
+| **Auth**           | Supabase Auth         | —              |
+| **Realtime**       | Supabase Realtime     | —              |
+| **Edge Functions** | Supabase (Deno 2.x)   | Runtime 1.74.2 |
+| **CLI**            | Supabase CLI          | 2.110.0        |
 
-| Infrastructure | Platform |
-|---------------|----------|
-| **Hosting** | Cloudflare Pages |
-| **CI/CD** | GitHub Actions |
-| **Version Control** | GitHub |
+| Infrastructure      | Platform         |
+| ------------------- | ---------------- |
+| **Hosting**         | Cloudflare Pages |
+| **CI/CD**           | GitHub Actions   |
+| **Version Control** | GitHub           |
 
 ---
 
@@ -189,23 +189,23 @@ gh-store/
 
 ## 🗄️ Database (Key Tables)
 
-| Table | Purpose |
-|-------|---------|
-| `profiles` | User profiles extending Supabase Auth |
-| `wallet_balances` | Customer wallet (optimistic locking) |
-| `wallet_transactions` | Deposit, withdrawal, purchase, refund, adjustment |
-| `categories` | Self-referential tree structure |
-| `products` | Product catalog (synced from providers) |
-| `product_pricing` | Quantity-based tier pricing |
-| `product_dynamic_fields` | Custom input fields per product |
-| `orders` | Full order lifecycle (10 statuses) |
-| `order_items` | Individual items per order |
-| `providers` | Provider registry (plugin system) |
-| `provider_credentials` | Encrypted API keys |
-| `sync_logs` | Sync operation history |
-| `coupons` | Discount codes with rules |
-| `audit_logs` | Admin action audit trail |
-| `activity_logs` | System-level activity |
+| Table                    | Purpose                                           |
+| ------------------------ | ------------------------------------------------- |
+| `profiles`               | User profiles extending Supabase Auth             |
+| `wallet_balances`        | Customer wallet (optimistic locking)              |
+| `wallet_transactions`    | Deposit, withdrawal, purchase, refund, adjustment |
+| `categories`             | Self-referential tree structure                   |
+| `products`               | Product catalog (synced from providers)           |
+| `product_pricing`        | Quantity-based tier pricing                       |
+| `product_dynamic_fields` | Custom input fields per product                   |
+| `orders`                 | Full order lifecycle (10 statuses)                |
+| `order_items`            | Individual items per order                        |
+| `providers`              | Provider registry (plugin system)                 |
+| `provider_credentials`   | Encrypted API keys                                |
+| `sync_logs`              | Sync operation history                            |
+| `coupons`                | Discount codes with rules                         |
+| `audit_logs`             | Admin action audit trail                          |
+| `activity_logs`          | System-level activity                             |
 
 ---
 
@@ -227,26 +227,26 @@ Layer 4: Application        →  RBAC, audit logs, rate limiting, encrypted secr
 
 ## 👥 Roles & Permissions
 
-| Role | Capabilities |
-|------|-------------|
-| **Customer** | Browse products, place orders, manage wallet, view order history, write reviews |
-| **Admin** | Full CRUD on all entities, manage providers, analytics, customers, coupons, logs |
+| Role         | Capabilities                                                                     |
+| ------------ | -------------------------------------------------------------------------------- |
+| **Customer** | Browse products, place orders, manage wallet, view order history, write reviews  |
+| **Admin**    | Full CRUD on all entities, manage providers, analytics, customers, coupons, logs |
 
 ---
 
 ## 📊 Admin Dashboard Sections
 
-| Section | Management Capabilities |
-|---------|----------------------|
-| **Overview** | Revenue charts, sales analytics, top products |
-| **Website** | Settings, homepage, banners, navigation, SEO, themes |
-| **Store** | Products, categories, attributes, dynamic fields, pricing, inventory |
-| **Orders** | All orders, refunds, status management |
-| **Customers** | Profiles, wallets, order history, roles |
-| **Coupons** | Discount codes, promotions, usage stats |
-| **Analytics** | Sales, revenue, profit, top products, top customers, provider stats |
-| **Providers** | Register, configure, credentials, test, sync |
-| **Logs** | Audit trail, activity logs |
+| Section       | Management Capabilities                                              |
+| ------------- | -------------------------------------------------------------------- |
+| **Overview**  | Revenue charts, sales analytics, top products                        |
+| **Website**   | Settings, homepage, banners, navigation, SEO, themes                 |
+| **Store**     | Products, categories, attributes, dynamic fields, pricing, inventory |
+| **Orders**    | All orders, refunds, status management                               |
+| **Customers** | Profiles, wallets, order history, roles                              |
+| **Coupons**   | Discount codes, promotions, usage stats                              |
+| **Analytics** | Sales, revenue, profit, top products, top customers, provider stats  |
+| **Providers** | Register, configure, credentials, test, sync                         |
+| **Logs**      | Audit trail, activity logs                                           |
 
 ---
 
@@ -273,15 +273,15 @@ Initially implemented: **G2Bulk** (product sync) + **SAM API** (payment processi
 
 ## 🛣️ Development Roadmap
 
-| Phase | Duration | Focus |
-|-------|----------|-------|
+| Phase              | Duration | Focus                                                |
+| ------------------ | -------- | ---------------------------------------------------- |
 | **1 — Foundation** | Week 1-2 | Next.js 16 setup, Supabase, schema, auth, RBAC, i18n |
-| **2 — Dashboard** | Week 3-4 | All admin CRUD sections |
-| **3 — Providers** | Week 5 | Provider adapters, G2Bulk, SAM, sync engine |
-| **4 — Storefront** | Week 6-7 | Public store, cart, checkout, wallet |
-| **5 — Themes** | Week 8 | Theme system, homepage banners, reviews |
-| **6 — Analytics** | Week 9 | Dashboards, audit logs, security hardening |
-| **7 — Deploy** | Week 10 | Cloudflare Pages, CI/CD, final QA |
+| **2 — Dashboard**  | Week 3-4 | All admin CRUD sections                              |
+| **3 — Providers**  | Week 5   | Provider adapters, G2Bulk, SAM, sync engine          |
+| **4 — Storefront** | Week 6-7 | Public store, cart, checkout, wallet                 |
+| **5 — Themes**     | Week 8   | Theme system, homepage banners, reviews              |
+| **6 — Analytics**  | Week 9   | Dashboards, audit logs, security hardening           |
+| **7 — Deploy**     | Week 10  | Cloudflare Pages, CI/CD, final QA                    |
 
 ---
 
@@ -301,4 +301,4 @@ This project is proprietary software. All rights reserved.
 
 ---
 
-*Built with Next.js 16, Supabase, TypeScript, Tailwind CSS, and shadcn/ui.*
+_Built with Next.js 16, Supabase, TypeScript, Tailwind CSS, and shadcn/ui._

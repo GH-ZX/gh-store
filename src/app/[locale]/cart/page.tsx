@@ -55,12 +55,12 @@ export default function CartPage() {
     <main className="flex-1">
       <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
         {/* ─── Header ──────────────────────────────── */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
               {isRtl ? "سلة التسوق" : "Shopping Cart"}
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-1 text-sm">
               {isRtl
                 ? `${itemCount} ${itemCount === 1 ? "منتج" : "منتجات"} في سلتك`
                 : `${itemCount} ${itemCount === 1 ? "item" : "items"} in your cart`}
@@ -80,7 +80,7 @@ export default function CartPage() {
 
         <div className="grid gap-8 lg:grid-cols-3">
           {/* ─── Items List ────────────────────────── */}
-          <div className="lg:col-span-2 space-y-3">
+          <div className="space-y-3 lg:col-span-2">
             {items.map((item) => (
               <CartItem
                 key={item.id}
@@ -93,7 +93,7 @@ export default function CartPage() {
             {/* Continue Shopping */}
             <Link
               href={`/${locale}/store`}
-              className="mt-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="text-muted-foreground hover:text-foreground mt-4 inline-flex items-center gap-1 text-sm transition-colors"
             >
               {isRtl ? <ArrowRight className="size-4" /> : <ArrowLeft className="size-4" />}
               {isRtl ? "مواصلة التسوق" : "Continue Shopping"}
@@ -102,10 +102,8 @@ export default function CartPage() {
 
           {/* ─── Order Summary ─────────────────────── */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 rounded-xl border bg-card p-6 space-y-4">
-              <h2 className="font-semibold text-lg">
-                {isRtl ? "ملخص الطلب" : "Order Summary"}
-              </h2>
+            <div className="bg-card sticky top-24 space-y-4 rounded-xl border p-6">
+              <h2 className="text-lg font-semibold">{isRtl ? "ملخص الطلب" : "Order Summary"}</h2>
 
               {/* Subtotal */}
               <div className="flex items-center justify-between text-sm">
@@ -117,9 +115,7 @@ export default function CartPage() {
 
               {/* Items count */}
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">
-                  {isRtl ? "عدد المنتجات" : "Items"}
-                </span>
+                <span className="text-muted-foreground">{isRtl ? "عدد المنتجات" : "Items"}</span>
                 <span className="font-medium">{itemCount}</span>
               </div>
 
@@ -128,15 +124,13 @@ export default function CartPage() {
               {/* Coupon */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Tag className="size-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">
-                    {isRtl ? "كود الخصم" : "Coupon Code"}
-                  </span>
+                  <Tag className="text-muted-foreground size-4" />
+                  <span className="text-sm font-medium">{isRtl ? "كود الخصم" : "Coupon Code"}</span>
                 </div>
                 <div className="flex gap-2">
                   <Input
                     placeholder={isRtl ? "أدخل الكود" : "Enter code"}
-                    className="flex-1 h-9 text-sm"
+                    className="h-9 flex-1 text-sm"
                   />
                   <Button variant="outline" size="sm" className="shrink-0">
                     {isRtl ? "تطبيق" : "Apply"}
@@ -148,12 +142,8 @@ export default function CartPage() {
 
               {/* Total */}
               <div className="flex items-center justify-between">
-                <span className="text-base font-semibold">
-                  {isRtl ? "الإجمالي" : "Total"}
-                </span>
-                <span className="text-xl font-bold text-primary">
-                  ${subtotal.toFixed(2)}
-                </span>
+                <span className="text-base font-semibold">{isRtl ? "الإجمالي" : "Total"}</span>
+                <span className="text-primary text-xl font-bold">${subtotal.toFixed(2)}</span>
               </div>
 
               {/* Checkout Button */}
@@ -166,10 +156,8 @@ export default function CartPage() {
                 {isRtl ? "متابعة الدفع" : "Proceed to Checkout"}
               </Button>
 
-              <p className="text-xs text-center text-muted-foreground">
-                {isRtl
-                  ? "الدفع آمن ومشفر بالكامل"
-                  : "Payment is secure and fully encrypted"}
+              <p className="text-muted-foreground text-center text-xs">
+                {isRtl ? "الدفع آمن ومشفر بالكامل" : "Payment is secure and fully encrypted"}
               </p>
             </div>
           </div>

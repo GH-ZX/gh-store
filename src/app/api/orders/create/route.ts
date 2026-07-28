@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     // ─── Generate Order Number ──────────────────────
     const { data: orderNumResult } = await adminClient.rpc("generate_order_number");
-    const orderNumber = orderNumResult as string || `GH-${Date.now()}`;
+    const orderNumber = (orderNumResult as string) || `GH-${Date.now()}`;
 
     // ─── Create Order ───────────────────────────────
     const { data: order, error: orderError } = await adminClient
@@ -104,9 +104,7 @@ export async function POST(request: NextRequest) {
       },
     }));
 
-    const { error: itemsError } = await adminClient
-      .from("order_items")
-      .insert(orderItems);
+    const { error: itemsError } = await adminClient.from("order_items").insert(orderItems);
 
     if (itemsError) {
       console.error("Failed to create order items:", itemsError);
@@ -119,14 +117,12 @@ export async function POST(request: NextRequest) {
     }
 
     // ─── Record initial status history ──────────────
-    await adminClient
-      .from("order_status_history")
-      .insert({
-        order_id: order.id,
-        old_status: null,
-        new_status: "pending",
-        reason: "Order created",
-      });
+    await adminClient.from("order_status_history").insert({
+      order_id: order.id,
+      old_status: null,
+      new_status: "pending",
+      reason: "Order created",
+    });
 
     // ─── Handle Payment ─────────────────────────────
 
@@ -149,7 +145,13 @@ export async function POST(request: NextRequest) {
         await adminClient.from("order_items").delete().eq("order_id", order.id);
 
         return NextResponse.json(
-          { success: false, message: errorMsg === "insufficient_balance" ? "Insufficient wallet balance" : "Payment failed" },
+          {
+            success: false,
+            message:
+              errorMsg === "insufficient_balance"
+                ? "Insufficient wallet balance"
+                : "Payment failed",
+          },
           { status: 400 },
         );
       }
@@ -164,14 +166,12 @@ export async function POST(request: NextRequest) {
         })
         .eq("id", order.id);
 
-      await adminClient
-        .from("order_status_history")
-        .insert({
-          order_id: order.id,
-          old_status: "pending",
-          new_status: "processing",
-          reason: "Payment received via wallet",
-        });
+      await adminClient.from("order_status_history").insert({
+        order_id: order.id,
+        old_status: "pending",
+        new_status: "processing",
+        reason: "Payment received via wallet",
+      });
 
       return NextResponse.json({
         success: true,

@@ -27,7 +27,9 @@ export function useWalletBalance() {
   } = useQuery<WalletBalance | null>({
     queryKey: ["wallet", "balance"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return null;
 
       const { data: wallet, error } = await supabase

@@ -53,10 +53,7 @@ export function useAdminProviderWallets() {
   const { isAdmin, isLoading: authLoading } = useAuth();
 
   // Fetch G2Bulk user info (via catalog which returns user + balance)
-  const {
-    data: g2bulkData,
-    isLoading: g2bulkLoading,
-  } = useQuery<G2BulkInfo | null>({
+  const { data: g2bulkData, isLoading: g2bulkLoading } = useQuery<G2BulkInfo | null>({
     queryKey: ["admin", "g2bulk-info"],
     queryFn: async () => {
       try {
@@ -75,10 +72,7 @@ export function useAdminProviderWallets() {
   });
 
   // Fetch SAM API wallets with balances
-  const {
-    data: samWalletsData,
-    isLoading: samWalletsLoading,
-  } = useQuery<SamWallet[]>({
+  const { data: samWalletsData, isLoading: samWalletsLoading } = useQuery<SamWallet[]>({
     queryKey: ["admin", "sam-wallets"],
     queryFn: async () => {
       try {

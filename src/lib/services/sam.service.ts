@@ -80,9 +80,7 @@ export async function resolveSAMReceivingWallet(
 
   if (!wallet) return null;
 
-  const identifier = String(
-    wallet.wallet_address || wallet.phone || wallet.cash_code || "",
-  );
+  const identifier = String(wallet.wallet_address || wallet.phone || wallet.cash_code || "");
   if (!identifier) return null;
 
   return {

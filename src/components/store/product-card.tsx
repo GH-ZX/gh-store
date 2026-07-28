@@ -86,14 +86,14 @@ export function ProductCard({
   return (
     <Card
       className={cn(
-        "group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5",
+        "group relative overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg",
         !isActive && "opacity-60",
         className,
       )}
     >
       <Link href={`/${params?.locale || "ar"}/store/${slug}`} className="block">
         {/* Image */}
-        <div className="relative aspect-square overflow-hidden bg-muted">
+        <div className="bg-muted relative aspect-square overflow-hidden">
           {imageUrl ? (
             <img
               src={imageUrl}
@@ -102,7 +102,7 @@ export function ProductCard({
               loading="lazy"
             />
           ) : (
-            <div className="flex size-full items-center justify-center text-muted-foreground/30">
+            <div className="text-muted-foreground/30 flex size-full items-center justify-center">
               <ShoppingCart className="size-12" />
             </div>
           )}
@@ -131,7 +131,7 @@ export function ProductCard({
             }
             aria-pressed={isWishlisted}
             className={cn(
-              "absolute top-3 right-3 size-8 rounded-full bg-background/60 backdrop-blur-sm transition-opacity",
+              "bg-background/60 absolute top-3 right-3 size-8 rounded-full backdrop-blur-sm transition-opacity",
               // Stay visible once saved, otherwise reveal on hover/focus
               isWishlisted
                 ? "opacity-100"
@@ -143,21 +143,17 @@ export function ProductCard({
               toggleWishlist(id);
             }}
           >
-            <Heart
-              className={cn("size-4", isWishlisted && "fill-red-500 text-red-500")}
-            />
+            <Heart className={cn("size-4", isWishlisted && "fill-red-500 text-red-500")} />
           </Button>
         </div>
 
         {/* Content */}
         <div className="space-y-1.5 p-4">
           {categoryAr && (
-            <p className="text-xs text-muted-foreground">
-              {isRtl ? categoryAr : categoryEn}
-            </p>
+            <p className="text-muted-foreground text-xs">{isRtl ? categoryAr : categoryEn}</p>
           )}
 
-          <h3 className="font-medium text-sm leading-tight line-clamp-2">
+          <h3 className="line-clamp-2 text-sm leading-tight font-medium">
             {isRtl ? nameAr : nameEn}
           </h3>
 
@@ -165,7 +161,7 @@ export function ProductCard({
           {rating && (
             <div className="flex items-center gap-1">
               <Star className="size-3 fill-amber-400 text-amber-400" />
-              <span className="text-xs text-muted-foreground">{rating.toFixed(1)}</span>
+              <span className="text-muted-foreground text-xs">{rating.toFixed(1)}</span>
             </div>
           )}
 
@@ -173,7 +169,7 @@ export function ProductCard({
           <div className="flex items-center gap-2 pt-1">
             <span className="text-base font-bold">${price.toFixed(2)}</span>
             {hasDiscount && (
-              <span className="text-sm text-muted-foreground line-through">
+              <span className="text-muted-foreground text-sm line-through">
                 ${originalPrice!.toFixed(2)}
               </span>
             )}

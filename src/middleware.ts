@@ -34,9 +34,7 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
-          );
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
@@ -53,13 +51,9 @@ export async function middleware(request: NextRequest) {
 
   const rest = pathname.slice(`/${pathLocale}`.length) || "/";
 
-  const isProtectedRoute = [
-    "/dashboard",
-    "/orders",
-    "/wallet",
-    "/checkout",
-    "/profile",
-  ].some((route) => rest === route || rest.startsWith(`${route}/`));
+  const isProtectedRoute = ["/dashboard", "/orders", "/wallet", "/checkout", "/profile"].some(
+    (route) => rest === route || rest.startsWith(`${route}/`),
+  );
 
   const isAdminRoute = rest === "/dashboard" || rest.startsWith("/dashboard/");
 

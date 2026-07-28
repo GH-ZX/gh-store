@@ -28,7 +28,7 @@ export async function GET() {
     // Fetch products and games in parallel
     const headers = {
       "X-API-Key": apiKey,
-      "Accept": "application/json",
+      Accept: "application/json",
     };
 
     const [productsRes, gamesRes, userRes] = await Promise.all([
@@ -45,21 +45,24 @@ export async function GET() {
 
     // Group individual products into voucher categories
     // Each category has: id, title, count, minPrice, maxPrice, currency, products
-    const categoryMap = new Map<number, {
-      id: number;
-      title: string;
-      count: number;
-      minPrice: number;
-      maxPrice: number;
-      currency: string;
-      products: Array<{
+    const categoryMap = new Map<
+      number,
+      {
         id: number;
         title: string;
-        unit_price: number;
-        face_value: number | null;
-        stock: number;
-      }>;
-    }>();
+        count: number;
+        minPrice: number;
+        maxPrice: number;
+        currency: string;
+        products: Array<{
+          id: number;
+          title: string;
+          unit_price: number;
+          face_value: number | null;
+          stock: number;
+        }>;
+      }
+    >();
 
     for (const p of allProducts) {
       const catId = p.category_id;

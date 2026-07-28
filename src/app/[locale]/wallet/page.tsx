@@ -17,7 +17,8 @@ import {
   RefreshCw,
   CreditCard,
   ExternalLink,
- Coins } from "lucide-react";
+  Coins,
+} from "lucide-react";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,7 +31,10 @@ import { cn } from "@/lib/utils";
 
 // ─── Transaction Config ──────────────────────────────
 
-const txConfig: Record<string, { labelAr: string; labelEn: string; icon: React.ReactNode; color: string }> = {
+const txConfig: Record<
+  string,
+  { labelAr: string; labelEn: string; icon: React.ReactNode; color: string }
+> = {
   deposit: {
     labelAr: "إيداع",
     labelEn: "Deposit",
@@ -112,11 +116,7 @@ export default function WalletPage() {
     refetch: refetchBalance,
   } = useWalletBalance();
 
-  const {
-    transactions,
-    isLoading: txLoading,
-    refetch: refetchTx,
-  } = useWalletTransactions(100);
+  const { transactions, isLoading: txLoading, refetch: refetchTx } = useWalletTransactions(100);
 
   // ─── Derived Stats ───────────────────────────────────
   const stats = useMemo(() => {
@@ -147,10 +147,10 @@ export default function WalletPage() {
     return (
       <main className="flex-1">
         <div className="mx-auto max-w-4xl px-4 py-12">
-          <div className="h-48 animate-pulse rounded-2xl bg-muted mb-8" />
+          <div className="bg-muted mb-8 h-48 animate-pulse rounded-2xl" />
           <div className="space-y-3">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-16 animate-pulse rounded-xl bg-muted" />
+              <div key={i} className="bg-muted h-16 animate-pulse rounded-xl" />
             ))}
           </div>
         </div>
@@ -165,16 +165,23 @@ export default function WalletPage() {
         <div className="mx-auto max-w-4xl px-4 py-12">
           <Card className="border-destructive/50">
             <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-              <AlertCircle className="size-14 text-destructive/30 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">
+              <AlertCircle className="text-destructive/30 mb-4 size-14" />
+              <h3 className="mb-2 text-lg font-semibold">
                 {isRtl ? "فشل تحميل المحفظة" : "Failed to load wallet"}
               </h3>
-              <p className="text-sm text-muted-foreground max-w-md mb-6">
+              <p className="text-muted-foreground mb-6 max-w-md text-sm">
                 {isRtl
                   ? "حدث خطأ أثناء تحميل بيانات المحفظة. حاول مرة أخرى."
                   : "An error occurred while loading wallet data. Please try again."}
               </p>
-              <Button onClick={() => { refetchBalance(); refetchTx(); }} variant="outline" className="gap-2">
+              <Button
+                onClick={() => {
+                  refetchBalance();
+                  refetchTx();
+                }}
+                variant="outline"
+                className="gap-2"
+              >
                 <RefreshCw className="size-4" />
                 {isRtl ? "إعادة المحاولة" : "Retry"}
               </Button>
@@ -189,16 +196,16 @@ export default function WalletPage() {
     <main className="flex-1">
       <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
         {/* ─── Balance Card ─────────────────────────── */}
-        <Card className="mb-8 overflow-hidden bg-gradient-to-br from-primary/10 via-primary/5 to-background border-primary/20">
+        <Card className="from-primary/10 via-primary/5 to-background border-primary/20 mb-8 overflow-hidden bg-gradient-to-br">
           <CardContent className="p-6 md:p-8">
             <div className="flex items-start justify-between">
               <div className="space-y-1">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="text-muted-foreground flex items-center gap-2 text-sm">
                   <WalletIcon className="size-4" />
                   <span>{isRtl ? "رصيد المحفظة" : "Wallet Balance"}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-4xl md:text-5xl font-bold tracking-tight">
+                  <span className="text-4xl font-bold tracking-tight md:text-5xl">
                     {showBalance ? `$${balance.toFixed(2)}` : "••••••"}
                   </span>
                   <button
@@ -208,7 +215,7 @@ export default function WalletPage() {
                     {showBalance ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
                   </button>
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   {currency} — {isRtl ? "دولار أمريكي" : "US Dollar"}
                 </p>
               </div>
@@ -220,7 +227,12 @@ export default function WalletPage() {
                     {isRtl ? "شحن" : "Recharge"}
                   </Button>
                 </Link>
-                <Button size="sm" className="gap-1" variant="outline" onClick={() => refetchBalance()}>
+                <Button
+                  size="sm"
+                  className="gap-1"
+                  variant="outline"
+                  onClick={() => refetchBalance()}
+                >
                   <RefreshCw className="size-3.5" />
                   {isRtl ? "تحديث" : "Refresh"}
                 </Button>
@@ -230,23 +242,19 @@ export default function WalletPage() {
             {/* Quick stats */}
             <div className="mt-6 grid grid-cols-3 gap-4 border-t pt-4">
               <div className="text-center">
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   {isRtl ? "الرصيد الحالي" : "Current"}
                 </p>
                 <p className="text-sm font-bold">${balance.toFixed(2)}</p>
               </div>
               <div className="text-center">
-                <p className="text-xs text-muted-foreground">
-                  {isRtl ? "المودع" : "Deposited"}
-                </p>
+                <p className="text-muted-foreground text-xs">{isRtl ? "المودع" : "Deposited"}</p>
                 <p className="text-sm font-bold text-green-600 dark:text-green-400">
                   +${stats.totalDeposited.toFixed(2)}
                 </p>
               </div>
               <div className="text-center">
-                <p className="text-xs text-muted-foreground">
-                  {isRtl ? "المنفق" : "Spent"}
-                </p>
+                <p className="text-muted-foreground text-xs">{isRtl ? "المنفق" : "Spent"}</p>
                 <p className="text-sm font-bold text-red-600 dark:text-red-400">
                   -${stats.totalSpent.toFixed(2)}
                 </p>
@@ -261,10 +269,8 @@ export default function WalletPage() {
             <h2 className="text-xl font-bold tracking-tight">
               {isRtl ? "سجل المعاملات" : "Transaction History"}
             </h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              {isRtl
-                ? `آخر ${stats.count} معاملة`
-                : `Last ${stats.count} transactions`}
+            <p className="text-muted-foreground mt-1 text-sm">
+              {isRtl ? `آخر ${stats.count} معاملة` : `Last ${stats.count} transactions`}
             </p>
           </div>
           {stats.count > 0 && (
@@ -298,44 +304,46 @@ export default function WalletPage() {
               return (
                 <div
                   key={tx.id}
-                  className="flex items-center gap-4 rounded-xl border p-4 transition-colors hover:bg-muted/30"
+                  className="hover:bg-muted/30 flex items-center gap-4 rounded-xl border p-4 transition-colors"
                 >
                   {/* Type icon */}
-                  <div className={cn(
-                    "flex size-10 shrink-0 items-center justify-center rounded-full",
-                    txBgColors[tx.type] || "bg-muted",
-                  )}>
-                    <span className={cn("size-4", config?.color)}>
-                      {config?.icon}
-                    </span>
+                  <div
+                    className={cn(
+                      "flex size-10 shrink-0 items-center justify-center rounded-full",
+                      txBgColors[tx.type] || "bg-muted",
+                    )}
+                  >
+                    <span className={cn("size-4", config?.color)}>{config?.icon}</span>
                   </div>
 
                   {/* Details */}
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium">
                       {tx.description || (isRtl ? "معاملة" : "Transaction")}
                     </p>
-                    <div className="flex items-center gap-2 mt-0.5">
+                    <div className="mt-0.5 flex items-center gap-2">
                       <span className={cn("text-xs font-medium", config?.color)}>
                         {isRtl ? config?.labelAr : config?.labelEn}
                       </span>
-                      <span className="text-xs text-muted-foreground">·</span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-muted-foreground text-xs">·</span>
+                      <span className="text-muted-foreground text-xs">
                         {formatDate(tx.created_at, locale)}
                       </span>
                     </div>
                   </div>
 
                   {/* Amount + Balance */}
-                  <div className="text-right shrink-0">
-                    <p className={cn(
-                      "text-sm font-bold tabular-nums",
-                      isCredit && "text-green-600 dark:text-green-400",
-                      isDebit && "text-red-600 dark:text-red-400",
-                    )}>
+                  <div className="shrink-0 text-right">
+                    <p
+                      className={cn(
+                        "text-sm font-bold tabular-nums",
+                        isCredit && "text-green-600 dark:text-green-400",
+                        isDebit && "text-red-600 dark:text-red-400",
+                      )}
+                    >
                       {isCredit ? "+" : ""}${Math.abs(tx.amount).toFixed(2)}
                     </p>
-                    <p className="text-xs text-muted-foreground tabular-nums">
+                    <p className="text-muted-foreground text-xs tabular-nums">
                       ${tx.balance_after.toFixed(2)}
                     </p>
                   </div>
@@ -353,12 +361,14 @@ export default function WalletPage() {
             <h2 className="text-xl font-bold tracking-tight">
               {isRtl ? "محافظ SAM API" : "SAM API Wallets"}
             </h2>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-muted-foreground mt-1 text-sm">
               {samWalletsLoading
-                ? (isRtl ? "جاري التحميل..." : "Loading...")
-                : (isRtl
+                ? isRtl
+                  ? "جاري التحميل..."
+                  : "Loading..."
+                : isRtl
                   ? "أرصدة محافظ الدفع الإلكتروني"
-                  : "E-wallet balances from SAM payment gateway")}
+                  : "E-wallet balances from SAM payment gateway"}
             </p>
           </div>
         </div>
@@ -367,40 +377,40 @@ export default function WalletPage() {
           {samWalletsLoading ? (
             /* Loading skeleton */
             <>
-              <Card className="overflow-hidden animate-pulse">
+              <Card className="animate-pulse overflow-hidden">
                 <CardContent className="p-5">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="size-9 rounded-lg bg-muted" />
-                    <div className="space-y-1.5 flex-1">
-                      <div className="h-4 w-28 rounded bg-muted" />
-                      <div className="h-3 w-20 rounded bg-muted" />
+                  <div className="mb-4 flex items-center gap-2">
+                    <div className="bg-muted size-9 rounded-lg" />
+                    <div className="flex-1 space-y-1.5">
+                      <div className="bg-muted h-4 w-28 rounded" />
+                      <div className="bg-muted h-3 w-20 rounded" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <div className="h-4 w-12 rounded bg-muted" />
-                      <div className="h-4 w-20 rounded bg-muted" />
+                      <div className="bg-muted h-4 w-12 rounded" />
+                      <div className="bg-muted h-4 w-20 rounded" />
                     </div>
                     <div className="flex justify-between">
-                      <div className="h-4 w-12 rounded bg-muted" />
-                      <div className="h-4 w-24 rounded bg-muted" />
+                      <div className="bg-muted h-4 w-12 rounded" />
+                      <div className="bg-muted h-4 w-24 rounded" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="overflow-hidden animate-pulse">
+              <Card className="animate-pulse overflow-hidden">
                 <CardContent className="p-5">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="size-9 rounded-lg bg-muted" />
-                    <div className="space-y-1.5 flex-1">
-                      <div className="h-4 w-28 rounded bg-muted" />
-                      <div className="h-3 w-20 rounded bg-muted" />
+                  <div className="mb-4 flex items-center gap-2">
+                    <div className="bg-muted size-9 rounded-lg" />
+                    <div className="flex-1 space-y-1.5">
+                      <div className="bg-muted h-4 w-28 rounded" />
+                      <div className="bg-muted h-3 w-20 rounded" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <div className="h-4 w-12 rounded bg-muted" />
-                      <div className="h-4 w-20 rounded bg-muted" />
+                      <div className="bg-muted h-4 w-12 rounded" />
+                      <div className="bg-muted h-4 w-20 rounded" />
                     </div>
                   </div>
                 </CardContent>
@@ -410,14 +420,19 @@ export default function WalletPage() {
             samWallets.map((w) => (
               <Card key={w.id} className="overflow-hidden">
                 <CardContent className="p-5">
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="mb-3 flex items-start justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <div className="bg-primary/10 text-primary flex size-9 items-center justify-center rounded-lg">
                         <Coins className="size-4" />
                       </div>
                       <div>
                         <p className="text-sm font-semibold">{w.providerDisplayName}</p>
-                        <p className="text-xs text-muted-foreground">{w.label || w.phone || w.walletAddress?.slice(0, 16) || w.accountNumber?.slice(0, 16)}</p>
+                        <p className="text-muted-foreground text-xs">
+                          {w.label ||
+                            w.phone ||
+                            w.walletAddress?.slice(0, 16) ||
+                            w.accountNumber?.slice(0, 16)}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -427,10 +442,12 @@ export default function WalletPage() {
                       {w.balances.map((b) => (
                         <div key={b.currency} className="flex items-center justify-between text-sm">
                           <span className="text-muted-foreground">{b.currency}</span>
-                          <span className={cn(
-                            "font-bold tabular-nums",
-                            Number(b.amount) > 0 ? "text-foreground" : "text-muted-foreground"
-                          )}>
+                          <span
+                            className={cn(
+                              "font-bold tabular-nums",
+                              Number(b.amount) > 0 ? "text-foreground" : "text-muted-foreground",
+                            )}
+                          >
                             {b.currency === "SYP"
                               ? `\u00a3S${Number(b.amount).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
                               : `$${Number(b.amount).toFixed(2)}`}
@@ -439,7 +456,7 @@ export default function WalletPage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       {isRtl ? "غير متاح" : "Unavailable"}
                     </p>
                   )}
@@ -448,8 +465,10 @@ export default function WalletPage() {
             ))
           ) : (
             <div className="col-span-full">
-              <p className="text-sm text-muted-foreground text-center py-8">
-                {isRtl ? "انقر على 'تحديث' في لوحة تحكم SAM API لجلب المحافظ" : "Click 'Refresh' in the SAM API dashboard settings to fetch wallets"}
+              <p className="text-muted-foreground py-8 text-center text-sm">
+                {isRtl
+                  ? "انقر على 'تحديث' في لوحة تحكم SAM API لجلب المحافظ"
+                  : "Click 'Refresh' in the SAM API dashboard settings to fetch wallets"}
               </p>
             </div>
           )}

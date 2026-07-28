@@ -28,27 +28,27 @@
 
 ## Version Matrix (July 2026)
 
-| Package | Version | Notes |
-|---------|---------|-------|
-| **Next.js** | `16.2.12` | Active LTS — App Router is default |
-| **React** | `19.2.8` | Server Components, Actions stable |
-| **TypeScript** | `7.0.2` | Major jump from 5.x — new syntax features |
-| **Tailwind CSS** | `4.3.3` | v4 is standard — CSS-first config |
-| **shadcn/ui (CLI)** | `4.x` | Uses **Base UI** by default (MUI team) — best for new projects |
-| **TanStack Query** | `5.101.4` | Server state management |
-| **Zod** | `4.4.3` | Breaking from v3 — new validation API |
-| **React Hook Form** | `7.83.0` | Stable, well-supported |
-| **@supabase/supabase-js** | `2.110.9` | Latest SDK |
-| **@supabase/ssr** | `0.12.3` | SSR auth helpers |
-| **next-intl** | `4.13.3` | Internationalization |
-| **zustand** | `5.0.14` | Breaking: stores are flat now |
-| **recharts** | `3.10.1` | v3 — breaking changes from v2 |
-| **lucide-react** | `1.27.0` | Icons |
-| **class-variance-authority** | `0.7.1` | Variants API |
-| **clsx** | `2.1.1` | Classname utility |
-| **tailwind-merge** | `3.6.0` | Class merging |
-| **Supabase CLI** | `2.110.0` | Database migrations + Edge Functions |
-| **Node.js** | `22.x` LTS | Required for Next.js 16 — pin via `.nvmrc` |
+| Package                      | Version    | Notes                                                          |
+| ---------------------------- | ---------- | -------------------------------------------------------------- |
+| **Next.js**                  | `16.2.12`  | Active LTS — App Router is default                             |
+| **React**                    | `19.2.8`   | Server Components, Actions stable                              |
+| **TypeScript**               | `7.0.2`    | Major jump from 5.x — new syntax features                      |
+| **Tailwind CSS**             | `4.3.3`    | v4 is standard — CSS-first config                              |
+| **shadcn/ui (CLI)**          | `4.x`      | Uses **Base UI** by default (MUI team) — best for new projects |
+| **TanStack Query**           | `5.101.4`  | Server state management                                        |
+| **Zod**                      | `4.4.3`    | Breaking from v3 — new validation API                          |
+| **React Hook Form**          | `7.83.0`   | Stable, well-supported                                         |
+| **@supabase/supabase-js**    | `2.110.9`  | Latest SDK                                                     |
+| **@supabase/ssr**            | `0.12.3`   | SSR auth helpers                                               |
+| **next-intl**                | `4.13.3`   | Internationalization                                           |
+| **zustand**                  | `5.0.14`   | Breaking: stores are flat now                                  |
+| **recharts**                 | `3.10.1`   | v3 — breaking changes from v2                                  |
+| **lucide-react**             | `1.27.0`   | Icons                                                          |
+| **class-variance-authority** | `0.7.1`    | Variants API                                                   |
+| **clsx**                     | `2.1.1`    | Classname utility                                              |
+| **tailwind-merge**           | `3.6.0`    | Class merging                                                  |
+| **Supabase CLI**             | `2.110.0`  | Database migrations + Edge Functions                           |
+| **Node.js**                  | `22.x` LTS | Required for Next.js 16 — pin via `.nvmrc`                     |
 
 ---
 
@@ -103,14 +103,14 @@
 
 ### 1.2 Architectural Principles
 
-| Principle | Application |
-|-----------|------------|
-| **Separation of Concerns** | Business logic never lives inside React components. All logic is in services. |
-| **Provider Adapter Pattern** | Every external provider is a plugin. Adding a provider requires zero changes to business logic. |
-| **Clean Architecture** | Layers: UI → Use Cases → Services → Data Access. Dependencies point inward. |
-| **SOLID Principles** | Single Responsibility, Open-Closed, Liskov Substitution, Interface Segregation, Dependency Inversion. |
-| **Type Safety** | Strict TypeScript throughout. Zod schemas validate all boundaries. |
-| **Server-First** | Server Actions and Server Components are the default. Client components are opt-in. |
+| Principle                    | Application                                                                                           |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Separation of Concerns**   | Business logic never lives inside React components. All logic is in services.                         |
+| **Provider Adapter Pattern** | Every external provider is a plugin. Adding a provider requires zero changes to business logic.       |
+| **Clean Architecture**       | Layers: UI → Use Cases → Services → Data Access. Dependencies point inward.                           |
+| **SOLID Principles**         | Single Responsibility, Open-Closed, Liskov Substitution, Interface Segregation, Dependency Inversion. |
+| **Type Safety**              | Strict TypeScript throughout. Zod schemas validate all boundaries.                                    |
+| **Server-First**             | Server Actions and Server Components are the default. Client components are opt-in.                   |
 
 ### 1.3 Request Flow
 
@@ -1118,22 +1118,28 @@ export async function middleware(request: NextRequest) {
   const { supabase, response } = createServerClient(request);
 
   // 1. Refresh session
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
   // 2. Get user (with profile)
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   // 3. Check route access
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/dashboard');
-  const isAuthRoute = request.nextUrl.pathname.startsWith('/auth');
-  const isProtectedRoute = isAdminRoute || request.nextUrl.pathname.startsWith('/orders')
-    || request.nextUrl.pathname.startsWith('/wallet');
+  const isAdminRoute = request.nextUrl.pathname.startsWith("/dashboard");
+  const isAuthRoute = request.nextUrl.pathname.startsWith("/auth");
+  const isProtectedRoute =
+    isAdminRoute ||
+    request.nextUrl.pathname.startsWith("/orders") ||
+    request.nextUrl.pathname.startsWith("/wallet");
 
   if (isProtectedRoute && !user) {
     return redirectToLogin(request);
   }
 
-  if (isAdminRoute && user?.role !== 'admin') {
+  if (isAdminRoute && user?.role !== "admin") {
     return forbiddenResponse(request);
   }
 
@@ -1151,42 +1157,47 @@ export async function middleware(request: NextRequest) {
 
 ### 5.1 Role Definitions
 
-| Role | Permissions |
-|------|------------|
-| **Customer** | Read products, create orders, view own orders, manage own wallet, write reviews |
-| **Admin** | Full CRUD on all entities, manage providers, view analytics, manage customers, access logs |
+| Role         | Permissions                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------ |
+| **Customer** | Read products, create orders, view own orders, manage own wallet, write reviews            |
+| **Admin**    | Full CRUD on all entities, manage providers, view analytics, manage customers, access logs |
 
 ### 5.2 Implementation
 
 **Server-side (canary)**
+
 ```typescript
 // src/lib/utils/supabase.ts
 export async function requireAuth() {
   const supabase = createServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new UnauthorizedError('Authentication required');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new UnauthorizedError("Authentication required");
   return user;
 }
 
 export async function requireAdmin() {
   const user = await requireAuth();
   const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
     .single();
-  if (profile?.role !== 'admin') throw new ForbiddenError('Admin access required');
+  if (profile?.role !== "admin") throw new ForbiddenError("Admin access required");
   return user;
 }
 ```
 
 **Client-side (soft UI guard)**
+
 ```typescript
 // useAuth hook provides user and role
 // Dashboard layout checks role, redirects if not admin
 ```
 
 **RLS (data-level)**
+
 - Row Level Security policies enforce access at the database level
 - Customers can only see/modify their own data
 - Admins can see/modify all data
@@ -1228,7 +1239,7 @@ export interface ProviderConfig {
   id: string;
   name: string;
   slug: string;
-  type: 'product' | 'payment' | 'fulfillment' | 'hybrid';
+  type: "product" | "payment" | "fulfillment" | "hybrid";
   isActive: boolean;
   credentials: Record<string, string>;
   options: Record<string, unknown>;
@@ -1258,7 +1269,7 @@ export interface OrderRequest {
 export interface OrderResult {
   success: boolean;
   externalOrderId?: string;
-  status: 'completed' | 'pending' | 'failed';
+  status: "completed" | "pending" | "failed";
   deliveryData?: Record<string, string>;
   error?: string;
 }
@@ -1266,7 +1277,7 @@ export interface OrderResult {
 export interface IProvider {
   readonly name: string;
   readonly slug: string;
-  readonly type: ProviderConfig['type'];
+  readonly type: ProviderConfig["type"];
 
   initialize(config: ProviderConfig): Promise<void>;
   healthCheck(): Promise<boolean>;
@@ -1449,18 +1460,18 @@ Dashboard Layout
 
 ### 8.2 Dashboard Features
 
-| Section | Features |
-|---------|----------|
-| **Overview** | Revenue chart, order count, top products, recent orders, quick stats |
-| **Products** | CRUD table, search, filter, bulk actions, dynamic field editor, pricing tiers, image upload |
-| **Categories** | Tree structure, drag-drop reorder, CRUD, multi-language |
-| **Orders** | Data table with filters (status, date, customer), detail view, status transitions, refund |
-| **Customers** | Profile view, order history, wallet management, balance adjustment |
-| **Coupons** | Code generation, discount rules, usage stats, expiry management |
-| **Analytics** | Date range picker, sales chart, revenue breakdown, provider stats |
-| **Providers** | Register/configure, credential management, test connection, sync trigger, sync history |
-| **Website** | Settings form, homepage builder, banner carousel, navigation editor, SEO per-page, theme selector |
-| **Logs** | Searchable audit trail, severity filtering, export |
+| Section        | Features                                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------- |
+| **Overview**   | Revenue chart, order count, top products, recent orders, quick stats                              |
+| **Products**   | CRUD table, search, filter, bulk actions, dynamic field editor, pricing tiers, image upload       |
+| **Categories** | Tree structure, drag-drop reorder, CRUD, multi-language                                           |
+| **Orders**     | Data table with filters (status, date, customer), detail view, status transitions, refund         |
+| **Customers**  | Profile view, order history, wallet management, balance adjustment                                |
+| **Coupons**    | Code generation, discount rules, usage stats, expiry management                                   |
+| **Analytics**  | Date range picker, sales chart, revenue breakdown, provider stats                                 |
+| **Providers**  | Register/configure, credential management, test connection, sync trigger, sync history            |
+| **Website**    | Settings form, homepage builder, banner carousel, navigation editor, SEO per-page, theme selector |
+| **Logs**       | Searchable audit trail, severity filtering, export                                                |
 
 ---
 
@@ -1468,26 +1479,26 @@ Dashboard Layout
 
 ### 9.1 Strategy
 
-| State Type | Solution | When |
-|-----------|----------|------|
-| **Server State** (products, orders, etc.) | **TanStack Query** (React Query) | All data from Supabase |
-| **Client State** (UI state, modals, sidebar) | **Zustand** (minimal) | Local UI only |
-| **Auth State** | **Supabase SSR + React Context** | Auth session |
-| **Form State** | **React Hook Form + Zod** | All forms |
-| **Cart State** | **Zustand** (persisted to localStorage) | Shopping cart |
-| **URL State** | **Next.js searchParams** | Filters, pagination |
+| State Type                                   | Solution                                | When                   |
+| -------------------------------------------- | --------------------------------------- | ---------------------- |
+| **Server State** (products, orders, etc.)    | **TanStack Query** (React Query)        | All data from Supabase |
+| **Client State** (UI state, modals, sidebar) | **Zustand** (minimal)                   | Local UI only          |
+| **Auth State**                               | **Supabase SSR + React Context**        | Auth session           |
+| **Form State**                               | **React Hook Form + Zod**               | All forms              |
+| **Cart State**                               | **Zustand** (persisted to localStorage) | Shopping cart          |
+| **URL State**                                | **Next.js searchParams**                | Filters, pagination    |
 
 ### 9.2 TanStack Query Configuration
 
 ```typescript
 // src/lib/utils/query-client.ts
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient } from "@tanstack/react-query";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,     // 5 minutes
-      gcTime: 10 * 60 * 1000,        // 10 minutes (garbage collection)
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes (garbage collection)
       retry: 2,
       refetchOnWindowFocus: false,
     },
@@ -1631,7 +1642,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
@@ -1749,78 +1760,78 @@ CF_API_TOKEN=your-api-token
 
 ### Phase 1: Foundation (Week 1-2)
 
-| Step | Tasks | Dependencies |
-|------|-------|-------------|
-| **1.1** | Initialize Next.js 15 project, configure TypeScript, Tailwind, shadcn/ui | None |
-| **1.2** | Set up Supabase project, run initial schema migrations | 1.1 |
-| **1.3** | Implement database schema (tables, RLS, triggers) | 1.2 |
-| **1.4** | Set up authentication (Supabase Auth + SSR) | 1.1, 1.3 |
-| **1.5** | Implement RBAC middleware and profile management | 1.4 |
-| **1.6** | Set up i18n (Arabic + English) | 1.1 |
-| **1.7** | Set up TanStack Query, React Hook Form, Zod | 1.1 |
+| Step    | Tasks                                                                    | Dependencies |
+| ------- | ------------------------------------------------------------------------ | ------------ |
+| **1.1** | Initialize Next.js 15 project, configure TypeScript, Tailwind, shadcn/ui | None         |
+| **1.2** | Set up Supabase project, run initial schema migrations                   | 1.1          |
+| **1.3** | Implement database schema (tables, RLS, triggers)                        | 1.2          |
+| **1.4** | Set up authentication (Supabase Auth + SSR)                              | 1.1, 1.3     |
+| **1.5** | Implement RBAC middleware and profile management                         | 1.4          |
+| **1.6** | Set up i18n (Arabic + English)                                           | 1.1          |
+| **1.7** | Set up TanStack Query, React Hook Form, Zod                              | 1.1          |
 
 ### Phase 2: Dashboard (Week 3-4)
 
-| Step | Tasks | Dependencies |
-|------|-------|-------------|
-| **2.1** | Dashboard layout (sidebar, header, breadcrumbs) | 1.5 |
-| **2.2** | Product CRUD with dynamic fields | 1.3 |
-| **2.3** | Category management (tree, reorder) | 2.2 |
-| **2.4** | Order management (list, detail, status) | 1.3 |
-| **2.5** | Customer management | 1.3 |
-| **2.6** | Coupon management | 1.3 |
-| **2.7** | Website settings, SEO, navigation | 1.3 |
+| Step    | Tasks                                           | Dependencies |
+| ------- | ----------------------------------------------- | ------------ |
+| **2.1** | Dashboard layout (sidebar, header, breadcrumbs) | 1.5          |
+| **2.2** | Product CRUD with dynamic fields                | 1.3          |
+| **2.3** | Category management (tree, reorder)             | 2.2          |
+| **2.4** | Order management (list, detail, status)         | 1.3          |
+| **2.5** | Customer management                             | 1.3          |
+| **2.6** | Coupon management                               | 1.3          |
+| **2.7** | Website settings, SEO, navigation               | 1.3          |
 
 ### Phase 3: Provider System (Week 5)
 
-| Step | Tasks | Dependencies |
-|------|-------|-------------|
-| **3.1** | Provider adapter interface and registry | 2.2 |
-| **3.2** | G2Bulk provider adapter | 3.1 |
-| **3.3** | SAM API payment adapter | 3.1 |
-| **3.4** | Provider management UI in dashboard | 2.7 |
-| **3.5** | Synchronization engine | 3.2 |
+| Step    | Tasks                                   | Dependencies |
+| ------- | --------------------------------------- | ------------ |
+| **3.1** | Provider adapter interface and registry | 2.2          |
+| **3.2** | G2Bulk provider adapter                 | 3.1          |
+| **3.3** | SAM API payment adapter                 | 3.1          |
+| **3.4** | Provider management UI in dashboard     | 2.7          |
+| **3.5** | Synchronization engine                  | 3.2          |
 
 ### Phase 4: Storefront (Week 6-7)
 
-| Step | Tasks | Dependencies |
-|------|-------|-------------|
-| **4.1** | Storefront layout (header, footer, navigation) | 1.6, 2.7 |
-| **4.2** | Product browsing (grid, search, filters) | 2.2, 2.3 |
-| **4.3** | Product detail page with dynamic fields | 4.2 |
-| **4.4** | Cart system (state, persistence) | 4.3 |
-| **4.5** | Checkout flow (form, payment, wallet) | 4.4, 3.3 |
-| **4.6** | Order history for customers | 4.5 |
-| **4.7** | Wallet (balance, transactions, top-up) | 4.5 |
+| Step    | Tasks                                          | Dependencies |
+| ------- | ---------------------------------------------- | ------------ |
+| **4.1** | Storefront layout (header, footer, navigation) | 1.6, 2.7     |
+| **4.2** | Product browsing (grid, search, filters)       | 2.2, 2.3     |
+| **4.3** | Product detail page with dynamic fields        | 4.2          |
+| **4.4** | Cart system (state, persistence)               | 4.3          |
+| **4.5** | Checkout flow (form, payment, wallet)          | 4.4, 3.3     |
+| **4.6** | Order history for customers                    | 4.5          |
+| **4.7** | Wallet (balance, transactions, top-up)         | 4.5          |
 
 ### Phase 5: Themes & Polish (Week 8)
 
-| Step | Tasks | Dependencies |
-|------|-------|-------------|
-| **5.1** | Theme system (5 themes, CSS vars) | 4.1 |
-| **5.2** | Theme selector UI in dashboard | 5.1 |
-| **5.3** | Homepage hero banners | 4.1 |
-| **5.4** | Customer reviews | 4.2 |
+| Step    | Tasks                             | Dependencies |
+| ------- | --------------------------------- | ------------ |
+| **5.1** | Theme system (5 themes, CSS vars) | 4.1          |
+| **5.2** | Theme selector UI in dashboard    | 5.1          |
+| **5.3** | Homepage hero banners             | 4.1          |
+| **5.4** | Customer reviews                  | 4.2          |
 
 ### Phase 6: Analytics & Security (Week 9)
 
-| Step | Tasks | Dependencies |
-|------|-------|-------------|
-| **6.1** | Analytics dashboard (sales, revenue, charts) | 2.4, 2.5 |
-| **6.2** | Provider analytics | 3.2 |
-| **6.3** | Audit log viewer | 1.3 |
-| **6.4** | Activity log viewer | 1.3 |
-| **6.5** | Security audit & hardening | All |
+| Step    | Tasks                                        | Dependencies |
+| ------- | -------------------------------------------- | ------------ |
+| **6.1** | Analytics dashboard (sales, revenue, charts) | 2.4, 2.5     |
+| **6.2** | Provider analytics                           | 3.2          |
+| **6.3** | Audit log viewer                             | 1.3          |
+| **6.4** | Activity log viewer                          | 1.3          |
+| **6.5** | Security audit & hardening                   | All          |
 
 ### Phase 7: Deployment & Final Review (Week 10)
 
-| Step | Tasks | Dependencies |
-|------|-------|-------------|
-| **7.1** | Cloudflare Pages deployment config | All |
-| **7.2** | CI/CD pipeline setup | All |
-| **7.3** | Database migration automation | All |
-| **7.4** | Performance optimization | All |
-| **7.5** | Final testing & QA | All |
+| Step    | Tasks                              | Dependencies |
+| ------- | ---------------------------------- | ------------ |
+| **7.1** | Cloudflare Pages deployment config | All          |
+| **7.2** | CI/CD pipeline setup               | All          |
+| **7.3** | Database migration automation      | All          |
+| **7.4** | Performance optimization           | All          |
+| **7.5** | Final testing & QA                 | All          |
 
 ---
 

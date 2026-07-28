@@ -48,7 +48,7 @@ export function ProductSection({
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               {isRtl
                 ? `تسوق ${products.length}+ منتج من أفضل الخيارات`
                 : `Browse ${products.length}+ products from top picks`}
@@ -59,11 +59,7 @@ export function ProductSection({
             <Link href={viewAllHref}>
               <Button variant="ghost" size="sm" className="gap-1">
                 {isRtl ? "عرض الكل" : "View All"}
-                {isRtl ? (
-                  <ArrowLeft className="size-4" />
-                ) : (
-                  <ArrowRight className="size-4" />
-                )}
+                {isRtl ? <ArrowLeft className="size-4" /> : <ArrowRight className="size-4" />}
               </Button>
             </Link>
           )}

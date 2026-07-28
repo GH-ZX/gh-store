@@ -58,12 +58,10 @@ export function Filters({
       {/* Search */}
       {onSearchChange && (
         <div className="relative min-w-[200px] flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
           <Input
             placeholder={
-              isRtl
-                ? searchPlaceholderAr
-                : searchPlaceholder || (isRtl ? "بحث..." : "Search...")
+              isRtl ? searchPlaceholderAr : searchPlaceholder || (isRtl ? "بحث..." : "Search...")
             }
             className="h-9 pl-9"
             value={searchValue}
@@ -82,9 +80,7 @@ export function Filters({
             <SelectValue placeholder={isRtl ? "الحالة" : "Status"} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">
-              {isRtl ? "الكل" : "All"}
-            </SelectItem>
+            <SelectItem value="all">{isRtl ? "الكل" : "All"}</SelectItem>
             {statusOptions.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>
                 {isRtl ? opt.labelAr || opt.label : opt.label}
@@ -104,9 +100,7 @@ export function Filters({
             <SelectValue placeholder={isRtl ? "الفترة" : "Period"} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">
-              {isRtl ? "الكل" : "All Time"}
-            </SelectItem>
+            <SelectItem value="all">{isRtl ? "الكل" : "All Time"}</SelectItem>
             {dateRangeOptions.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>
                 {isRtl ? opt.labelAr || opt.label : opt.label}
@@ -122,7 +116,7 @@ export function Filters({
           variant="ghost"
           size="sm"
           onClick={onClearFilters}
-          className="gap-1 text-muted-foreground"
+          className="text-muted-foreground gap-1"
         >
           <X className="size-3" />
           {isRtl ? "مسح" : "Clear"} ({activeFilters})

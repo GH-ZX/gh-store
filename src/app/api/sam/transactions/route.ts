@@ -48,8 +48,7 @@ export async function GET(request: Request) {
     // The identifier goes into a URL *path* segment, so it must be
     // percent-encoded. The schema also restricts it to [A-Za-z0-9_-], so a
     // traversal sequence cannot reach here in the first place.
-    const identifier =
-      provider === "shamcash" ? walletAddress! : (cashCode || phone)!;
+    const identifier = provider === "shamcash" ? walletAddress! : (cashCode || phone)!;
 
     const url = new URL(
       `${SAM_API_BASE}/v1/wallets/${provider}/${encodeURIComponent(identifier)}/transactions`,

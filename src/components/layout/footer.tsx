@@ -43,17 +43,17 @@ export function Footer() {
   const isRtl = locale === "ar";
 
   return (
-    <footer className="border-t border-border/40 bg-background">
+    <footer className="border-border/40 bg-background border-t">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="space-y-4">
-            <Link href={`/${locale}`} className="font-bold text-xl tracking-tight">
-              <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <Link href={`/${locale}`} className="text-xl font-bold tracking-tight">
+              <span className="from-primary to-primary/70 bg-gradient-to-r bg-clip-text text-transparent">
                 {APP_NAME}
               </span>
             </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground text-sm leading-relaxed">
               {isRtl
                 ? "منصتك الموثوقة لشراء المنتجات الرقمية بأسعار تنافسية وتوصيل فوري."
                 : "Your trusted platform for buying digital products at competitive prices with instant delivery."}
@@ -63,15 +63,13 @@ export function Footer() {
           {/* Link Columns */}
           {footerLinks.map((group) => (
             <div key={group.titleEn} className="space-y-3">
-              <h4 className="text-sm font-semibold">
-                {isRtl ? group.titleAr : group.titleEn}
-              </h4>
+              <h4 className="text-sm font-semibold">{isRtl ? group.titleAr : group.titleEn}</h4>
               <ul className="space-y-2">
                 {group.links.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={`/${locale}${link.href}`}
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      className="text-muted-foreground hover:text-foreground text-sm transition-colors"
                     >
                       {isRtl ? link.labelAr : link.labelEn}
                     </Link>
@@ -85,13 +83,13 @@ export function Footer() {
         <Separator className="my-8" />
 
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             &copy; {new Date().getFullYear()} {APP_NAME}.{" "}
             {isRtl ? "جميع الحقوق محفوظة." : "All rights reserved."}
           </p>
-          <p className="flex items-center gap-1 text-xs text-muted-foreground">
+          <p className="text-muted-foreground flex items-center gap-1 text-xs">
             {isRtl ? "صُنع بـ" : "Made with"}{" "}
-            <Heart className="size-3 fill-destructive text-destructive" />{" "}
+            <Heart className="fill-destructive text-destructive size-3" />{" "}
             {isRtl ? "لأفضل تجربة تسوق" : "for the best shopping experience"}
           </p>
         </div>

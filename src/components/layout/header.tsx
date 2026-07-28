@@ -3,7 +3,19 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ShoppingCart, Menu, Search, User, LayoutDashboard, LogIn, Wallet, ArrowRight, ChevronDown, Coins, CreditCard } from "lucide-react";
+import {
+  ShoppingCart,
+  Menu,
+  Search,
+  User,
+  LayoutDashboard,
+  LogIn,
+  Wallet,
+  ArrowRight,
+  ChevronDown,
+  Coins,
+  CreditCard,
+} from "lucide-react";
 import { LocaleSwitcher } from "@/components/shared/locale-switcher";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -65,14 +77,14 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl backdrop-saturate-150">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 lg:gap-4 px-4 sm:px-6 lg:px-8">
+    <header className="border-border/40 bg-background/80 sticky top-0 z-50 w-full border-b backdrop-blur-xl backdrop-saturate-150">
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-4 sm:px-6 lg:gap-4 lg:px-8">
         {/* Logo */}
         <Link
           href={`/${locale}`}
-          className="flex shrink-0 items-center gap-2 font-bold text-xl tracking-tight"
+          className="flex shrink-0 items-center gap-2 text-xl font-bold tracking-tight"
         >
-          <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+          <span className="from-primary to-primary/70 bg-gradient-to-r bg-clip-text text-transparent">
             {APP_NAME}
           </span>
         </Link>
@@ -83,7 +95,7 @@ export function Header() {
             <Link
               key={item.href}
               href={`/${locale}${item.href}`}
-              className="inline-flex h-8 items-center justify-center rounded-lg px-2.5 text-sm font-medium whitespace-nowrap text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-8 items-center justify-center rounded-lg px-2.5 text-sm font-medium whitespace-nowrap transition-colors"
             >
               {isRtl ? item.labelAr : item.labelEn}
             </Link>
@@ -94,20 +106,20 @@ export function Header() {
         <div className="flex-1" />
 
         {/* Search (desktop) — form that navigates to store */}
-        <form onSubmit={handleSearch} className="relative hidden lg:flex items-center gap-1">
+        <form onSubmit={handleSearch} className="relative hidden items-center gap-1 lg:flex">
           <div className="relative w-48 xl:w-64">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
             <Input
               ref={searchRef}
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
               placeholder={isRtl ? "بحث في المتجر..." : "Search store..."}
-              className="h-9 rounded-lg bg-muted/50 pl-9 pr-2 text-sm focus:bg-background transition-all"
+              className="bg-muted/50 focus:bg-background h-9 rounded-lg pr-2 pl-9 text-sm transition-all"
             />
           </div>
           <button
             type="submit"
-            className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-input bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
+            className="border-input bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground inline-flex size-9 shrink-0 items-center justify-center rounded-lg border transition-all"
             aria-label={isRtl ? "بحث" : "Search"}
           >
             <ArrowRight className={cn("size-4", isRtl && "rotate-180")} />
@@ -115,11 +127,11 @@ export function Header() {
         </form>
 
         {/* Auth buttons (desktop) */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden items-center gap-1 md:flex">
           {authLoading || !isAuthenticated ? (
             <a
               href={`/${locale}/auth/login`}
-              className="inline-flex h-8 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-md gap-1.5"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-8 items-center justify-center gap-1.5 rounded-lg px-4 text-sm font-medium transition-all hover:shadow-md"
             >
               <LogIn className="size-4" />
               <span className="hidden lg:inline">{isRtl ? "تسجيل الدخول" : "Sign In"}</span>
@@ -131,10 +143,10 @@ export function Header() {
                 <div className="relative">
                   <button
                     onClick={() => setShowAdminWallets(!showAdminWallets)}
-                    className="inline-flex h-8 items-center justify-center rounded-lg px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground gap-1"
+                    className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-8 items-center justify-center gap-1 rounded-lg px-2.5 text-sm font-medium transition-colors"
                   >
                     <Wallet className="size-4" />
-                    <span className="hidden lg:inline font-semibold">
+                    <span className="hidden font-semibold lg:inline">
                       {balanceLoading ? "..." : `$${balance.toFixed(2)}`}
                     </span>
                     <ChevronDown className={cn("size-3", showAdminWallets && "rotate-180")} />
@@ -143,37 +155,44 @@ export function Header() {
                   {showAdminWallets && (
                     <>
                       {/* Backdrop to close */}
-                      <div className="fixed inset-0 z-40" onClick={() => setShowAdminWallets(false)} />
-                      <div className={cn(
-                        "absolute top-full mt-1 z-50 w-72 rounded-xl border bg-card p-3 shadow-xl",
-                        isRtl ? "left-0" : "right-0",
-                      )}>
-                        <p className="text-xs font-medium text-muted-foreground mb-2 px-1">
+                      <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setShowAdminWallets(false)}
+                      />
+                      <div
+                        className={cn(
+                          "bg-card absolute top-full z-50 mt-1 w-72 rounded-xl border p-3 shadow-xl",
+                          isRtl ? "left-0" : "right-0",
+                        )}
+                      >
+                        <p className="text-muted-foreground mb-2 px-1 text-xs font-medium">
                           {isRtl ? "محافظ المزودين" : "Provider Wallets"}
                         </p>
 
                         {/* G2Bulk balance */}
-                        <div className="flex items-center gap-2 rounded-lg px-2 py-2 mb-1">
-                          <Coins className="size-4 text-primary" />
-                          <div className="flex-1 min-w-0">
+                        <div className="mb-1 flex items-center gap-2 rounded-lg px-2 py-2">
+                          <Coins className="text-primary size-4" />
+                          <div className="min-w-0 flex-1">
                             <p className="text-xs font-medium">G2Bulk</p>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-muted-foreground text-xs">
                               {g2bulkLoading ? (
                                 <span className="inline-flex items-center gap-1">
-                                  <span className="size-1.5 rounded-full bg-muted-foreground/30 animate-pulse" />
+                                  <span className="bg-muted-foreground/30 size-1.5 animate-pulse rounded-full" />
                                   {isRtl ? "جاري التحميل..." : "Loading..."}
                                 </span>
                               ) : g2bulk ? (
                                 `@${g2bulk.username}`
+                              ) : isRtl ? (
+                                "غير متصل"
                               ) : (
-                                isRtl ? "غير متصل" : "Disconnected"
+                                "Disconnected"
                               )}
                             </p>
                           </div>
                           <span className="text-sm font-bold">
                             {g2bulkLoading ? (
                               <span className="inline-flex items-center gap-1">
-                                <span className="size-1.5 rounded-full bg-muted-foreground/30 animate-pulse" />
+                                <span className="bg-muted-foreground/30 size-1.5 animate-pulse rounded-full" />
                                 ---
                               </span>
                             ) : g2bulk ? (
@@ -186,33 +205,43 @@ export function Header() {
 
                         {/* SAM API wallets */}
                         {samWalletsLoading ? (
-                          <div className="px-2 py-2 space-y-2">
-                            <div className="h-8 rounded-lg bg-muted/50 animate-pulse" />
-                            <div className="h-8 rounded-lg bg-muted/50 animate-pulse" />
+                          <div className="space-y-2 px-2 py-2">
+                            <div className="bg-muted/50 h-8 animate-pulse rounded-lg" />
+                            <div className="bg-muted/50 h-8 animate-pulse rounded-lg" />
                           </div>
                         ) : samWallets.length > 0 ? (
                           samWallets.map((w) => (
-                            <div key={w.id} className="flex items-center gap-2 rounded-lg px-2 py-2">
-                              <CreditCard className="size-4 text-primary" />
-                              <div className="flex-1 min-w-0">
+                            <div
+                              key={w.id}
+                              className="flex items-center gap-2 rounded-lg px-2 py-2"
+                            >
+                              <CreditCard className="text-primary size-4" />
+                              <div className="min-w-0 flex-1">
                                 <p className="text-xs font-medium">{w.providerDisplayName}</p>
-                                <p className="text-xs text-muted-foreground truncate">{w.label || w.phone || w.walletAddress?.slice(0, 12)}</p>
+                                <p className="text-muted-foreground truncate text-xs">
+                                  {w.label || w.phone || w.walletAddress?.slice(0, 12)}
+                                </p>
                               </div>
                               <div className="text-right">
                                 {w.balances && w.balances.length > 0 ? (
                                   w.balances.slice(0, 2).map((b, i) => (
-                                    <span key={b.currency || i} className="text-xs font-semibold block">
-                                      {b.currency === "SYP" ? `£S${Number(b.amount).toFixed(0)}` : `$${Number(b.amount).toFixed(2)}`}
+                                    <span
+                                      key={b.currency || i}
+                                      className="block text-xs font-semibold"
+                                    >
+                                      {b.currency === "SYP"
+                                        ? `£S${Number(b.amount).toFixed(0)}`
+                                        : `$${Number(b.amount).toFixed(2)}`}
                                     </span>
                                   ))
                                 ) : (
-                                  <span className="text-xs text-muted-foreground">---</span>
+                                  <span className="text-muted-foreground text-xs">---</span>
                                 )}
                               </div>
                             </div>
                           ))
                         ) : (
-                          <p className="text-xs text-muted-foreground px-2 py-1">
+                          <p className="text-muted-foreground px-2 py-1 text-xs">
                             {isRtl ? "لا توجد محافظ SAM" : "No SAM wallets"}
                           </p>
                         )}
@@ -220,7 +249,7 @@ export function Header() {
                         {/* Link to full wallet */}
                         <Link
                           href={`/${locale}/wallet`}
-                          className="mt-2 block rounded-lg bg-muted/50 px-3 py-2 text-xs font-medium text-center hover:bg-muted transition-colors"
+                          className="bg-muted/50 hover:bg-muted mt-2 block rounded-lg px-3 py-2 text-center text-xs font-medium transition-colors"
                           onClick={() => setShowAdminWallets(false)}
                         >
                           {isRtl ? "عرض المحفظة كاملة" : "View Full Wallet"} →
@@ -232,10 +261,10 @@ export function Header() {
               ) : (
                 <Link
                   href={`/${locale}/wallet`}
-                  className="inline-flex h-8 items-center justify-center rounded-lg px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground gap-1.5"
+                  className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-8 items-center justify-center gap-1.5 rounded-lg px-2.5 text-sm font-medium transition-colors"
                 >
                   <Wallet className="size-4" />
-                  <span className="hidden lg:inline font-semibold">
+                  <span className="hidden font-semibold lg:inline">
                     {balanceLoading ? "..." : `$${balance.toFixed(2)}`}
                   </span>
                 </Link>
@@ -245,7 +274,7 @@ export function Header() {
               {isAdmin && (
                 <Link
                   href={`/${locale}/dashboard`}
-                  className="inline-flex h-8 items-center justify-center rounded-lg px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground gap-1.5"
+                  className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-8 items-center justify-center gap-1.5 rounded-lg px-2.5 text-sm font-medium transition-colors"
                 >
                   <LayoutDashboard className="size-4" />
                   <span className="hidden lg:inline">{isRtl ? "لوحة التحكم" : "Dashboard"}</span>
@@ -255,11 +284,15 @@ export function Header() {
               {/* Profile */}
               <Link
                 href={`/${locale}/profile`}
-                className="inline-flex h-8 items-center justify-center rounded-lg px-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground gap-1.5"
+                className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-8 items-center justify-center gap-1.5 rounded-lg px-2 text-sm font-medium transition-colors"
               >
                 <Avatar className="size-6">
                   <AvatarFallback className="text-[10px]">
-                    {profile?.full_name ? getInitials(profile.full_name) : <User className="size-3.5" />}
+                    {profile?.full_name ? (
+                      getInitials(profile.full_name)
+                    ) : (
+                      <User className="size-3.5" />
+                    )}
                   </AvatarFallback>
                 </Avatar>
                 <span className="hidden lg:inline">
@@ -273,11 +306,11 @@ export function Header() {
         {/* Cart */}
         <Link
           href={`/${locale}/cart`}
-          className="relative inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="text-muted-foreground hover:bg-muted hover:text-foreground relative inline-flex size-8 items-center justify-center rounded-lg transition-colors"
         >
           <ShoppingCart className="size-5" />
           {cartCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
+            <span className="bg-primary text-primary-foreground absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-medium">
               {cartCount > 99 ? "99+" : cartCount}
             </span>
           )}
@@ -290,7 +323,7 @@ export function Header() {
 
         {/* Mobile Menu */}
         <Sheet>
-          <SheetTrigger className="md:hidden inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+          <SheetTrigger className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex size-8 items-center justify-center rounded-lg transition-colors md:hidden">
             <Menu className="size-5" />
           </SheetTrigger>
           <SheetContent side={isRtl ? "right" : "left"} className="w-72">
@@ -299,27 +332,36 @@ export function Header() {
               {authLoading || !isAuthenticated ? (
                 <a
                   href={`/${locale}/auth/login`}
-                  className="inline-flex h-9 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-md gap-2 mx-3"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 mx-3 inline-flex h-9 items-center justify-center gap-2 rounded-lg px-4 text-sm font-medium transition-all hover:shadow-md"
                 >
                   <LogIn className="size-4" />
                   {isRtl ? "تسجيل الدخول" : "Sign In"}
                 </a>
               ) : (
                 <>
-                  <div className="flex items-center gap-3 px-3 py-2 mb-2">
+                  <div className="mb-2 flex items-center gap-3 px-3 py-2">
                     <Avatar className="size-10">
                       <AvatarFallback>
-                        {profile?.full_name ? getInitials(profile.full_name) : <User className="size-4" />}
+                        {profile?.full_name ? (
+                          getInitials(profile.full_name)
+                        ) : (
+                          <User className="size-4" />
+                        )}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{profile?.full_name || (isRtl ? "مستخدم" : "User")}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">
+                        {profile?.full_name || (isRtl ? "مستخدم" : "User")}
+                      </p>
+                      <div className="mt-0.5 flex items-center gap-2">
                         <Badge variant="secondary" className="text-[10px]">
-                          {isAdmin ? (isRtl ? "مدير" : "Admin") : (isRtl ? "عميل" : "Customer")}
+                          {isAdmin ? (isRtl ? "مدير" : "Admin") : isRtl ? "عميل" : "Customer"}
                         </Badge>
-                        <Link href={`/${locale}/wallet`} className="text-xs font-semibold text-primary hover:underline">
-                          <Wallet className="size-3 inline mr-0.5" />${balance.toFixed(2)}
+                        <Link
+                          href={`/${locale}/wallet`}
+                          className="text-primary text-xs font-semibold hover:underline"
+                        >
+                          <Wallet className="mr-0.5 inline size-3" />${balance.toFixed(2)}
                         </Link>
                       </div>
                     </div>
@@ -327,7 +369,7 @@ export function Header() {
                   {isAdmin && (
                     <Link
                       href={`/${locale}/dashboard`}
-                      className="inline-flex h-9 items-center justify-start rounded-lg px-3 text-base font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground gap-2"
+                      className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-9 items-center justify-start gap-2 rounded-lg px-3 text-base font-medium transition-colors"
                     >
                       <LayoutDashboard className="size-4" />
                       {isRtl ? "لوحة التحكم" : "Dashboard"}
@@ -339,12 +381,12 @@ export function Header() {
               {/* Mobile search */}
               <div className="px-3 py-1">
                 <form onSubmit={handleSearch} className="relative">
-                  <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                  <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
                   <Input
                     value={searchValue}
                     onChange={(e) => setSearchValue(e.target.value)}
                     placeholder={isRtl ? "بحث في المتجر..." : "Search store..."}
-                    className="h-10 rounded-lg bg-muted/50 pl-9 text-sm w-full"
+                    className="bg-muted/50 h-10 w-full rounded-lg pl-9 text-sm"
                   />
                 </form>
               </div>
@@ -356,7 +398,7 @@ export function Header() {
                 <Link
                   key={item.href}
                   href={`/${locale}${item.href}`}
-                  className="inline-flex h-9 items-center justify-start rounded-lg px-3 text-base font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-9 items-center justify-start rounded-lg px-3 text-base font-medium transition-colors"
                 >
                   {isRtl ? item.labelAr : item.labelEn}
                 </Link>
@@ -364,19 +406,19 @@ export function Header() {
               <Separator className="my-2" />
               <Link
                 href={`/${locale}/orders`}
-                className="inline-flex h-9 items-center justify-start rounded-lg px-3 text-base font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-9 items-center justify-start rounded-lg px-3 text-base font-medium transition-colors"
               >
                 {isRtl ? "طلباتي" : "My Orders"}
               </Link>
               <Link
                 href={`/${locale}/wallet`}
-                className="inline-flex h-9 items-center justify-start rounded-lg px-3 text-base font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-9 items-center justify-start rounded-lg px-3 text-base font-medium transition-colors"
               >
                 {isRtl ? "المحفظة" : "Wallet"}
               </Link>
               <Link
                 href={`/${locale}/profile`}
-                className="inline-flex h-9 items-center justify-start rounded-lg px-3 text-base font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-9 items-center justify-start rounded-lg px-3 text-base font-medium transition-colors"
               >
                 {isRtl ? "الملف الشخصي" : "Profile"}
               </Link>

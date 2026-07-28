@@ -43,45 +43,39 @@ export function QuickActions({ games, isRtl }: QuickActionsProps) {
             href={`/${locale}/store/${game.slug}`}
             className={cn(
               "group inline-flex items-center gap-2 sm:gap-3",
-              "rounded-xl border px-3 sm:px-4 py-2 sm:py-2.5",
+              "rounded-xl border px-3 py-2 sm:px-4 sm:py-2.5",
               "bg-card hover:bg-accent/50 transition-all",
-              "hover:shadow-md hover:-translate-y-0.5",
-              "text-xs sm:text-sm font-medium",
+              "hover:-translate-y-0.5 hover:shadow-md",
+              "text-xs font-medium sm:text-sm",
               "shrink-0",
             )}
           >
             {/* Game icon */}
-            <div className="relative size-7 sm:size-9 rounded-lg overflow-hidden bg-muted/50 shrink-0 flex items-center justify-center">
+            <div className="bg-muted/50 relative flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg sm:size-9">
               {game.imageUrl ? (
-                <img
-                  src={game.imageUrl}
-                  alt=""
-                  className="w-full h-full object-contain p-0.5"
-                />
+                <img src={game.imageUrl} alt="" className="h-full w-full object-contain p-0.5" />
               ) : (
-                <Gamepad2 className="size-4 text-muted-foreground/40" />
+                <Gamepad2 className="text-muted-foreground/40 size-4" />
               )}
             </div>
 
             {/* Game name + price */}
             <div className="min-w-0">
-              <p className="font-semibold leading-tight truncate max-w-[120px] sm:max-w-[160px]">
+              <p className="max-w-[120px] truncate leading-tight font-semibold sm:max-w-[160px]">
                 {isRtl ? game.nameAr : game.nameEn}
               </p>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="text-[11px] font-bold text-primary">
-                  ${minPrice.toFixed(2)}
-                </span>
+              <div className="mt-0.5 flex items-center gap-1.5">
+                <span className="text-primary text-[11px] font-bold">${minPrice.toFixed(2)}</span>
               </div>
             </div>
 
             {/* Discount badge */}
-            <div className="shrink-0 bg-destructive/10 text-destructive text-[10px] sm:text-xs font-bold px-2 py-1 rounded-md">
+            <div className="bg-destructive/10 text-destructive shrink-0 rounded-md px-2 py-1 text-[10px] font-bold sm:text-xs">
               {disc}%
             </div>
 
             {/* CTA */}
-            <span className="hidden sm:inline text-[11px] font-semibold text-primary">
+            <span className="text-primary hidden text-[11px] font-semibold sm:inline">
               {isRtl ? "اشتر الآن" : "Buy Now"}
             </span>
           </Link>

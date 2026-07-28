@@ -26,9 +26,7 @@ export function CategoryNav({ categories, activeCategory, onCategoryChange }: Ca
 
   // Determine the active category: from props (filter mode) or URL (navigation mode)
   const isFilterMode = onCategoryChange !== undefined;
-  const currentCategory = isFilterMode
-    ? activeCategory
-    : pathname.split("/").pop();
+  const currentCategory = isFilterMode ? activeCategory : pathname.split("/").pop();
 
   const handleClick = (slug: string | undefined) => {
     if (isFilterMode && onCategoryChange) {
@@ -40,9 +38,7 @@ export function CategoryNav({ categories, activeCategory, onCategoryChange }: Ca
     if (isFilterMode) {
       return slug === currentCategory || (!slug && !currentCategory);
     }
-    return slug
-      ? currentCategory === slug
-      : !currentCategory || currentCategory === "store";
+    return slug ? currentCategory === slug : !currentCategory || currentCategory === "store";
   };
 
   return (
@@ -53,7 +49,7 @@ export function CategoryNav({ categories, activeCategory, onCategoryChange }: Ca
           <button
             onClick={() => handleClick(undefined)}
             className={cn(
-              "shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-accent cursor-pointer",
+              "hover:bg-accent shrink-0 cursor-pointer rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
               isActive()
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-background border-border",
@@ -65,7 +61,7 @@ export function CategoryNav({ categories, activeCategory, onCategoryChange }: Ca
           <Link
             href={`/${params?.locale || "ar"}/store`}
             className={cn(
-              "shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-accent",
+              "hover:bg-accent shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
               isActive()
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-background border-border",
@@ -81,13 +77,13 @@ export function CategoryNav({ categories, activeCategory, onCategoryChange }: Ca
               key={category.slug}
               onClick={() => handleClick(category.slug)}
               className={cn(
-                "shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-accent cursor-pointer",
+                "hover:bg-accent shrink-0 cursor-pointer rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
                 isActive(category.slug)
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-background border-border",
               )}
             >
-              {category.icon && <span className="text-base mr-1">{category.icon}</span>}
+              {category.icon && <span className="mr-1 text-base">{category.icon}</span>}
               {isRtl ? category.nameAr : category.nameEn}
             </button>
           ) : (
@@ -95,13 +91,13 @@ export function CategoryNav({ categories, activeCategory, onCategoryChange }: Ca
               key={category.slug}
               href={`/${params?.locale || "ar"}/store/${category.slug}`}
               className={cn(
-                "shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-accent",
+                "hover:bg-accent shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
                 isActive(category.slug)
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-background border-border",
               )}
             >
-              {category.icon && <span className="text-base mr-1">{category.icon}</span>}
+              {category.icon && <span className="mr-1 text-base">{category.icon}</span>}
               {isRtl ? category.nameAr : category.nameEn}
             </Link>
           ),

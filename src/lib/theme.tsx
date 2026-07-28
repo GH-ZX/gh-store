@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 export interface Theme {
   name: string;
@@ -68,9 +62,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [mounted, currentTheme]);
 
   return (
-    <ThemeContext.Provider
-      value={{ currentTheme, setTheme: handleSetTheme }}
-    >
+    <ThemeContext.Provider value={{ currentTheme, setTheme: handleSetTheme }}>
       {children}
     </ThemeContext.Provider>
   );

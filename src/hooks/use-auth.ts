@@ -43,7 +43,9 @@ export function useAuth() {
   } = useQuery<Profile | null>({
     queryKey: ["auth", "profile"],
     queryFn: async () => {
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      const {
+        data: { user: currentUser },
+      } = await supabase.auth.getUser();
       if (!currentUser) return null;
 
       const { data, error } = await supabase
@@ -102,7 +104,9 @@ export function useAuth() {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: Partial<Pick<Profile, "full_name" | "phone" | "avatar_url">>) => {
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      const {
+        data: { user: currentUser },
+      } = await supabase.auth.getUser();
       if (!currentUser) throw new Error("Not authenticated");
 
       const { data, error } = await supabase

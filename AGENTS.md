@@ -4,14 +4,14 @@
 
 Companion docs (open only when needed):
 
-| Doc | When |
-|-----|------|
-| `ROADMAP.md` | Phase order, exit criteria — **do not skip phases** |
-| `ARCHITECTURE.md` | System design, folders, security layers |
-| `DESIGN-SYSTEM.md` | UI/UX — mandatory for any visual work |
-| `PRODUCT_VISION.md` | Product goals and principles |
-| `PROGRESS.md` | What is already done |
-| `CONTRIBUTING.md` | Human workflow, PR checklist, commands |
+| Doc                 | When                                                |
+| ------------------- | --------------------------------------------------- |
+| `ROADMAP.md`        | Phase order, exit criteria — **do not skip phases** |
+| `ARCHITECTURE.md`   | System design, folders, security layers             |
+| `DESIGN-SYSTEM.md`  | UI/UX — mandatory for any visual work               |
+| `PRODUCT_VISION.md` | Product goals and principles                        |
+| `PROGRESS.md`       | What is already done                                |
+| `CONTRIBUTING.md`   | Human workflow, PR checklist, commands              |
 
 ---
 
@@ -42,41 +42,41 @@ Env: copy `.env.example` → `.env.local`. Never commit secrets.
 
 ## Non-negotiable conventions
 
-| Topic | Rule | Where |
-|-------|------|--------|
-| **Phases** | Never skip roadmap phases. Wait for approval before starting the next phase. | `ROADMAP.md` |
-| **i18n** | No hardcoded user-facing Arabic/English strings in components. Use locale JSON + hooks. | `public/locales/{ar,en}/*.json`, `useTranslations`, `use-locale` |
-| **RTL** | Default locale is Arabic. Every UI must work RTL and LTR. | `middleware.ts`, layout `dir` |
-| **Design** | Only Design System + `src/components/ui/*`. No one-off visual systems. | `DESIGN-SYSTEM.md` |
-| **Data access** | Browser never uses service-role key. Server/admin clients only on server. | `src/lib/utils/supabase*.ts` |
-| **AuthZ** | 3 layers: middleware → service (`requireAuth` / `requireAdmin`) → RLS | `middleware.ts`, `auth.service.ts` |
-| **Validation** | All inputs through Zod schemas before DB/API | `src/lib/validation/*` |
-| **Providers** | External APIs only via `IProvider` adapters — never call G2Bulk/SAM from UI | `src/providers/*` |
-| **Secrets** | Provider credentials encrypted server-side; never log tokens/keys | `provider_credentials`, edge functions |
-| **Mock data** | Prefer Supabase; mocks only as empty-DB fallback, clearly named | `src/lib/data/mock-*.ts` |
-| **No TODOs** | Do not leave unfinished features or `TODO` placeholders in shipped phase work | `ROADMAP.md` principles |
-| **Quality gate** | Before claiming done: `pnpm check` must pass | scripts below |
+| Topic            | Rule                                                                                    | Where                                                            |
+| ---------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| **Phases**       | Never skip roadmap phases. Wait for approval before starting the next phase.            | `ROADMAP.md`                                                     |
+| **i18n**         | No hardcoded user-facing Arabic/English strings in components. Use locale JSON + hooks. | `public/locales/{ar,en}/*.json`, `useTranslations`, `use-locale` |
+| **RTL**          | Default locale is Arabic. Every UI must work RTL and LTR.                               | `middleware.ts`, layout `dir`                                    |
+| **Design**       | Only Design System + `src/components/ui/*`. No one-off visual systems.                  | `DESIGN-SYSTEM.md`                                               |
+| **Data access**  | Browser never uses service-role key. Server/admin clients only on server.               | `src/lib/utils/supabase*.ts`                                     |
+| **AuthZ**        | 3 layers: middleware → service (`requireAuth` / `requireAdmin`) → RLS                   | `middleware.ts`, `auth.service.ts`                               |
+| **Validation**   | All inputs through Zod schemas before DB/API                                            | `src/lib/validation/*`                                           |
+| **Providers**    | External APIs only via `IProvider` adapters — never call G2Bulk/SAM from UI             | `src/providers/*`                                                |
+| **Secrets**      | Provider credentials encrypted server-side; never log tokens/keys                       | `provider_credentials`, edge functions                           |
+| **Mock data**    | Prefer Supabase; mocks only as empty-DB fallback, clearly named                         | `src/lib/data/mock-*.ts`                                         |
+| **No TODOs**     | Do not leave unfinished features or `TODO` placeholders in shipped phase work           | `ROADMAP.md` principles                                          |
+| **Quality gate** | Before claiming done: `pnpm check` must pass                                            | scripts below                                                    |
 
 ---
 
 ## Where things live
 
-| Concern | Path |
-|---------|------|
-| App routes (locale) | `src/app/[locale]/**` |
-| API routes | `src/app/api/**` |
-| UI primitives (shadcn) | `src/components/ui/**` |
-| Layout / store / dashboard / shared | `src/components/{layout,store,dashboard,shared}/**` |
-| Business services | `src/lib/services/**` |
-| Provider adapters (real) | `src/providers/**` |
-| Empty scaffold (legacy) | `src/lib/providers/**` — **do not put new code here** |
-| Validation | `src/lib/validation/**` |
-| Supabase clients | `src/lib/utils/supabase.ts`, `supabase-client.ts` |
-| Cart (client) | `src/stores/cart-store.ts` |
-| DB types | `src/types/database.ts` (generated — do not hand-edit casually) |
-| Migrations | `supabase/migrations/**` |
-| Edge functions | `supabase/functions/**` |
-| Themes | `config/themes/**` |
+| Concern                             | Path                                                            |
+| ----------------------------------- | --------------------------------------------------------------- |
+| App routes (locale)                 | `src/app/[locale]/**`                                           |
+| API routes                          | `src/app/api/**`                                                |
+| UI primitives (shadcn)              | `src/components/ui/**`                                          |
+| Layout / store / dashboard / shared | `src/components/{layout,store,dashboard,shared}/**`             |
+| Business services                   | `src/lib/services/**`                                           |
+| Provider adapters (real)            | `src/providers/**`                                              |
+| Empty scaffold (legacy)             | `src/lib/providers/**` — **do not put new code here**           |
+| Validation                          | `src/lib/validation/**`                                         |
+| Supabase clients                    | `src/lib/utils/supabase.ts`, `supabase-client.ts`               |
+| Cart (client)                       | `src/stores/cart-store.ts`                                      |
+| DB types                            | `src/types/database.ts` (generated — do not hand-edit casually) |
+| Migrations                          | `supabase/migrations/**`                                        |
+| Edge functions                      | `supabase/functions/**`                                         |
+| Themes                              | `config/themes/**`                                              |
 
 ---
 

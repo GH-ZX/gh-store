@@ -21,7 +21,10 @@ const cache = new Map<string, Record<string, TranslationValue>>();
  * Uses a static module map for Turbopack compatibility.
  * Results are cached in a module-level Map to avoid re-fetching.
  */
-async function loadNamespace(locale: string, ns: Namespace): Promise<Record<string, TranslationValue>> {
+async function loadNamespace(
+  locale: string,
+  ns: Namespace,
+): Promise<Record<string, TranslationValue>> {
   const key = `${locale}:${ns}`;
   if (cache.has(key)) return cache.get(key)!;
 

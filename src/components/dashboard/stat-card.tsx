@@ -30,14 +30,12 @@ export function StatCard({
     <Card className={cn("p-6 transition-all hover:shadow-md", className)}>
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <p className="text-sm text-muted-foreground">{titleAr || title}</p>
+          <p className="text-muted-foreground text-sm">{titleAr || title}</p>
           <p className="text-2xl font-bold tracking-tight">{value}</p>
-          {description && (
-            <p className="text-xs text-muted-foreground">{description}</p>
-          )}
+          {description && <p className="text-muted-foreground text-xs">{description}</p>}
         </div>
         {icon && (
-          <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <div className="bg-primary/10 text-primary flex size-10 items-center justify-center rounded-lg">
             {icon}
           </div>
         )}
@@ -47,7 +45,7 @@ export function StatCard({
           {trend.isPositive ? (
             <TrendingUp className="size-4 text-emerald-500" />
           ) : (
-            <TrendingDown className="size-4 text-destructive" />
+            <TrendingDown className="text-destructive size-4" />
           )}
           <span
             className={cn(
@@ -58,7 +56,7 @@ export function StatCard({
             {trend.isPositive ? "+" : ""}
             {trend.value}%
           </span>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-muted-foreground text-xs">
             {description ? "vs last period" : ""}
           </span>
         </div>

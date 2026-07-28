@@ -30,13 +30,13 @@ export function EmptyState({
 
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="mb-6 flex size-16 items-center justify-center rounded-full bg-muted">
-        {icon || <Inbox className="size-8 text-muted-foreground" />}
+      <div className="bg-muted mb-6 flex size-16 items-center justify-center rounded-full">
+        {icon || <Inbox className="text-muted-foreground size-8" />}
       </div>
       <h3 className="text-lg font-semibold">
         {isRtl && titleAr ? titleAr : title || (isRtl ? "لا توجد نتائج" : "No results found")}
       </h3>
-      <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+      <p className="text-muted-foreground mt-2 max-w-sm text-sm">
         {isRtl && descriptionAr
           ? descriptionAr
           : description || (isRtl ? "لم يتم العثور على أي عناصر." : "No items were found.")}

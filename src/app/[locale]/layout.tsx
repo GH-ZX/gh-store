@@ -29,7 +29,7 @@ export default async function LocaleLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className="flex min-h-screen flex-col bg-background font-sans antialiased">
+      <body className="bg-background flex min-h-screen flex-col font-sans antialiased">
         <ThemeProvider>
           <QueryProvider>
             <AuthProvider>

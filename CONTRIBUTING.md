@@ -33,11 +33,11 @@ pnpm check
 
 This runs:
 
-| Step | Command | Purpose |
-|------|---------|---------|
-| Lint | `pnpm lint` | ESLint (Next core-web-vitals + TS + project rules) |
-| Types | `pnpm typecheck` | `tsc --noEmit` |
-| Format | `pnpm format:check` | Prettier (incl. Tailwind class sorting) |
+| Step   | Command             | Purpose                                            |
+| ------ | ------------------- | -------------------------------------------------- |
+| Lint   | `pnpm lint`         | ESLint (Next core-web-vitals + TS + project rules) |
+| Types  | `pnpm typecheck`    | `tsc --noEmit`                                     |
+| Format | `pnpm format:check` | Prettier (incl. Tailwind class sorting)            |
 
 Fix automatically when safe:
 
@@ -48,17 +48,17 @@ pnpm format
 
 ## Scripts reference
 
-| Script | Description |
-|--------|-------------|
-| `pnpm dev` | Next.js dev server |
-| `pnpm build` | Production build |
-| `pnpm start` | Serve production build |
-| `pnpm lint` | ESLint |
-| `pnpm lint:fix` | ESLint with `--fix` |
-| `pnpm typecheck` | TypeScript check |
-| `pnpm format` | Prettier write |
-| `pnpm format:check` | Prettier check |
-| `pnpm check` | lint + typecheck + format:check |
+| Script              | Description                     |
+| ------------------- | ------------------------------- |
+| `pnpm dev`          | Next.js dev server              |
+| `pnpm build`        | Production build                |
+| `pnpm start`        | Serve production build          |
+| `pnpm lint`         | ESLint                          |
+| `pnpm lint:fix`     | ESLint with `--fix`             |
+| `pnpm typecheck`    | TypeScript check                |
+| `pnpm format`       | Prettier write                  |
+| `pnpm format:check` | Prettier check                  |
+| `pnpm check`        | lint + typecheck + format:check |
 
 ## Development principles
 

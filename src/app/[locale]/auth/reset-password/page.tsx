@@ -9,7 +9,14 @@ import { useForm } from "react-hook-form";
 import { LoadingPage } from "@/components/shared/loading";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslations } from "@/hooks/use-translations";
@@ -99,10 +106,10 @@ function ResetPasswordPageInner() {
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
               <CheckCircle2 className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
-            <CardTitle className="text-2xl font-bold mt-4">{t("password.new_password_title")}</CardTitle>
-            <CardDescription className="text-base">
-              {t("password.success")}
-            </CardDescription>
+            <CardTitle className="mt-4 text-2xl font-bold">
+              {t("password.new_password_title")}
+            </CardTitle>
+            <CardDescription className="text-base">{t("password.success")}</CardDescription>
           </CardHeader>
           <CardFooter className="justify-center">
             <Link href={`/${locale}/auth/login`}>
@@ -124,12 +131,10 @@ function ResetPasswordPageInner() {
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
               <CheckCircle2 className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
-            <CardTitle className="text-2xl font-bold mt-4">
+            <CardTitle className="mt-4 text-2xl font-bold">
               {isRtl ? "تحقق من بريدك الإلكتروني" : "Check Your Email"}
             </CardTitle>
-            <CardDescription className="text-base">
-              {t("password.sent")}
-            </CardDescription>
+            <CardDescription className="text-base">{t("password.sent")}</CardDescription>
           </CardHeader>
           <CardFooter className="justify-center">
             <Link href={`/${locale}/auth/login`}>
@@ -175,7 +180,7 @@ function ResetPasswordPageInner() {
                   aria-invalid={!!passwordForm.formState.errors.password}
                 />
                 {passwordForm.formState.errors.password && (
-                  <p className="text-sm text-destructive">
+                  <p className="text-destructive text-sm">
                     {passwordForm.formState.errors.password.message}
                   </p>
                 )}
@@ -186,13 +191,15 @@ function ResetPasswordPageInner() {
                 <Input
                   id="confirm-new-password"
                   type="password"
-                  placeholder={isRtl ? "أعد إدخال كلمة المرور الجديدة" : "Re-enter your new password"}
+                  placeholder={
+                    isRtl ? "أعد إدخال كلمة المرور الجديدة" : "Re-enter your new password"
+                  }
                   autoComplete="new-password"
                   {...passwordForm.register("confirmPassword")}
                   aria-invalid={!!passwordForm.formState.errors.confirmPassword}
                 />
                 {passwordForm.formState.errors.confirmPassword && (
-                  <p className="text-sm text-destructive">
+                  <p className="text-destructive text-sm">
                     {passwordForm.formState.errors.confirmPassword.message}
                   </p>
                 )}
@@ -247,7 +254,7 @@ function ResetPasswordPageInner() {
                 aria-invalid={!!emailForm.formState.errors.email}
               />
               {emailForm.formState.errors.email && (
-                <p className="text-sm text-destructive">
+                <p className="text-destructive text-sm">
                   {emailForm.formState.errors.email.message}
                 </p>
               )}
@@ -269,10 +276,7 @@ function ResetPasswordPageInner() {
           </form>
         </CardContent>
         <CardFooter className="justify-center">
-          <Link
-            href={`/${locale}/auth/login`}
-            className="text-sm text-primary hover:underline"
-          >
+          <Link href={`/${locale}/auth/login`} className="text-primary text-sm hover:underline">
             {isRtl ? "العودة لتسجيل الدخول" : "Back to Sign In"}
           </Link>
         </CardFooter>

@@ -29,7 +29,7 @@ export function LocaleSwitcher() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+      <DropdownMenuTrigger className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors">
         <Globe className="size-4" />
         <span className="text-xs font-medium">{current?.label || currentLocale}</span>
       </DropdownMenuTrigger>

@@ -4,11 +4,7 @@ import { HomepageClient } from "./homepage-client";
 /**
  * Homepage — server component that fetches data and passes to the client component.
  */
-export default async function HomePage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const isRtl = locale === "ar";
 

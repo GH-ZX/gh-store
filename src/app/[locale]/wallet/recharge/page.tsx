@@ -3,7 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { CreditCard, ExternalLink, Loader2, AlertCircle, CheckCircle, ArrowLeft } from "lucide-react";
+import {
+  CreditCard,
+  ExternalLink,
+  Loader2,
+  AlertCircle,
+  CheckCircle,
+  ArrowLeft,
+} from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,9 +53,7 @@ export default function RechargePage() {
       const data = await res.json();
 
       if (!data.success) {
-        setErrorMsg(
-          data.message || (isRtl ? "فشل إنشاء طلب الشحن" : "Failed to start recharge"),
-        );
+        setErrorMsg(data.message || (isRtl ? "فشل إنشاء طلب الشحن" : "Failed to start recharge"));
         return;
       }
 
@@ -70,13 +75,13 @@ export default function RechargePage() {
     return (
       <main className="flex-1">
         <div className="mx-auto max-w-lg px-4 py-12 text-center">
-          <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900 mb-6">
+          <div className="mx-auto mb-6 flex size-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
             <CheckCircle className="size-8 text-green-600 dark:text-green-400" />
           </div>
           <h1 className="text-2xl font-bold">
             {isRtl ? "طلب الشحن قيد المعالجة" : "Recharge Request Submitted"}
           </h1>
-          <p className="mt-2 text-muted-foreground">
+          <p className="text-muted-foreground mt-2">
             {isRtl
               ? "سيتم إضافة الرصيد إلى محفظتك بعد تأكيد الدفع"
               : "Funds will be added to your wallet after payment confirmation"}
@@ -86,9 +91,7 @@ export default function RechargePage() {
           {paymentUrl && (
             <Button
               className="mt-6 w-full sm:w-auto"
-              render={
-                <a href={paymentUrl} target="_blank" rel="noopener noreferrer" />
-              }
+              render={<a href={paymentUrl} target="_blank" rel="noopener noreferrer" />}
             >
               <ExternalLink className="size-4" />
               {isRtl ? "إتمام الدفع" : "Complete Payment"}
@@ -117,16 +120,14 @@ export default function RechargePage() {
         {/* Back link */}
         <Link
           href={`/${locale}/wallet`}
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6"
+          className="text-muted-foreground hover:text-foreground mb-6 inline-flex items-center gap-1 text-sm"
         >
           {isRtl ? "→ العودة للمحفظة" : "← Back to Wallet"}
         </Link>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">
-              {isRtl ? "شحن المحفظة" : "Recharge Wallet"}
-            </CardTitle>
+            <CardTitle className="text-xl">{isRtl ? "شحن المحفظة" : "Recharge Wallet"}</CardTitle>
             <CardDescription>
               {isRtl
                 ? "أدخل المبلغ الذي تريد شحنه واختر طريقة الدفع"
@@ -145,7 +146,9 @@ export default function RechargePage() {
             <div className="space-y-2">
               <Label>{isRtl ? "المبلغ (USD)" : "Amount (USD)"}</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">$</span>
+                <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2 text-sm font-medium">
+                  $
+                </span>
                 <Input
                   type="number"
                   min="1"
@@ -165,7 +168,7 @@ export default function RechargePage() {
                   key={val}
                   onClick={() => setAmount(val)}
                   className={cn(
-                    "rounded-lg border py-2 text-sm font-medium transition-colors hover:bg-muted",
+                    "hover:bg-muted rounded-lg border py-2 text-sm font-medium transition-colors",
                     amount === val && "border-primary bg-primary/5 text-primary",
                   )}
                 >
@@ -187,15 +190,15 @@ export default function RechargePage() {
                 <Label
                   htmlFor="shamcash"
                   className={cn(
-                    "flex items-center gap-3 rounded-lg border p-3 cursor-pointer transition-colors hover:bg-muted/50",
-                    paymentMethod === "shamcash" && "border-primary ring-1 ring-primary",
+                    "hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors",
+                    paymentMethod === "shamcash" && "border-primary ring-primary ring-1",
                   )}
                 >
                   <RadioGroupItem value="shamcash" id="shamcash" />
-                  <CreditCard className="size-5 text-primary" />
+                  <CreditCard className="text-primary size-5" />
                   <div className="flex-1">
                     <p className="text-sm font-medium">ShamCash</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       {isRtl ? "الدفع عبر محفظة شام كاش" : "Pay via ShamCash wallet"}
                     </p>
                   </div>
@@ -203,15 +206,15 @@ export default function RechargePage() {
                 <Label
                   htmlFor="syriatel"
                   className={cn(
-                    "flex items-center gap-3 rounded-lg border p-3 cursor-pointer transition-colors hover:bg-muted/50",
-                    paymentMethod === "syriatel" && "border-primary ring-1 ring-primary",
+                    "hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors",
+                    paymentMethod === "syriatel" && "border-primary ring-primary ring-1",
                   )}
                 >
                   <RadioGroupItem value="syriatel" id="syriatel" />
-                  <CreditCard className="size-5 text-primary" />
+                  <CreditCard className="text-primary size-5" />
                   <div className="flex-1">
                     <p className="text-sm font-medium">Syriatel Cash</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       {isRtl ? "الدفع عبر محفظة سيريتل كاش" : "Pay via Syriatel Cash wallet"}
                     </p>
                   </div>
@@ -226,9 +229,15 @@ export default function RechargePage() {
               disabled={isSubmitting}
             >
               {isSubmitting ? (
-                <><Loader2 className="size-4 animate-spin" /> {isRtl ? "جاري المعالجة..." : "Processing..."}</>
+                <>
+                  <Loader2 className="size-4 animate-spin" />{" "}
+                  {isRtl ? "جاري المعالجة..." : "Processing..."}
+                </>
               ) : (
-                <><ExternalLink className="size-4" /> {isRtl ? "شحن $" + amount : "Deposit $" + amount}</>
+                <>
+                  <ExternalLink className="size-4" />{" "}
+                  {isRtl ? "شحن $" + amount : "Deposit $" + amount}
+                </>
               )}
             </Button>
           </CardContent>

@@ -45,9 +45,7 @@ function getPromoDescription(game: StoreProduct, isRtl: boolean): string {
       ? `أسعار تبدأ من $${minPrice.toFixed(2)} — شحن فوري`
       : `Prices from $${minPrice.toFixed(2)} — Instant delivery`;
   }
-  return isRtl
-    ? "شحن فوري بأفضل الأسعار"
-    : "Instant delivery at the best prices";
+  return isRtl ? "شحن فوري بأفضل الأسعار" : "Instant delivery at the best prices";
 }
 
 // ─── Game-specific promo badges ──────────────────────────
@@ -106,8 +104,8 @@ export function HeroCarousel({ products, isLoading }: HeroCarouselProps) {
 
   if (isLoading) {
     return (
-      <div className="relative overflow-hidden rounded-2xl bg-muted">
-        <div className="aspect-[21/9] animate-pulse bg-muted-foreground/10" />
+      <div className="bg-muted relative overflow-hidden rounded-2xl">
+        <div className="bg-muted-foreground/10 aspect-[21/9] animate-pulse" />
       </div>
     );
   }
@@ -117,7 +115,7 @@ export function HeroCarousel({ products, isLoading }: HeroCarouselProps) {
   }
 
   return (
-    <div className="relative group">
+    <div className="group relative">
       {/* ─── Main Carousel ─────────────────────────── */}
       <div ref={emblaRef} className="overflow-hidden rounded-2xl">
         <div className="flex">
@@ -127,21 +125,18 @@ export function HeroCarousel({ products, isLoading }: HeroCarouselProps) {
             const promoBadge = getPromoBadge(product, isRtl);
 
             return (
-              <div
-                key={product.id}
-                className="relative min-w-0 shrink-0 grow-0 basis-full"
-              >
+              <div key={product.id} className="relative min-w-0 shrink-0 grow-0 basis-full">
                 <Link
                   href={`/${params?.locale || "ar"}/store/${product.slug}`}
                   className="relative block overflow-hidden"
                 >
-                  <div className="relative aspect-[21/9] md:aspect-[3/1] overflow-hidden">
+                  <div className="relative aspect-[21/9] overflow-hidden md:aspect-[3/1]">
                     {/* Full background image */}
                     {product.imageUrl ? (
                       <img
                         src={product.imageUrl}
                         alt=""
-                        className="absolute inset-0 w-full h-full object-contain md:object-cover scale-105"
+                        className="absolute inset-0 h-full w-full scale-105 object-contain md:object-cover"
                         loading="lazy"
                       />
                     ) : null}
@@ -151,47 +146,47 @@ export function HeroCarousel({ products, isLoading }: HeroCarouselProps) {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/20" />
 
                     {/* Content */}
-                    <div className="relative z-10 flex flex-col justify-center h-full px-6 sm:px-10 md:px-16 lg:px-20">
+                    <div className="relative z-10 flex h-full flex-col justify-center px-6 sm:px-10 md:px-16 lg:px-20">
                       {/* Category badge */}
                       <Badge
                         variant="secondary"
-                        className="w-fit mb-2 sm:mb-3 text-[10px] sm:text-xs font-medium bg-white/15 text-white/90 border-white/20 backdrop-blur-sm uppercase tracking-wider"
+                        className="mb-2 w-fit border-white/20 bg-white/15 text-[10px] font-medium tracking-wider text-white/90 uppercase backdrop-blur-sm sm:mb-3 sm:text-xs"
                       >
                         {isRtl ? product.categoryAr : product.categoryEn}
                       </Badge>
 
                       {/* Game name */}
-                      <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold max-w-2xl leading-tight text-white drop-shadow-lg">
+                      <h2 className="max-w-2xl text-xl leading-tight font-extrabold text-white drop-shadow-lg sm:text-3xl md:text-4xl lg:text-5xl">
                         {isRtl ? product.nameAr : product.nameEn}
                       </h2>
 
                       {/* Promotion title (the "ROYALE PASS A20" part) */}
-                      <p className="mt-1 sm:mt-2 text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-yellow-400 drop-shadow">
+                      <p className="mt-1 text-sm font-bold text-yellow-400 drop-shadow sm:mt-2 sm:text-lg md:text-xl lg:text-2xl">
                         {promoTitle}
                       </p>
 
                       {/* Promo badge */}
-                      <div className="mt-2 sm:mt-3 flex items-center gap-2">
-                        <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[10px] sm:text-xs font-semibold gap-1">
+                      <div className="mt-2 flex items-center gap-2 sm:mt-3">
+                        <Badge className="gap-1 border-yellow-500/30 bg-yellow-500/20 text-[10px] font-semibold text-yellow-400 sm:text-xs">
                           <Zap className="size-3" />
                           {promoBadge}
                         </Badge>
                       </div>
 
                       {/* Description */}
-                      <p className="mt-2 sm:mt-3 text-xs sm:text-sm md:text-base text-white/70 max-w-lg line-clamp-2 drop-shadow">
+                      <p className="mt-2 line-clamp-2 max-w-lg text-xs text-white/70 drop-shadow sm:mt-3 sm:text-sm md:text-base">
                         {promoDesc}
                       </p>
 
                       {/* CTA */}
-                      <div className="mt-4 sm:mt-6 flex items-center gap-3">
+                      <div className="mt-4 flex items-center gap-3 sm:mt-6">
                         <Button
                           size="sm"
-                          className="shadow-lg bg-yellow-500 text-black hover:bg-yellow-400 font-bold text-xs sm:text-sm px-4 sm:px-6"
+                          className="bg-yellow-500 px-4 text-xs font-bold text-black shadow-lg hover:bg-yellow-400 sm:px-6 sm:text-sm"
                         >
                           {isRtl ? "تسوق الآن" : "Shop Now"}
                         </Button>
-                        <span className="text-xs sm:text-sm text-white/50">
+                        <span className="text-xs text-white/50 sm:text-sm">
                           {isRtl ? "توصيل فوري" : "Instant delivery"}
                         </span>
                       </div>
@@ -210,11 +205,11 @@ export function HeroCarousel({ products, isLoading }: HeroCarouselProps) {
           <button
             onClick={scrollPrev}
             className={cn(
-              "absolute top-1/2 -translate-y-1/2 right-2 md:right-4",
-              "flex size-8 md:size-10 items-center justify-center",
-              "rounded-full bg-black/40 backdrop-blur-md border border-white/20 shadow-lg",
-              "opacity-0 group-hover:opacity-100 transition-opacity",
-              "hover:bg-black/60 focus:outline-none text-white",
+              "absolute top-1/2 right-2 -translate-y-1/2 md:right-4",
+              "flex size-8 items-center justify-center md:size-10",
+              "rounded-full border border-white/20 bg-black/40 shadow-lg backdrop-blur-md",
+              "opacity-0 transition-opacity group-hover:opacity-100",
+              "text-white hover:bg-black/60 focus:outline-none",
               "hidden md:flex",
             )}
             aria-label="السابق"
@@ -224,11 +219,11 @@ export function HeroCarousel({ products, isLoading }: HeroCarouselProps) {
           <button
             onClick={scrollNext}
             className={cn(
-              "absolute top-1/2 -translate-y-1/2 left-2 md:left-4",
-              "flex size-8 md:size-10 items-center justify-center",
-              "rounded-full bg-black/40 backdrop-blur-md border border-white/20 shadow-lg",
-              "opacity-0 group-hover:opacity-100 transition-opacity",
-              "hover:bg-black/60 focus:outline-none text-white",
+              "absolute top-1/2 left-2 -translate-y-1/2 md:left-4",
+              "flex size-8 items-center justify-center md:size-10",
+              "rounded-full border border-white/20 bg-black/40 shadow-lg backdrop-blur-md",
+              "opacity-0 transition-opacity group-hover:opacity-100",
+              "text-white hover:bg-black/60 focus:outline-none",
               "hidden md:flex",
             )}
             aria-label="التالي"
@@ -241,11 +236,11 @@ export function HeroCarousel({ products, isLoading }: HeroCarouselProps) {
           <button
             onClick={scrollPrev}
             className={cn(
-              "absolute top-1/2 -translate-y-1/2 left-2 md:left-4",
-              "flex size-8 md:size-10 items-center justify-center",
-              "rounded-full bg-black/40 backdrop-blur-md border border-white/20 shadow-lg",
-              "opacity-0 group-hover:opacity-100 transition-opacity",
-              "hover:bg-black/60 focus:outline-none text-white",
+              "absolute top-1/2 left-2 -translate-y-1/2 md:left-4",
+              "flex size-8 items-center justify-center md:size-10",
+              "rounded-full border border-white/20 bg-black/40 shadow-lg backdrop-blur-md",
+              "opacity-0 transition-opacity group-hover:opacity-100",
+              "text-white hover:bg-black/60 focus:outline-none",
               "hidden md:flex",
             )}
             aria-label="Previous"
@@ -255,11 +250,11 @@ export function HeroCarousel({ products, isLoading }: HeroCarouselProps) {
           <button
             onClick={scrollNext}
             className={cn(
-              "absolute top-1/2 -translate-y-1/2 right-2 md:right-4",
-              "flex size-8 md:size-10 items-center justify-center",
-              "rounded-full bg-black/40 backdrop-blur-md border border-white/20 shadow-lg",
-              "opacity-0 group-hover:opacity-100 transition-opacity",
-              "hover:bg-black/60 focus:outline-none text-white",
+              "absolute top-1/2 right-2 -translate-y-1/2 md:right-4",
+              "flex size-8 items-center justify-center md:size-10",
+              "rounded-full border border-white/20 bg-black/40 shadow-lg backdrop-blur-md",
+              "opacity-0 transition-opacity group-hover:opacity-100",
+              "text-white hover:bg-black/60 focus:outline-none",
               "hidden md:flex",
             )}
             aria-label="Next"
@@ -271,7 +266,7 @@ export function HeroCarousel({ products, isLoading }: HeroCarouselProps) {
 
       {/* ─── Bottom Thumbnail Strip ────────────────── */}
       {scrollSnaps.length > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-3 sm:mt-4 md:mt-5">
+        <div className="mt-3 flex items-center justify-center gap-2 sm:mt-4 md:mt-5">
           {products.map((product, index) => {
             const isActive = index === selectedIndex;
             return (
@@ -280,28 +275,24 @@ export function HeroCarousel({ products, isLoading }: HeroCarouselProps) {
                 onClick={() => scrollTo(index)}
                 className={cn(
                   "relative overflow-hidden rounded-lg border-2 transition-all duration-300",
-                  "h-10 sm:h-12 md:h-14 shrink-0",
+                  "h-10 shrink-0 sm:h-12 md:h-14",
                   isActive
-                    ? "border-yellow-500 w-14 sm:w-20 md:w-24 opacity-100"
-                    : "border-transparent w-10 sm:w-12 md:w-16 opacity-40 hover:opacity-70 hover:w-12 sm:hover:w-16 md:hover:w-20",
+                    ? "w-14 border-yellow-500 opacity-100 sm:w-20 md:w-24"
+                    : "w-10 border-transparent opacity-40 hover:w-12 hover:opacity-70 sm:w-12 sm:hover:w-16 md:w-16 md:hover:w-20",
                 )}
                 aria-label={`${isRtl ? "الانتقال للشريحة" : "Go to slide"} ${index + 1}`}
               >
                 {product.imageUrl ? (
-                  <img
-                    src={product.imageUrl}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={product.imageUrl} alt="" className="h-full w-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-muted flex items-center justify-center">
-                    <span className="text-[9px] sm:text-[10px] text-muted-foreground truncate px-1">
+                  <div className="bg-muted flex h-full w-full items-center justify-center">
+                    <span className="text-muted-foreground truncate px-1 text-[9px] sm:text-[10px]">
                       {isRtl ? product.nameAr : product.nameEn}
                     </span>
                   </div>
                 )}
                 {isActive && (
-                  <div className="absolute inset-0 ring-1 ring-inset ring-yellow-500/30" />
+                  <div className="absolute inset-0 ring-1 ring-yellow-500/30 ring-inset" />
                 )}
               </button>
             );
@@ -311,7 +302,7 @@ export function HeroCarousel({ products, isLoading }: HeroCarouselProps) {
 
       {/* ─── Dots fallback for mobile ──────────────── */}
       {scrollSnaps.length > 1 && (
-        <div className="flex justify-center gap-1.5 mt-2 md:hidden">
+        <div className="mt-2 flex justify-center gap-1.5 md:hidden">
           {scrollSnaps.map((_, index) => (
             <button
               key={index}

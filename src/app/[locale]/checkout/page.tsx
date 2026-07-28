@@ -14,18 +14,9 @@ import {
 import { EmptyState } from "@/components/shared/empty-state";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@/components/ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
@@ -142,27 +133,29 @@ export default function CheckoutPage() {
       <main className="flex-1">
         <div className="mx-auto max-w-7xl px-4 py-16">
           <div className="mx-auto max-w-md text-center">
-            <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900 mb-6">
+            <div className="mx-auto mb-6 flex size-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
               <CheckCircle className="size-8 text-green-600 dark:text-green-400" />
             </div>
             <h1 className="text-3xl font-bold tracking-tight">
               {isRtl ? "تم تأكيد الطلب!" : "Order Confirmed!"}
             </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-2 text-sm">
               {successOrderNumber && (
-                <span className="font-mono text-foreground">{successOrderNumber}</span>
+                <span className="text-foreground font-mono">{successOrderNumber}</span>
               )}
             </p>
-            <p className="mt-3 text-muted-foreground">
+            <p className="text-muted-foreground mt-3">
               {isRtl
                 ? "شكراً لك! تم استلام طلبك وسيتم معالجته قريباً."
                 : "Thank you! Your order has been received and will be processed shortly."}
             </p>
 
             {paymentMethod === "sam" && (
-              <div className="mt-4 rounded-lg bg-primary/5 p-4 text-sm">
-                <p className="font-medium mb-1">
-                  {isRtl ? "🚀 تم فتح صفحة الدفع في نافذة جديدة" : "🚀 Payment page opened in a new window"}
+              <div className="bg-primary/5 mt-4 rounded-lg p-4 text-sm">
+                <p className="mb-1 font-medium">
+                  {isRtl
+                    ? "🚀 تم فتح صفحة الدفع في نافذة جديدة"
+                    : "🚀 Payment page opened in a new window"}
                 </p>
                 <p className="text-muted-foreground">
                   {isRtl
@@ -194,14 +187,14 @@ export default function CheckoutPage() {
           <h1 className="text-3xl font-bold tracking-tight">
             {isRtl ? "إتمام الطلب" : "Checkout"}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-sm">
             {isRtl ? "راجع طلبك واختر طريقة الدفع" : "Review your order and select payment method"}
           </p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-3">
           {/* ─── Left: Payment & Details ───────────── */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="space-y-8 lg:col-span-2">
             {/* Login required */}
             {!authLoading && !isAuthenticated && (
               <Card>
@@ -217,7 +210,9 @@ export default function CheckoutPage() {
                 </CardHeader>
                 <CardContent>
                   <Button
-                    onClick={() => router.push(`/${locale}/auth/login?redirect=/${locale}/checkout`)}
+                    onClick={() =>
+                      router.push(`/${locale}/auth/login?redirect=/${locale}/checkout`)
+                    }
                   >
                     {isRtl ? "تسجيل الدخول" : "Sign In"}
                   </Button>
@@ -235,15 +230,10 @@ export default function CheckoutPage() {
 
             {/* Items preview */}
             <div className="space-y-3">
-              <h2 className="font-semibold text-lg">
-                {isRtl ? "المنتجات" : "Products"}
-              </h2>
+              <h2 className="text-lg font-semibold">{isRtl ? "المنتجات" : "Products"}</h2>
               {items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center gap-4 rounded-xl border p-4"
-                >
-                  <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground/30">
+                <div key={item.id} className="flex items-center gap-4 rounded-xl border p-4">
+                  <div className="bg-muted text-muted-foreground/30 flex size-12 shrink-0 items-center justify-center rounded-lg">
                     {item.imageUrl ? (
                       <img
                         src={item.imageUrl}
@@ -254,13 +244,13 @@ export default function CheckoutPage() {
                       <ShoppingCart className="size-6" />
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{item.name}</p>
-                    <p className="text-xs text-muted-foreground">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{item.name}</p>
+                    <p className="text-muted-foreground text-xs">
                       {isRtl ? `الكمية: ${item.quantity}` : `Qty: ${item.quantity}`}
                     </p>
                   </div>
-                  <span className="text-sm font-medium shrink-0">
+                  <span className="shrink-0 text-sm font-medium">
                     ${item.totalPrice.toFixed(2)}
                   </span>
                 </div>
@@ -269,9 +259,7 @@ export default function CheckoutPage() {
 
             {/* Payment Method */}
             <div className="space-y-4">
-              <h2 className="font-semibold text-lg">
-                {isRtl ? "طريقة الدفع" : "Payment Method"}
-              </h2>
+              <h2 className="text-lg font-semibold">{isRtl ? "طريقة الدفع" : "Payment Method"}</h2>
 
               <RadioGroup
                 value={paymentMethod}
@@ -281,20 +269,16 @@ export default function CheckoutPage() {
                 <Label
                   htmlFor="wallet"
                   className={cn(
-                    "flex items-center gap-4 rounded-xl border p-4 cursor-pointer transition-colors hover:bg-muted/50",
-                    paymentMethod === "wallet" && "border-primary ring-1 ring-primary",
+                    "hover:bg-muted/50 flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors",
+                    paymentMethod === "wallet" && "border-primary ring-primary ring-1",
                   )}
                 >
                   <RadioGroupItem value="wallet" id="wallet" />
-                  <Wallet className="size-5 text-primary" />
+                  <Wallet className="text-primary size-5" />
                   <div className="flex-1">
-                    <p className="text-sm font-medium">
-                      {isRtl ? "المحفظة" : "Wallet"}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {isRtl
-                        ? "ادفع باستخدام رصيد محفظتك"
-                        : "Pay using your wallet balance"}
+                    <p className="text-sm font-medium">{isRtl ? "المحفظة" : "Wallet"}</p>
+                    <p className="text-muted-foreground text-xs">
+                      {isRtl ? "ادفع باستخدام رصيد محفظتك" : "Pay using your wallet balance"}
                     </p>
                   </div>
                 </Label>
@@ -302,15 +286,15 @@ export default function CheckoutPage() {
                 <Label
                   htmlFor="sam"
                   className={cn(
-                    "flex items-center gap-4 rounded-xl border p-4 cursor-pointer transition-colors hover:bg-muted/50",
-                    paymentMethod === "sam" && "border-primary ring-1 ring-primary",
+                    "hover:bg-muted/50 flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors",
+                    paymentMethod === "sam" && "border-primary ring-primary ring-1",
                   )}
                 >
                   <RadioGroupItem value="sam" id="sam" />
-                  <CreditCard className="size-5 text-primary" />
+                  <CreditCard className="text-primary size-5" />
                   <div className="flex-1">
                     <p className="text-sm font-medium">SAM API</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       {isRtl
                         ? "ادفع عبر ShamCash أو Syriatel Cash"
                         : "Pay via ShamCash or Syriatel Cash"}
@@ -321,8 +305,8 @@ export default function CheckoutPage() {
 
               {/* SAM info note */}
               {paymentMethod === "sam" && (
-                <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
-                  <p className="text-sm text-muted-foreground">
+                <div className="border-primary/20 bg-primary/5 rounded-xl border p-4">
+                  <p className="text-muted-foreground text-sm">
                     {isRtl
                       ? "سيتم توجيهك إلى بوابة الدفع SAM API عند تأكيد الطلب. اختر طريقة الدفع المناسبة (ShamCash أو Syriatel Cash) في صفحة الدفع."
                       : "You will be redirected to the SAM API payment gateway after placing your order. Select your preferred payment method (ShamCash or Syriatel Cash) on the payment page."}
@@ -334,15 +318,13 @@ export default function CheckoutPage() {
 
           {/* ─── Right: Order Summary ──────────────── */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 rounded-xl border bg-card p-6 space-y-4">
-              <h2 className="font-semibold text-lg">
-                {isRtl ? "ملخص الطلب" : "Order Summary"}
-              </h2>
+            <div className="bg-card sticky top-24 space-y-4 rounded-xl border p-6">
+              <h2 className="text-lg font-semibold">{isRtl ? "ملخص الطلب" : "Order Summary"}</h2>
 
               <div className="space-y-3">
                 {items.map((item) => (
                   <div key={item.id} className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground truncate max-w-[180px]">
+                    <span className="text-muted-foreground max-w-[180px] truncate">
                       {item.name} × {item.quantity}
                     </span>
                     <span className="font-medium">${item.totalPrice.toFixed(2)}</span>
@@ -360,21 +342,15 @@ export default function CheckoutPage() {
               </div>
 
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">
-                  {isRtl ? "الخصم" : "Discount"}
-                </span>
+                <span className="text-muted-foreground">{isRtl ? "الخصم" : "Discount"}</span>
                 <span>$0.00</span>
               </div>
 
               <Separator />
 
               <div className="flex items-center justify-between">
-                <span className="text-base font-semibold">
-                  {isRtl ? "الإجمالي" : "Total"}
-                </span>
-                <span className="text-xl font-bold text-primary">
-                  ${subtotal.toFixed(2)}
-                </span>
+                <span className="text-base font-semibold">{isRtl ? "الإجمالي" : "Total"}</span>
+                <span className="text-primary text-xl font-bold">${subtotal.toFixed(2)}</span>
               </div>
 
               {/* Place Order */}
@@ -397,13 +373,17 @@ export default function CheckoutPage() {
                       <CheckCircle className="size-4" />
                     )}
                     {paymentMethod === "sam"
-                      ? (isRtl ? "الدفع عبر SAM" : "Pay with SAM")
-                      : (isRtl ? "تأكيد الطلب" : "Place Order")}
+                      ? isRtl
+                        ? "الدفع عبر SAM"
+                        : "Pay with SAM"
+                      : isRtl
+                        ? "تأكيد الطلب"
+                        : "Place Order"}
                   </>
                 )}
               </Button>
 
-              <p className="text-xs text-center text-muted-foreground">
+              <p className="text-muted-foreground text-center text-xs">
                 {isRtl
                   ? "بالضغط على تأكيد الطلب، أنت توافق على الشروط والأحكام"
                   : "By placing this order, you agree to our Terms & Conditions"}

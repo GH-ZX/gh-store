@@ -48,14 +48,16 @@ export interface StoreCategory {
 
 function toProduct(p: ProductRow, cat?: CategoryRow | null): StoreProduct {
   const meta = p.metadata as Record<string, unknown> | null;
-  const metaFields = meta?.fields as Array<{
-    key: string;
-    labelAr: string;
-    labelEn: string;
-    type: string;
-    required: boolean;
-    options?: string[];
-  }> | undefined;
+  const metaFields = meta?.fields as
+    | Array<{
+        key: string;
+        labelAr: string;
+        labelEn: string;
+        type: string;
+        required: boolean;
+        options?: string[];
+      }>
+    | undefined;
 
   return {
     id: p.id,
@@ -160,9 +162,7 @@ async function fetchFeaturedProducts(): Promise<StoreProduct[]> {
 /**
  * Fetch product by slug.
  */
-async function fetchProductBySlug(
-  slug: string,
-): Promise<StoreProduct | null> {
+async function fetchProductBySlug(slug: string): Promise<StoreProduct | null> {
   const supabase = createSupabaseBrowserClient();
 
   try {
@@ -224,10 +224,7 @@ async function fetchCategories(): Promise<StoreCategory[]> {
 /**
  * Hook to fetch all active products.
  */
-export function useProducts(options?: {
-  categorySlug?: string;
-  limit?: number;
-}) {
+export function useProducts(options?: { categorySlug?: string; limit?: number }) {
   return useQuery<StoreProduct[]>({
     queryKey: ["products", options?.categorySlug, options?.limit],
     queryFn: () => fetchProducts(options),

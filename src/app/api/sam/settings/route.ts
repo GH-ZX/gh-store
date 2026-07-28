@@ -13,7 +13,7 @@ const CONFIG_KEY = "payment_config";
 // ─── Types ───────────────────────────────────────────
 
 export interface SAMAdvancedConfig {
-  profitMargin: number;        // 0–100 (percentage)
+  profitMargin: number; // 0–100 (percentage)
   defaultWalletId: string | null;
   defaultCurrency: "USD" | "SYP" | "EUR";
   webhookUrl: string;
@@ -70,16 +70,14 @@ async function saveConfig(
   providerId: string,
   config: SAMAdvancedConfig,
 ): Promise<void> {
-  await supabase
-    .from("provider_config")
-    .upsert(
-      {
-        provider_id: providerId,
-        key: CONFIG_KEY,
-        value: JSON.parse(JSON.stringify(config)),
-      },
-      { onConflict: "provider_id, key" },
-    );
+  await supabase.from("provider_config").upsert(
+    {
+      provider_id: providerId,
+      key: CONFIG_KEY,
+      value: JSON.parse(JSON.stringify(config)),
+    },
+    { onConflict: "provider_id, key" },
+  );
 }
 
 /**
@@ -292,7 +290,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: false, message: "No data provided (apiKey, config, or regenerateWebhook expected)" },
+      {
+        success: false,
+        message: "No data provided (apiKey, config, or regenerateWebhook expected)",
+      },
       { status: 400 },
     );
   } catch (err) {

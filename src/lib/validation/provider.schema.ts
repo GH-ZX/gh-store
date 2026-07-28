@@ -20,10 +20,9 @@ export const g2bulkSyncSchema = z
     products: z.array(z.number().int().positive()).max(500).optional(),
     games: z.array(z.string().min(1).max(100)).max(200).optional(),
   })
-  .refine(
-    (v) => Boolean(v.categories?.length || v.products?.length || v.games?.length),
-    { message: "Select at least one category, product, or game to sync" },
-  );
+  .refine((v) => Boolean(v.categories?.length || v.products?.length || v.games?.length), {
+    message: "Select at least one category, product, or game to sync",
+  });
 
 /** Advanced SAM config saved under provider_config.payment_config */
 export const samConfigSchema = z.object({
@@ -67,8 +66,7 @@ export const samTransactionsQuerySchema = z
     walletId: z.string().uuid().optional(),
   })
   .refine(
-    (v) =>
-      v.provider === "shamcash" ? Boolean(v.walletAddress) : Boolean(v.phone || v.cashCode),
+    (v) => (v.provider === "shamcash" ? Boolean(v.walletAddress) : Boolean(v.phone || v.cashCode)),
     { message: "Missing identifier for the selected provider" },
   );
 

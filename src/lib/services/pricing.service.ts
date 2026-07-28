@@ -101,9 +101,7 @@ function resolveUnitPrice(
  * total and the order total from database values only. Returns `{ error }`
  * rather than throwing so route handlers can map it straight to a 400.
  */
-export async function priceOrder(
-  items: RequestedItem[],
-): Promise<PricedOrder | PricingError> {
+export async function priceOrder(items: RequestedItem[]): Promise<PricedOrder | PricingError> {
   if (items.length === 0) return { error: "Cart is empty" };
 
   const supabase = createSupabaseAdminClient();

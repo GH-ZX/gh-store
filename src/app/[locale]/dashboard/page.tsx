@@ -135,7 +135,10 @@ const recentOrders = [
   },
 ];
 
-const statusConfig: Record<string, { label: string; labelAr: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+const statusConfig: Record<
+  string,
+  { label: string; labelAr: string; variant: "default" | "secondary" | "destructive" | "outline" }
+> = {
   completed: { label: "Completed", labelAr: "مكتمل", variant: "default" },
   processing: { label: "Processing", labelAr: "قيد المعالجة", variant: "secondary" },
   pending: { label: "Pending", labelAr: "معلق", variant: "outline" },
@@ -166,13 +169,9 @@ export default function DashboardOverview() {
     <div className="space-y-8">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          {isRtl ? "لوحة التحكم" : "Dashboard"}
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight">{isRtl ? "لوحة التحكم" : "Dashboard"}</h1>
         <p className="text-muted-foreground mt-1">
-          {isRtl
-            ? "نظرة عامة على متجرك اليوم"
-            : "An overview of your store today"}
+          {isRtl ? "نظرة عامة على متجرك اليوم" : "An overview of your store today"}
         </p>
       </div>
 
@@ -183,7 +182,7 @@ export default function DashboardOverview() {
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     {isRtl ? stat.titleAr : stat.title}
                   </p>
                   <p className="text-2xl font-bold tracking-tight">{stat.value}</p>
@@ -198,7 +197,13 @@ export default function DashboardOverview() {
                 ) : (
                   <ArrowDownRight className="size-3.5 text-red-600 dark:text-red-400" />
                 )}
-                <span className={stat.trend === "up" ? "text-green-600 dark:text-green-400 font-medium" : "text-red-600 dark:text-red-400 font-medium"}>
+                <span
+                  className={
+                    stat.trend === "up"
+                      ? "font-medium text-green-600 dark:text-green-400"
+                      : "font-medium text-red-600 dark:text-red-400"
+                  }
+                >
                   {stat.change}
                 </span>
                 <span className="text-muted-foreground">
@@ -240,8 +245,8 @@ export default function DashboardOverview() {
         {/* Recent Orders */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <ShoppingBag className="size-5 text-muted-foreground" />
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <ShoppingBag className="text-muted-foreground size-5" />
               {isRtl ? "آخر الطلبات" : "Recent Orders"}
             </CardTitle>
           </CardHeader>
@@ -251,7 +256,9 @@ export default function DashboardOverview() {
                 <TableRow>
                   <TableHead className="px-4">{isRtl ? "الطلب" : "Order"}</TableHead>
                   <TableHead>{isRtl ? "العميل" : "Customer"}</TableHead>
-                  <TableHead className="hidden sm:table-cell">{isRtl ? "المبلغ" : "Amount"}</TableHead>
+                  <TableHead className="hidden sm:table-cell">
+                    {isRtl ? "المبلغ" : "Amount"}
+                  </TableHead>
                   <TableHead>{isRtl ? "الحالة" : "Status"}</TableHead>
                 </TableRow>
               </TableHeader>
@@ -263,15 +270,15 @@ export default function DashboardOverview() {
                       <TableCell className="px-4 font-medium">{order.id}</TableCell>
                       <TableCell>
                         <div>
-                          <p className="font-medium text-sm">{order.customer}</p>
-                          <p className="text-xs text-muted-foreground hidden sm:block">{order.email}</p>
+                          <p className="text-sm font-medium">{order.customer}</p>
+                          <p className="text-muted-foreground hidden text-xs sm:block">
+                            {order.email}
+                          </p>
                         </div>
                       </TableCell>
                       <TableCell className="hidden sm:table-cell">{order.total}</TableCell>
                       <TableCell>
-                        <Badge variant={sc.variant}>
-                          {isRtl ? sc.labelAr : sc.label}
-                        </Badge>
+                        <Badge variant={sc.variant}>{isRtl ? sc.labelAr : sc.label}</Badge>
                       </TableCell>
                     </TableRow>
                   );
@@ -284,8 +291,8 @@ export default function DashboardOverview() {
         {/* Top Products */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Package className="size-5 text-muted-foreground" />
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Package className="text-muted-foreground size-5" />
               {isRtl ? "أفضل المنتجات" : "Top Products"}
             </CardTitle>
           </CardHeader>
@@ -304,9 +311,9 @@ export default function DashboardOverview() {
                     <TableCell className="px-4 font-medium">{product.name}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="h-2 w-16 rounded-full bg-muted overflow-hidden">
+                        <div className="bg-muted h-2 w-16 overflow-hidden rounded-full">
                           <div
-                            className="h-full rounded-full bg-primary"
+                            className="bg-primary h-full rounded-full"
                             style={{
                               width: `${(product.sales / Math.max(...topProducts.map((p) => p.sales))) * 100}%`,
                             }}
@@ -327,8 +334,8 @@ export default function DashboardOverview() {
       {/* ─── Provider Stats ──────────────────────────── */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Activity className="size-5 text-muted-foreground" />
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Activity className="text-muted-foreground size-5" />
             {isRtl ? "إحصائيات المزوّدين" : "Provider Statistics"}
           </CardTitle>
         </CardHeader>
@@ -348,11 +355,15 @@ export default function DashboardOverview() {
                 <TableRow key={p.name}>
                   <TableCell className="px-4 font-medium">{p.name}</TableCell>
                   <TableCell className="tabular-nums">{p.total}</TableCell>
-                  <TableCell className="tabular-nums text-green-600 dark:text-green-400">{p.success}</TableCell>
-                  <TableCell className="tabular-nums text-red-600 dark:text-red-400">{p.failed}</TableCell>
+                  <TableCell className="text-green-600 tabular-nums dark:text-green-400">
+                    {p.success}
+                  </TableCell>
+                  <TableCell className="text-red-600 tabular-nums dark:text-red-400">
+                    {p.failed}
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <div className="h-2 w-20 rounded-full bg-muted overflow-hidden">
+                      <div className="bg-muted h-2 w-20 overflow-hidden rounded-full">
                         <div
                           className="h-full rounded-full bg-green-500"
                           style={{ width: p.rate }}

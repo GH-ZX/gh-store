@@ -31,7 +31,14 @@ const ITEMS_PER_PAGE = 12;
 
 type SortOption = "default" | "price-asc" | "price-desc" | "name-asc" | "name-desc" | "rating-desc";
 
-export function StoreClient({ locale, isRtl, initialProducts, initialCategories, initialSearchQuery = "", initialType }: StoreClientProps) {
+export function StoreClient({
+  locale,
+  isRtl,
+  initialProducts,
+  initialCategories,
+  initialSearchQuery = "",
+  initialType,
+}: StoreClientProps) {
   // ─── State ──────────────────────────────────────────
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [activeCategory, setActiveCategory] = useState<string | undefined>();
@@ -71,10 +78,14 @@ export function StoreClient({ locale, isRtl, initialProducts, initialCategories,
         list.sort((a, b) => b.basePrice - a.basePrice);
         break;
       case "name-asc":
-        list.sort((a, b) => (isRtl ? a.nameAr.localeCompare(b.nameAr) : a.nameEn.localeCompare(b.nameEn)));
+        list.sort((a, b) =>
+          isRtl ? a.nameAr.localeCompare(b.nameAr) : a.nameEn.localeCompare(b.nameEn),
+        );
         break;
       case "name-desc":
-        list.sort((a, b) => (isRtl ? b.nameAr.localeCompare(a.nameAr) : b.nameEn.localeCompare(a.nameEn)));
+        list.sort((a, b) =>
+          isRtl ? b.nameAr.localeCompare(a.nameAr) : b.nameEn.localeCompare(a.nameEn),
+        );
         break;
       case "rating-desc":
         list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
@@ -116,10 +127,8 @@ export function StoreClient({ locale, isRtl, initialProducts, initialCategories,
       <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
         {/* ─── Page Header ──────────────────────────── */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">
-            {isRtl ? "المتجر" : "Store"}
-          </h1>
-          <p className="mt-2 text-muted-foreground">
+          <h1 className="text-3xl font-bold tracking-tight">{isRtl ? "المتجر" : "Store"}</h1>
+          <p className="text-muted-foreground mt-2">
             {isRtl
               ? `تصفح ${filteredProducts.length} منتج من أفضل العروض`
               : `Browse ${filteredProducts.length} products from top deals`}
@@ -127,20 +136,20 @@ export function StoreClient({ locale, isRtl, initialProducts, initialCategories,
         </div>
 
         {/* ─── Search + Sort Bar ────────────────────── */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           {/* Search */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <div className="relative max-w-md flex-1">
+            <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
             <Input
               placeholder={isRtl ? "ابحث عن منتج..." : "Search products..."}
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
-              className="pl-9 pr-9"
+              className="pr-9 pl-9"
             />
             {searchQuery && (
               <button
                 onClick={() => handleSearch("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2"
               >
                 <X className="size-4" />
               </button>
@@ -150,15 +159,27 @@ export function StoreClient({ locale, isRtl, initialProducts, initialCategories,
           {/* Sort + Filter toggle */}
           <div className="flex items-center gap-2">
             {/* Sort */}
-            <Select value={sortBy} onValueChange={(v) => { if (v) { setSortBy(v as SortOption); setCurrentPage(1); }}}>
+            <Select
+              value={sortBy}
+              onValueChange={(v) => {
+                if (v) {
+                  setSortBy(v as SortOption);
+                  setCurrentPage(1);
+                }
+              }}
+            >
               <SelectTrigger className="w-[180px]">
-                <ArrowUpDown className="size-3.5 mr-2" />
+                <ArrowUpDown className="mr-2 size-3.5" />
                 <SelectValue placeholder={isRtl ? "ترتيب" : "Sort"} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="default">{isRtl ? "افتراضي" : "Default"}</SelectItem>
-                <SelectItem value="price-asc">{isRtl ? "السعر: من الأقل" : "Price: Low to High"}</SelectItem>
-                <SelectItem value="price-desc">{isRtl ? "السعر: من الأعلى" : "Price: High to Low"}</SelectItem>
+                <SelectItem value="price-asc">
+                  {isRtl ? "السعر: من الأقل" : "Price: Low to High"}
+                </SelectItem>
+                <SelectItem value="price-desc">
+                  {isRtl ? "السعر: من الأعلى" : "Price: High to Low"}
+                </SelectItem>
                 <SelectItem value="name-asc">{isRtl ? "الاسم: أ-ي" : "Name: A-Z"}</SelectItem>
                 <SelectItem value="name-desc">{isRtl ? "الاسم: ي-أ" : "Name: Z-A"}</SelectItem>
                 <SelectItem value="rating-desc">{isRtl ? "التقييم" : "Top Rated"}</SelectItem>
@@ -199,10 +220,7 @@ export function StoreClient({ locale, isRtl, initialProducts, initialCategories,
           </div>
         ) : (
           <>
-            <ProductGrid
-              products={paginatedProducts.map(toGridProduct)}
-              columns={4}
-            />
+            <ProductGrid products={paginatedProducts.map(toGridProduct)} columns={4} />
 
             {/* ─── Pagination ───────────────────────── */}
             {totalPages > 1 && (

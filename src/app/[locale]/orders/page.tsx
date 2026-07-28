@@ -53,7 +53,10 @@ interface Order {
 
 // ─── Status Config ───────────────────────────────────
 
-const statusConfig: Record<string, { labelAr: string; labelEn: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+const statusConfig: Record<
+  string,
+  { labelAr: string; labelEn: string; variant: "default" | "secondary" | "destructive" | "outline" }
+> = {
   pending: { labelAr: "قيد الانتظار", labelEn: "Pending", variant: "outline" },
   processing: { labelAr: "قيد المعالجة", labelEn: "Processing", variant: "secondary" },
   completed: { labelAr: "مكتمل", labelEn: "Completed", variant: "default" },
@@ -61,7 +64,10 @@ const statusConfig: Record<string, { labelAr: string; labelEn: string; variant: 
   refunded: { labelAr: "مسترجع", labelEn: "Refunded", variant: "outline" },
 };
 
-const paymentStatusConfig: Record<string, { labelAr: string; labelEn: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+const paymentStatusConfig: Record<
+  string,
+  { labelAr: string; labelEn: string; variant: "default" | "secondary" | "destructive" | "outline" }
+> = {
   pending: { labelAr: "قيد الدفع", labelEn: "Pending", variant: "outline" },
   paid: { labelAr: "تم الدفع", labelEn: "Paid", variant: "default" },
   failed: { labelAr: "فشل الدفع", labelEn: "Failed", variant: "destructive" },
@@ -128,7 +134,7 @@ export default function OrdersPage() {
         <div className="mx-auto max-w-4xl px-4 py-12">
           <div className="space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-32 animate-pulse rounded-xl bg-muted" />
+              <div key={i} className="bg-muted h-32 animate-pulse rounded-xl" />
             ))}
           </div>
         </div>
@@ -143,13 +149,11 @@ export default function OrdersPage() {
         <div className="mx-auto max-w-4xl px-4 py-16">
           <Card className="border-destructive/50">
             <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-              <AlertCircle className="size-14 text-destructive/30 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">
+              <AlertCircle className="text-destructive/30 mb-4 size-14" />
+              <h3 className="mb-2 text-lg font-semibold">
                 {isRtl ? "فشل تحميل الطلبات" : "Failed to load orders"}
               </h3>
-              <p className="text-sm text-muted-foreground max-w-md mb-6">
-                {error}
-              </p>
+              <p className="text-muted-foreground mb-6 max-w-md text-sm">{error}</p>
               <Button onClick={fetchOrders} variant="outline" className="gap-2">
                 <RefreshCw className="size-4" />
                 {isRtl ? "إعادة المحاولة" : "Retry"}
@@ -178,7 +182,7 @@ export default function OrdersPage() {
             descriptionAr="لم تقم بشراء أي منتجات بعد. تصفح المتجر لبدء التسوق."
             action={{
               label: isRtl ? "تصفح المتجر" : "Browse Store",
-              onClick: () => window.location.href = `/${locale}/store`,
+              onClick: () => (window.location.href = `/${locale}/store`),
             }}
           />
         </div>
@@ -192,13 +196,9 @@ export default function OrdersPage() {
         {/* ─── Header ──────────────────────────────── */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              {isRtl ? "طلباتي" : "My Orders"}
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {isRtl
-                ? `عرض ${orders.length} طلب`
-                : `Viewing ${orders.length} orders`}
+            <h1 className="text-3xl font-bold tracking-tight">{isRtl ? "طلباتي" : "My Orders"}</h1>
+            <p className="text-muted-foreground mt-1 text-sm">
+              {isRtl ? `عرض ${orders.length} طلب` : `Viewing ${orders.length} orders`}
             </p>
           </div>
 
@@ -212,35 +212,51 @@ export default function OrdersPage() {
         <div className="space-y-4">
           {orders.map((order) => {
             const status = statusConfig[order.status] || statusConfig.pending;
-            const payStatus = paymentStatusConfig[order.payment_status] || paymentStatusConfig.pending;
+            const payStatus =
+              paymentStatusConfig[order.payment_status] || paymentStatusConfig.pending;
             const isExpanded = expandedId === order.id;
 
             return (
-              <Card key={order.id} className="overflow-hidden transition-colors hover:border-border/80">
+              <Card
+                key={order.id}
+                className="hover:border-border/80 overflow-hidden transition-colors"
+              >
                 {/* Header row */}
                 <button
                   onClick={() => setExpandedId(isExpanded ? null : order.id)}
                   className="flex w-full items-center gap-4 p-5 text-left"
                 >
                   {/* Status icon */}
-                  <div className={cn(
-                    "flex size-10 shrink-0 items-center justify-center rounded-full",
-                    order.status === "completed" && "bg-green-100 dark:bg-green-900",
-                    order.status === "processing" && "bg-blue-100 dark:bg-blue-900",
-                    order.status === "cancelled" && "bg-red-100 dark:bg-red-900",
-                    order.status === "pending" && "bg-muted",
-                    order.status === "refunded" && "bg-orange-100 dark:bg-orange-900",
-                  )}>
-                    {order.status === "completed" && <CheckCircle2 className="size-5 text-green-600 dark:text-green-400" />}
-                    {order.status === "processing" && <Clock className="size-5 text-blue-600 dark:text-blue-400" />}
-                    {order.status === "cancelled" && <XCircle className="size-5 text-red-600 dark:text-red-400" />}
-                    {order.status === "pending" && <AlertCircle className="size-5 text-muted-foreground" />}
-                    {order.status === "refunded" && <Package className="size-5 text-orange-600 dark:text-orange-400" />}
+                  <div
+                    className={cn(
+                      "flex size-10 shrink-0 items-center justify-center rounded-full",
+                      order.status === "completed" && "bg-green-100 dark:bg-green-900",
+                      order.status === "processing" && "bg-blue-100 dark:bg-blue-900",
+                      order.status === "cancelled" && "bg-red-100 dark:bg-red-900",
+                      order.status === "pending" && "bg-muted",
+                      order.status === "refunded" && "bg-orange-100 dark:bg-orange-900",
+                    )}
+                  >
+                    {order.status === "completed" && (
+                      <CheckCircle2 className="size-5 text-green-600 dark:text-green-400" />
+                    )}
+                    {order.status === "processing" && (
+                      <Clock className="size-5 text-blue-600 dark:text-blue-400" />
+                    )}
+                    {order.status === "cancelled" && (
+                      <XCircle className="size-5 text-red-600 dark:text-red-400" />
+                    )}
+                    {order.status === "pending" && (
+                      <AlertCircle className="text-muted-foreground size-5" />
+                    )}
+                    {order.status === "refunded" && (
+                      <Package className="size-5 text-orange-600 dark:text-orange-400" />
+                    )}
                   </div>
 
                   {/* Details */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="text-sm font-semibold">{order.order_number}</span>
                       <Badge variant={status.variant} className="text-[10px]">
                         {isRtl ? status.labelAr : status.labelEn}
@@ -249,14 +265,16 @@ export default function OrdersPage() {
                         {isRtl ? payStatus.labelAr : payStatus.labelEn}
                       </Badge>
                     </div>
-                    <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+                    <div className="text-muted-foreground mt-0.5 flex items-center gap-2 text-xs">
                       <span>{formatDate(order.created_at, locale)}</span>
                       <span>·</span>
                       <span>{formatTime(order.created_at, locale)}</span>
                       <span>·</span>
                       <span>
                         {order.payment_method === "wallet"
-                          ? (isRtl ? "محفظة" : "Wallet")
+                          ? isRtl
+                            ? "محفظة"
+                            : "Wallet"
                           : "SAM API"}
                       </span>
                       <span>·</span>
@@ -267,30 +285,33 @@ export default function OrdersPage() {
                   </div>
 
                   {/* Total + Expand */}
-                  <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex shrink-0 items-center gap-3">
                     <span className="text-base font-bold">${Number(order.total).toFixed(2)}</span>
                     {isExpanded ? (
-                      <ChevronUp className="size-4 text-muted-foreground" />
+                      <ChevronUp className="text-muted-foreground size-4" />
                     ) : (
-                      <ChevronDown className="size-4 text-muted-foreground" />
+                      <ChevronDown className="text-muted-foreground size-4" />
                     )}
                   </div>
                 </button>
 
                 {/* Expanded items */}
                 {isExpanded && (
-                  <div className="border-t px-5 py-4 space-y-3">
+                  <div className="space-y-3 border-t px-5 py-4">
                     {order.order_items?.map((item) => (
                       <div key={item.id} className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-3">
-                          <div className="flex size-8 items-center justify-center rounded-lg bg-muted">
-                            <Package className="size-4 text-muted-foreground" />
+                          <div className="bg-muted flex size-8 items-center justify-center rounded-lg">
+                            <Package className="text-muted-foreground size-4" />
                           </div>
                           <div>
                             <p className="font-medium">
-                              {(item.dynamic_fields as Record<string, string>)?.product_name || (isRtl ? `منتج #${item.product_id.slice(0, 8)}` : `Product #${item.product_id.slice(0, 8)}`)}
+                              {(item.dynamic_fields as Record<string, string>)?.product_name ||
+                                (isRtl
+                                  ? `منتج #${item.product_id.slice(0, 8)}`
+                                  : `Product #${item.product_id.slice(0, 8)}`)}
                             </p>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-muted-foreground text-xs">
                               {isRtl ? `الكمية: ${item.quantity}` : `Qty: ${item.quantity}`}
                             </p>
                           </div>
@@ -300,14 +321,16 @@ export default function OrdersPage() {
                     ))}
 
                     {/* Payment & Order Details */}
-                    <div className="border-t pt-3 space-y-2">
+                    <div className="space-y-2 border-t pt-3">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">
                           {isRtl ? "طريقة الدفع" : "Payment Method"}
                         </span>
                         <span className="font-medium">
                           {order.payment_method === "wallet"
-                            ? (isRtl ? "المحفظة" : "Wallet")
+                            ? isRtl
+                              ? "المحفظة"
+                              : "Wallet"
                             : "SAM API"}
                         </span>
                       </div>
@@ -343,9 +366,7 @@ export default function OrdersPage() {
         {/* ─── Continue Shopping ────────────────────── */}
         <div className="mt-8 text-center">
           <Link href={`/${locale}/store`}>
-            <Button variant="outline">
-              {isRtl ? "مواصلة التسوق" : "Continue Shopping"}
-            </Button>
+            <Button variant="outline">{isRtl ? "مواصلة التسوق" : "Continue Shopping"}</Button>
           </Link>
         </div>
       </div>

@@ -118,9 +118,7 @@ export default function ProfilePage() {
       });
 
       if (signInError) {
-        setPasswordError(
-          isRtl ? "كلمة المرور الحالية غير صحيحة" : "Current password is incorrect",
-        );
+        setPasswordError(isRtl ? "كلمة المرور الحالية غير صحيحة" : "Current password is incorrect");
         setIsChangingPassword(false);
         return;
       }
@@ -139,9 +137,11 @@ export default function ProfilePage() {
       setTimeout(() => setPasswordSuccess(false), 3000);
     } catch (err) {
       setPasswordError(
-        err instanceof Error ? err.message : isRtl
-          ? "فشل تغيير كلمة المرور"
-          : "Failed to change password",
+        err instanceof Error
+          ? err.message
+          : isRtl
+            ? "فشل تغيير كلمة المرور"
+            : "Failed to change password",
       );
     } finally {
       setIsChangingPassword(false);
@@ -159,8 +159,8 @@ export default function ProfilePage() {
       <main className="flex-1">
         <div className="mx-auto max-w-4xl px-4 py-12">
           <div className="space-y-6">
-            <div className="h-48 animate-pulse rounded-2xl bg-muted" />
-            <div className="h-64 animate-pulse rounded-2xl bg-muted" />
+            <div className="bg-muted h-48 animate-pulse rounded-2xl" />
+            <div className="bg-muted h-64 animate-pulse rounded-2xl" />
           </div>
         </div>
       </main>
@@ -202,17 +202,19 @@ export default function ProfilePage() {
             {isRtl ? "الملف الشخصي" : "My Profile"}
           </h1>
           <p className="text-muted-foreground mt-1">
-            {isRtl ? "إدارة معلومات حسابك وإعداداتك" : "Manage your account information and settings"}
+            {isRtl
+              ? "إدارة معلومات حسابك وإعداداتك"
+              : "Manage your account information and settings"}
           </p>
         </div>
 
         {/* ─── Profile Summary Card ─────────────────── */}
         <Card className="mb-8 overflow-hidden">
-          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background p-6 md:p-8">
+          <div className="from-primary/10 via-primary/5 to-background bg-gradient-to-r p-6 md:p-8">
             <div className="flex items-start gap-6">
               {/* Avatar */}
               <div className="relative shrink-0">
-                <div className="flex size-20 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <div className="bg-primary/10 text-primary flex size-20 items-center justify-center rounded-full">
                   {profile?.avatar_url ? (
                     <img
                       src={profile.avatar_url}
@@ -224,7 +226,7 @@ export default function ProfilePage() {
                   )}
                 </div>
                 <button
-                  className="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 absolute -right-1 -bottom-1 flex size-7 items-center justify-center rounded-full shadow-sm transition-colors"
                   onClick={() => {
                     // Avatar upload placeholder
                   }}
@@ -235,22 +237,26 @@ export default function ProfilePage() {
               </div>
 
               {/* Info */}
-              <div className="flex-1 min-w-0">
-                <h2 className="text-xl font-bold truncate">
+              <div className="min-w-0 flex-1">
+                <h2 className="truncate text-xl font-bold">
                   {profile?.full_name || (isRtl ? "مستخدم" : "User")}
                 </h2>
-                <p className="text-sm text-muted-foreground">{user.email}</p>
+                <p className="text-muted-foreground text-sm">{user.email}</p>
                 {profile?.phone && (
-                  <p className="text-sm text-muted-foreground mt-0.5">{profile.phone}</p>
+                  <p className="text-muted-foreground mt-0.5 text-sm">{profile.phone}</p>
                 )}
-                <div className="flex items-center gap-3 mt-3">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                <div className="mt-3 flex items-center gap-3">
+                  <span className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium">
                     <Shield className="size-3" />
                     {profile?.role === "admin"
-                      ? isRtl ? "مدير" : "Admin"
-                      : isRtl ? "عميل" : "Customer"}
+                      ? isRtl
+                        ? "مدير"
+                        : "Admin"
+                      : isRtl
+                        ? "عميل"
+                        : "Customer"}
                   </span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-muted-foreground text-xs">
                     {isRtl ? "عضو منذ" : "Member since"}{" "}
                     {profile?.created_at
                       ? new Date(profile.created_at).toLocaleDateString(
@@ -287,9 +293,7 @@ export default function ProfilePage() {
                   {isRtl ? "المعلومات الشخصية" : "Personal Information"}
                 </CardTitle>
                 <CardDescription>
-                  {isRtl
-                    ? "قم بتحديث اسمك ورقم هاتفك"
-                    : "Update your name and phone number"}
+                  {isRtl ? "قم بتحديث اسمك ورقم هاتفك" : "Update your name and phone number"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -317,9 +321,7 @@ export default function ProfilePage() {
 
                 <form onSubmit={handleEditProfile} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="fullName">
-                      {isRtl ? "الاسم الكامل" : "Full Name"}
-                    </Label>
+                    <Label htmlFor="fullName">{isRtl ? "الاسم الكامل" : "Full Name"}</Label>
                     <Input
                       id="fullName"
                       value={fullName}
@@ -331,26 +333,15 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">
-                      {isRtl ? "البريد الإلكتروني" : "Email"}
-                    </Label>
-                    <Input
-                      id="email"
-                      value={user.email || ""}
-                      disabled
-                      className="bg-muted/50"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      {isRtl
-                        ? "البريد الإلكتروني لا يمكن تغييره"
-                        : "Email cannot be changed"}
+                    <Label htmlFor="email">{isRtl ? "البريد الإلكتروني" : "Email"}</Label>
+                    <Input id="email" value={user.email || ""} disabled className="bg-muted/50" />
+                    <p className="text-muted-foreground text-xs">
+                      {isRtl ? "البريد الإلكتروني لا يمكن تغييره" : "Email cannot be changed"}
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone">
-                      {isRtl ? "رقم الهاتف" : "Phone"}
-                    </Label>
+                    <Label htmlFor="phone">{isRtl ? "رقم الهاتف" : "Phone"}</Label>
                     <Input
                       id="phone"
                       value={phone}
@@ -367,7 +358,9 @@ export default function ProfilePage() {
                         <Button type="submit" disabled={isUpdatingProfile}>
                           {isUpdatingProfile ? (
                             <>
-                              <Loader2 className={`${isRtl ? "ml-2" : "mr-2"} h-4 w-4 animate-spin`} />
+                              <Loader2
+                                className={`${isRtl ? "ml-2" : "mr-2"} h-4 w-4 animate-spin`}
+                              />
                               {isRtl ? "جاري الحفظ..." : "Saving..."}
                             </>
                           ) : (
@@ -407,17 +400,21 @@ export default function ProfilePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className={`flex items-center justify-between py-2 ${isRtl ? "flex-row-reverse" : ""}`}>
+                <div
+                  className={`flex items-center justify-between py-2 ${isRtl ? "flex-row-reverse" : ""}`}
+                >
                   <div className="flex items-center gap-2">
-                    <Mail className="size-4 text-muted-foreground shrink-0" />
+                    <Mail className="text-muted-foreground size-4 shrink-0" />
                     <span className="text-sm">{isRtl ? "البريد الإلكتروني" : "Email"}</span>
                   </div>
                   <span className="text-sm font-medium">{user.email}</span>
                 </div>
                 <Separator />
-                <div className={`flex items-center justify-between py-2 ${isRtl ? "flex-row-reverse" : ""}`}>
+                <div
+                  className={`flex items-center justify-between py-2 ${isRtl ? "flex-row-reverse" : ""}`}
+                >
                   <div className="flex items-center gap-2">
-                    <Calendar className="size-4 text-muted-foreground shrink-0" />
+                    <Calendar className="text-muted-foreground size-4 shrink-0" />
                     <span className="text-sm">{isRtl ? "تاريخ التسجيل" : "Registered"}</span>
                   </div>
                   <span className="text-sm font-medium">
@@ -430,17 +427,23 @@ export default function ProfilePage() {
                   </span>
                 </div>
                 <Separator />
-                <div className={`flex items-center justify-between py-2 ${isRtl ? "flex-row-reverse" : ""}`}>
+                <div
+                  className={`flex items-center justify-between py-2 ${isRtl ? "flex-row-reverse" : ""}`}
+                >
                   <div className="flex items-center gap-2">
-                    <Shield className="size-4 text-muted-foreground shrink-0" />
+                    <Shield className="text-muted-foreground size-4 shrink-0" />
                     <span className="text-sm">{isRtl ? "الدور" : "Role"}</span>
                   </div>
-                  <span className="text-sm font-medium capitalize">{profile?.role || "customer"}</span>
+                  <span className="text-sm font-medium capitalize">
+                    {profile?.role || "customer"}
+                  </span>
                 </div>
                 <Separator />
-                <div className={`flex items-center justify-between py-2 ${isRtl ? "flex-row-reverse" : ""}`}>
+                <div
+                  className={`flex items-center justify-between py-2 ${isRtl ? "flex-row-reverse" : ""}`}
+                >
                   <div className="flex items-center gap-2">
-                    <Globe className="size-4 text-muted-foreground shrink-0" />
+                    <Globe className="text-muted-foreground size-4 shrink-0" />
                     <span className="text-sm">{isRtl ? "اللغة" : "Language"}</span>
                   </div>
                   <span className="text-sm font-medium">
@@ -448,9 +451,11 @@ export default function ProfilePage() {
                   </span>
                 </div>
                 <Separator />
-                <div className={`flex items-center justify-between py-2 ${isRtl ? "flex-row-reverse" : ""}`}>
+                <div
+                  className={`flex items-center justify-between py-2 ${isRtl ? "flex-row-reverse" : ""}`}
+                >
                   <div className="flex items-center gap-2">
-                    <CreditCard className="size-4 text-muted-foreground shrink-0" />
+                    <CreditCard className="text-muted-foreground size-4 shrink-0" />
                     <span className="text-sm">{isRtl ? "العملة" : "Currency"}</span>
                   </div>
                   <span className="text-sm font-medium">USD</span>
@@ -478,9 +483,7 @@ export default function ProfilePage() {
                   <Alert className="mb-4 border-green-500 text-green-600 dark:text-green-400">
                     <CheckCircle2 className="h-4 w-4" />
                     <AlertDescription>
-                      {isRtl
-                        ? "تم تغيير كلمة المرور بنجاح"
-                        : "Password changed successfully"}
+                      {isRtl ? "تم تغيير كلمة المرور بنجاح" : "Password changed successfully"}
                     </AlertDescription>
                   </Alert>
                 )}
@@ -502,9 +505,7 @@ export default function ProfilePage() {
                       type="password"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder={
-                        isRtl ? "أدخل كلمة المرور الحالية" : "Enter current password"
-                      }
+                      placeholder={isRtl ? "أدخل كلمة المرور الحالية" : "Enter current password"}
                       required
                       autoComplete="current-password"
                     />
@@ -519,9 +520,7 @@ export default function ProfilePage() {
                       type="password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder={
-                        isRtl ? "أدخل كلمة المرور الجديدة" : "Enter new password"
-                      }
+                      placeholder={isRtl ? "أدخل كلمة المرور الجديدة" : "Enter new password"}
                       required
                       minLength={6}
                       autoComplete="new-password"
@@ -565,23 +564,21 @@ export default function ProfilePage() {
             {/* Quick Links */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">
-                  {isRtl ? "روابط سريعة" : "Quick Links"}
-                </CardTitle>
+                <CardTitle className="text-lg">{isRtl ? "روابط سريعة" : "Quick Links"}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Link
                   href={`/${locale}/orders`}
-                  className={`flex items-center gap-3 rounded-lg p-3 text-sm hover:bg-muted transition-colors ${isRtl ? "flex-row-reverse" : ""}`}
+                  className={`hover:bg-muted flex items-center gap-3 rounded-lg p-3 text-sm transition-colors ${isRtl ? "flex-row-reverse" : ""}`}
                 >
-                  <span className="size-2 rounded-full bg-primary" />
+                  <span className="bg-primary size-2 rounded-full" />
                   {isRtl ? "عرض طلباتي" : "View My Orders"}
                 </Link>
                 <Link
                   href={`/${locale}/wallet`}
-                  className={`flex items-center gap-3 rounded-lg p-3 text-sm hover:bg-muted transition-colors ${isRtl ? "flex-row-reverse" : ""}`}
+                  className={`hover:bg-muted flex items-center gap-3 rounded-lg p-3 text-sm transition-colors ${isRtl ? "flex-row-reverse" : ""}`}
                 >
-                  <span className="size-2 rounded-full bg-primary" />
+                  <span className="bg-primary size-2 rounded-full" />
                   {isRtl ? "المحفظة ورصيدي" : "Wallet & Balance"}
                 </Link>
               </CardContent>
@@ -591,7 +588,7 @@ export default function ProfilePage() {
             <div className="flex justify-center pt-4">
               <Button
                 variant="outline"
-                className="w-full max-w-xs gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 w-full max-w-xs gap-2"
                 onClick={handleSignOut}
                 disabled={isSigningOut}
               >

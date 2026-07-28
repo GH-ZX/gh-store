@@ -59,9 +59,7 @@ export function ConfirmDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>
-            {isRtl && cancelLabelAr
-              ? cancelLabelAr
-              : cancelLabel || (isRtl ? "إلغاء" : "Cancel")}
+            {isRtl && cancelLabelAr ? cancelLabelAr : cancelLabel || (isRtl ? "إلغاء" : "Cancel")}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}

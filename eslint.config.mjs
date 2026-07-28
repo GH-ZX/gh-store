@@ -72,15 +72,7 @@ const eslintConfig = defineConfig([
       "import/order": [
         "warn",
         {
-          groups: [
-            "builtin",
-            "external",
-            "internal",
-            "parent",
-            "sibling",
-            "index",
-            "type",
-          ],
+          groups: ["builtin", "external", "internal", "parent", "sibling", "index", "type"],
           pathGroups: [
             { pattern: "react", group: "external", position: "before" },
             { pattern: "next/**", group: "external", position: "before" },
@@ -117,11 +109,7 @@ const eslintConfig = defineConfig([
   // Config and scripts (Node)
   {
     name: "gh-store/node-scripts",
-    files: [
-      "*.config.{js,mjs,ts,cjs}",
-      "scripts/**/*.{js,mjs,ts,cjs}",
-      "eslint.config.mjs",
-    ],
+    files: ["*.config.{js,mjs,ts,cjs}", "scripts/**/*.{js,mjs,ts,cjs}", "eslint.config.mjs"],
     rules: {
       "no-console": "off",
       "import/no-default-export": "off",

@@ -27,15 +27,15 @@ export function GiftCardScroller({ vouchers, isRtl }: GiftCardScrollerProps) {
   return (
     <section>
       {/* Header */}
-      <div className="flex items-center gap-3 mb-5">
-        <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
+      <div className="mb-5 flex items-center gap-3">
+        <div className="bg-primary/10 text-primary rounded-xl p-2.5">
           <Gift className="size-5" />
         </div>
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
+          <h2 className="text-xl font-bold tracking-tight sm:text-2xl">
             {isRtl ? "بطاقات الهدايا والقسائم" : "Gift Cards & Vouchers"}
           </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+          <p className="text-muted-foreground mt-0.5 text-xs sm:text-sm">
             {isRtl
               ? `اختر من ${vouchers.length} بطاقة رقمية من أشهر المنصات`
               : `Choose from ${vouchers.length} digital gift cards from top platforms`}
@@ -45,13 +45,15 @@ export function GiftCardScroller({ vouchers, isRtl }: GiftCardScrollerProps) {
 
       {/* Horizontal scrollable row */}
       <div className="relative">
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none -mx-1 px-1 snap-x snap-mandatory">
+        <div className="-mx-1 flex snap-x snap-mandatory scrollbar-none gap-3 overflow-x-auto px-1 pb-2">
           {items.map((voucher) => {
             const meta = voucher.metadata as Record<string, unknown> | undefined;
-            const amounts = meta?.amounts as Array<{ unit_price: number; face_value: number | null }> | undefined;
+            const amounts = meta?.amounts as
+              Array<{ unit_price: number; face_value: number | null }> | undefined;
             const sorted = amounts ? [...amounts].sort((a, b) => a.unit_price - b.unit_price) : [];
             const minPrice = sorted.length > 0 ? sorted[0].unit_price : voucher.basePrice;
-            const maxPrice = sorted.length > 0 ? sorted[sorted.length - 1].unit_price : voucher.basePrice;
+            const maxPrice =
+              sorted.length > 0 ? sorted[sorted.length - 1].unit_price : voucher.basePrice;
 
             // Extract platform name for display (first word or short name)
             const name = isRtl ? voucher.nameAr : voucher.nameEn;
@@ -62,29 +64,33 @@ export function GiftCardScroller({ vouchers, isRtl }: GiftCardScrollerProps) {
                 key={voucher.id}
                 href={`/${params?.locale || "ar"}/store/${voucher.slug}`}
                 className={cn(
-                  "flex flex-col items-center gap-2 min-w-[100px] sm:min-w-[120px]",
+                  "flex min-w-[100px] flex-col items-center gap-2 sm:min-w-[120px]",
                   "rounded-xl border p-3 sm:p-4",
                   "bg-card hover:bg-accent/50 transition-all",
-                  "hover:shadow-md hover:-translate-y-0.5",
-                  "snap-start shrink-0",
+                  "hover:-translate-y-0.5 hover:shadow-md",
+                  "shrink-0 snap-start",
                 )}
               >
                 {/* Icon placeholder */}
-                <div className="size-10 sm:size-12 rounded-xl bg-muted/50 flex items-center justify-center">
+                <div className="bg-muted/50 flex size-10 items-center justify-center rounded-xl sm:size-12">
                   {voucher.imageUrl ? (
-                    <img src={voucher.imageUrl} alt="" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
+                    <img
+                      src={voucher.imageUrl}
+                      alt=""
+                      className="h-8 w-8 object-contain sm:h-10 sm:w-10"
+                    />
                   ) : (
-                    <Gift className="size-5 sm:size-6 text-muted-foreground/30" />
+                    <Gift className="text-muted-foreground/30 size-5 sm:size-6" />
                   )}
                 </div>
 
                 {/* Name */}
-                <p className="text-[11px] sm:text-xs font-semibold text-center leading-tight line-clamp-2">
+                <p className="line-clamp-2 text-center text-[11px] leading-tight font-semibold sm:text-xs">
                   {shortName}
                 </p>
 
                 {/* Price range */}
-                <p className="text-[10px] sm:text-xs text-muted-foreground text-center">
+                <p className="text-muted-foreground text-center text-[10px] sm:text-xs">
                   ${minPrice.toFixed(2)}–${maxPrice.toFixed(2)}
                 </p>
               </Link>
@@ -95,15 +101,15 @@ export function GiftCardScroller({ vouchers, isRtl }: GiftCardScrollerProps) {
           <Link
             href={`/${params?.locale || "ar"}/store`}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 min-w-[80px] sm:min-w-[100px]",
+              "flex min-w-[80px] flex-col items-center justify-center gap-1 sm:min-w-[100px]",
               "rounded-xl border border-dashed p-3 sm:p-4",
               "hover:bg-accent/50 transition-all",
-              "snap-start shrink-0",
+              "shrink-0 snap-start",
               "text-muted-foreground hover:text-foreground",
             )}
           >
-            <span className="text-lg sm:text-xl font-bold">+</span>
-            <span className="text-[10px] sm:text-xs font-medium">
+            <span className="text-lg font-bold sm:text-xl">+</span>
+            <span className="text-[10px] font-medium sm:text-xs">
               {isRtl ? "عرض الكل" : "View All"}
             </span>
           </Link>

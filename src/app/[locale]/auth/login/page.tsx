@@ -9,7 +9,14 @@ import { useForm } from "react-hook-form";
 import { LoadingPage } from "@/components/shared/loading";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
@@ -77,7 +84,7 @@ function LoginPageInner() {
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
       </div>
     );
   }
@@ -100,19 +107,13 @@ function LoginPageInner() {
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                {signInError instanceof Error
-                  ? signInError.message
-                  : t("login.error")}
+                {signInError instanceof Error ? signInError.message : t("login.error")}
               </AlertDescription>
             </Alert>
           )}
 
           {/* Google sign-in button */}
-          <Button
-            variant="outline"
-            className="w-full gap-2"
-            onClick={handleGoogleSignIn}
-          >
+          <Button variant="outline" className="w-full gap-2" onClick={handleGoogleSignIn}>
             <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
@@ -140,9 +141,7 @@ function LoginPageInner() {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">
-                {isRtl ? "أو" : "or"}
-              </span>
+              <span className="bg-card text-muted-foreground px-2">{isRtl ? "أو" : "or"}</span>
             </div>
           </div>
 
@@ -158,9 +157,7 @@ function LoginPageInner() {
                 {...register("email")}
                 aria-invalid={!!errors.email}
               />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-destructive text-sm">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -168,7 +165,7 @@ function LoginPageInner() {
                 <Label htmlFor="password">{t("login.password_label")}</Label>
                 <Link
                   href={`/${locale}/auth/reset-password`}
-                  className="text-sm text-primary hover:underline"
+                  className="text-primary text-sm hover:underline"
                 >
                   {t("login.forgot_password")}
                 </Link>
@@ -182,7 +179,7 @@ function LoginPageInner() {
                 aria-invalid={!!errors.password}
               />
               {errors.password && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
+                <p className="text-destructive text-sm">{errors.password.message}</p>
               )}
             </div>
 
@@ -203,7 +200,7 @@ function LoginPageInner() {
         </CardContent>
 
         <CardFooter className="justify-center">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {t("login.no_account")}{" "}
             <Link
               href={`/${locale}/auth/register`}

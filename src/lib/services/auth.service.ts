@@ -1,4 +1,4 @@
-import { createSupabaseServerClient , createSupabaseAdminClient } from "@/lib/utils/supabase";
+import { createSupabaseServerClient, createSupabaseAdminClient } from "@/lib/utils/supabase";
 import type { Database } from "@/types/database";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
@@ -76,11 +76,7 @@ export class AuthService {
 
     const supabase = await createSupabaseServerClient();
 
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+    const { data, error } = await supabase.from("profiles").select("*").eq("id", user.id).single();
 
     if (error || !data) return null;
     return data;
@@ -100,7 +96,9 @@ export class AuthService {
   /**
    * Update the user's profile.
    */
-  static async updateProfile(updates: Partial<Pick<Profile, "full_name" | "phone" | "avatar_url">>) {
+  static async updateProfile(
+    updates: Partial<Pick<Profile, "full_name" | "phone" | "avatar_url">>,
+  ) {
     const user = await this.requireAuth();
     const supabase = await createSupabaseServerClient();
 
@@ -123,7 +121,7 @@ export class AuthService {
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=/auth/reset-password`,
-    // Note: locale prefix is added by the caller when needed
+      // Note: locale prefix is added by the caller when needed
     });
 
     if (error) throw error;

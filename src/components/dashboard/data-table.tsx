@@ -76,7 +76,7 @@ export function DataTable<T extends { id: string }>({
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="flex gap-4">
             {columns.map((col) => (
-              <div key={col.key} className="h-4 flex-1 animate-pulse rounded bg-muted" />
+              <div key={col.key} className="bg-muted h-4 flex-1 animate-pulse rounded" />
             ))}
           </div>
         ))}
@@ -88,7 +88,7 @@ export function DataTable<T extends { id: string }>({
     <div className={cn("space-y-4", className)}>
       {searchable && (
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
           <Input
             placeholder={searchPlaceholderAr || searchPlaceholder || "Search..."}
             className="h-9 pl-9"
@@ -104,10 +104,7 @@ export function DataTable<T extends { id: string }>({
               {columns.map((col) => (
                 <TableHead
                   key={col.key}
-                  className={cn(
-                    col.sortable && "cursor-pointer select-none",
-                    col.className,
-                  )}
+                  className={cn(col.sortable && "cursor-pointer select-none", col.className)}
                   onClick={() => col.sortable && handleSort(col.key)}
                 >
                   <div className="flex items-center gap-1">
@@ -133,7 +130,10 @@ export function DataTable<T extends { id: string }>({
           <TableBody>
             {sortedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-32 text-center text-muted-foreground">
+                <TableCell
+                  colSpan={columns.length}
+                  className="text-muted-foreground h-32 text-center"
+                >
                   {emptyMessageAr || emptyMessage || "No data"}
                 </TableCell>
               </TableRow>

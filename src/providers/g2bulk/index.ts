@@ -50,10 +50,7 @@ export class G2BulkProvider extends BaseProvider {
   /**
    * Make an authenticated request to the G2Bulk API.
    */
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {},
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
     const response = await fetch(url, {
@@ -61,16 +58,14 @@ export class G2BulkProvider extends BaseProvider {
       headers: {
         "X-API-Key": this.apiKey,
         "Content-Type": "application/json",
-        "Accept": "application/json",
+        Accept: "application/json",
         ...options.headers,
       },
     });
 
     if (!response.ok) {
       const errorBody = await response.text().catch(() => "");
-      throw new Error(
-        `G2Bulk API error (${response.status}): ${errorBody || response.statusText}`,
-      );
+      throw new Error(`G2Bulk API error (${response.status}): ${errorBody || response.statusText}`);
     }
 
     const data = await response.json();
@@ -222,8 +217,7 @@ export class G2BulkProvider extends BaseProvider {
               amount: Number(item.amount ?? 0),
             }));
 
-            const minPrice =
-              catalogue.length > 0 ? Math.min(...catalogue.map((c) => c.amount)) : 0;
+            const minPrice = catalogue.length > 0 ? Math.min(...catalogue.map((c) => c.amount)) : 0;
 
             const { created: wasCreated } = await upsertProduct(supabase, slug, {
               slug,
@@ -245,9 +239,27 @@ export class G2BulkProvider extends BaseProvider {
                 game_image: game.image_url || null,
                 catalogue,
                 fields: [
-                  { key: "player_id", labelAr: "معرف اللاعب (UID)", labelEn: "Player ID (UID)", type: "text", required: true },
-                  { key: "server_id", labelAr: "الخادم (اختياري)", labelEn: "Server (optional)", type: "text", required: false },
-                  { key: "charname", labelAr: "اسم الشخصية (اختياري)", labelEn: "Character Name (optional)", type: "text", required: false },
+                  {
+                    key: "player_id",
+                    labelAr: "معرف اللاعب (UID)",
+                    labelEn: "Player ID (UID)",
+                    type: "text",
+                    required: true,
+                  },
+                  {
+                    key: "server_id",
+                    labelAr: "الخادم (اختياري)",
+                    labelEn: "Server (optional)",
+                    type: "text",
+                    required: false,
+                  },
+                  {
+                    key: "charname",
+                    labelAr: "اسم الشخصية (اختياري)",
+                    labelEn: "Character Name (optional)",
+                    type: "text",
+                    required: false,
+                  },
                 ],
               },
             });
@@ -318,18 +330,12 @@ export class G2BulkProvider extends BaseProvider {
   /**
    * Purchase a voucher/gift card product.
    */
-  private async purchaseVoucher(
-    productId: string,
-    quantity: number,
-  ): Promise<OrderResult> {
+  private async purchaseVoucher(productId: string, quantity: number): Promise<OrderResult> {
     try {
-      const data = await this.request<G2BulkPurchaseResponse>(
-        `/products/${productId}/purchase`,
-        {
-          method: "POST",
-          body: JSON.stringify({ quantity }),
-        },
-      );
+      const data = await this.request<G2BulkPurchaseResponse>(`/products/${productId}/purchase`, {
+        method: "POST",
+        body: JSON.stringify({ quantity }),
+      });
 
       return {
         success: data.success,
@@ -360,20 +366,17 @@ export class G2BulkProvider extends BaseProvider {
     callbackUrl?: string,
   ): Promise<OrderResult> {
     try {
-      const data = await this.request<G2BulkTopupResponse>(
-        `/games/${gameCode}/order`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            catalogue_name: fields?.catalogue_name || "",
-            player_id: fields?.player_id || fields?.uid || "",
-            server_id: fields?.server_id,
-            charname: fields?.charname,
-            remark: fields?.remark,
-            callback_url: callbackUrl,
-          }),
-        },
-      );
+      const data = await this.request<G2BulkTopupResponse>(`/games/${gameCode}/order`, {
+        method: "POST",
+        body: JSON.stringify({
+          catalogue_name: fields?.catalogue_name || "",
+          player_id: fields?.player_id || fields?.uid || "",
+          server_id: fields?.server_id,
+          charname: fields?.charname,
+          remark: fields?.remark,
+          callback_url: callbackUrl,
+        }),
+      });
 
       return {
         success: data.success,

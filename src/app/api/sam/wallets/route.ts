@@ -3,12 +3,15 @@ import { resolveSAMApiKey, SAM_API_BASE } from "@/lib/services/sam.service";
 import { requireApiAdmin } from "@/lib/utils/api-auth";
 import { createSupabaseAdminClient } from "@/lib/utils/supabase";
 
-async function fetchBalance(apiKey: string, wallet: {
-  provider: string;
-  walletAddress?: string;
-  phone?: string;
-  cashCode?: string;
-}): Promise<{ currency: string; amount: number; label: string | null }[] | null> {
+async function fetchBalance(
+  apiKey: string,
+  wallet: {
+    provider: string;
+    walletAddress?: string;
+    phone?: string;
+    cashCode?: string;
+  },
+): Promise<{ currency: string; amount: number; label: string | null }[] | null> {
   try {
     let url: string;
     if (wallet.provider === "shamcash" && wallet.walletAddress) {
@@ -67,12 +70,15 @@ export async function GET() {
     // Fetch balance for each wallet in parallel
     const walletsWithBalance = await Promise.all(
       wallets.map(async (w: Record<string, unknown>) => {
-        const balances = await fetchBalance(apiKey, w as {
-          provider: string;
-          walletAddress?: string;
-          phone?: string;
-          cashCode?: string;
-        });
+        const balances = await fetchBalance(
+          apiKey,
+          w as {
+            provider: string;
+            walletAddress?: string;
+            phone?: string;
+            cashCode?: string;
+          },
+        );
         return { ...w, balances };
       }),
     );

@@ -15,7 +15,10 @@ import { createSupabaseServerClient } from "@/lib/utils/supabase";
 export async function GET(request: Request) {
   try {
     const supabase = await createSupabaseServerClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json(
@@ -39,7 +42,8 @@ export async function GET(request: Request) {
 
     let query = supabase
       .from("orders")
-      .select(`
+      .select(
+        `
         id,
         order_number,
         status,
@@ -61,7 +65,8 @@ export async function GET(request: Request) {
           dynamic_fields,
           status
         )
-      `)
+      `,
+      )
       .eq("profile_id", user.id)
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);

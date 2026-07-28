@@ -53,14 +53,11 @@ const CHART_COLORS = [
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload) return null;
   return (
-    <div className="rounded-lg border bg-card px-3 py-2 shadow-md text-sm">
-      <p className="font-medium mb-1">{label}</p>
+    <div className="bg-card rounded-lg border px-3 py-2 text-sm shadow-md">
+      <p className="mb-1 font-medium">{label}</p>
       {payload.map((entry: any, i: number) => (
         <div key={i} className="flex items-center gap-2">
-          <div
-            className="size-2 rounded-full"
-            style={{ backgroundColor: entry.color }}
-          />
+          <div className="size-2 rounded-full" style={{ backgroundColor: entry.color }} />
           <span className="text-muted-foreground">{entry.name}:</span>
           <span className="font-medium">{entry.value}</span>
         </div>
@@ -86,9 +83,7 @@ export function Chart({
       case "area":
         return (
           <AreaChart data={data}>
-            {showGrid && (
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-            )}
+            {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />}
             <XAxis
               dataKey={xAxisKey}
               tick={{ fontSize: 12 }}
@@ -114,9 +109,7 @@ export function Chart({
       case "bar":
         return (
           <BarChart data={data}>
-            {showGrid && (
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-            )}
+            {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />}
             <XAxis
               dataKey={xAxisKey}
               tick={{ fontSize: 12 }}
@@ -139,9 +132,7 @@ export function Chart({
       case "line":
         return (
           <LineChart data={data}>
-            {showGrid && (
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-            )}
+            {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />}
             <XAxis
               dataKey={xAxisKey}
               tick={{ fontSize: 12 }}
@@ -178,10 +169,7 @@ export function Chart({
               paddingAngle={2}
             >
               {data.map((_entry, i) => (
-                <Cell
-                  key={`cell-${i}`}
-                  fill={CHART_COLORS[i % CHART_COLORS.length]}
-                />
+                <Cell key={`cell-${i}`} fill={CHART_COLORS[i % CHART_COLORS.length]} />
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />

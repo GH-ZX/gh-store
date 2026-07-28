@@ -17,15 +17,11 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
   const isRtl = params?.locale === "ar";
 
   return (
-    <div className="flex items-start gap-4 rounded-xl border p-4 transition-colors hover:bg-muted/30">
+    <div className="hover:bg-muted/30 flex items-start gap-4 rounded-xl border p-4 transition-colors">
       {/* Product image placeholder */}
-      <div className="flex size-16 shrink-0 items-center justify-center rounded-lg bg-muted">
+      <div className="bg-muted flex size-16 shrink-0 items-center justify-center rounded-lg">
         {item.imageUrl ? (
-          <img
-            src={item.imageUrl}
-            alt={item.name}
-            className="size-full rounded-lg object-cover"
-          />
+          <img src={item.imageUrl} alt={item.name} className="size-full rounded-lg object-cover" />
         ) : (
           <div className="text-muted-foreground/30 text-xs">{isRtl ? "صورة" : "Image"}</div>
         )}
@@ -34,11 +30,11 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
       {/* Details */}
       <div className="flex flex-1 flex-col gap-1">
         <div className="flex items-start justify-between gap-2">
-          <h4 className="font-medium text-sm">{item.name}</h4>
+          <h4 className="text-sm font-medium">{item.name}</h4>
           <Button
             variant="ghost"
             size="icon"
-            className="size-7 shrink-0 text-muted-foreground hover:text-destructive"
+            className="text-muted-foreground hover:text-destructive size-7 shrink-0"
             onClick={() => onRemove(item.id)}
           >
             <Trash2 className="size-4" />
@@ -49,7 +45,10 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
         {item.fields && Object.keys(item.fields).length > 0 && (
           <div className="flex flex-wrap gap-1">
             {Object.entries(item.fields).map(([key, value]) => (
-              <span key={key} className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+              <span
+                key={key}
+                className="bg-muted text-muted-foreground rounded-md px-2 py-0.5 text-xs"
+              >
                 {key}: {value}
               </span>
             ))}

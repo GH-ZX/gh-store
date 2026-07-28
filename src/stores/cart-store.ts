@@ -71,9 +71,7 @@ export const useCartStore = create<CartState>()(
       updateQuantity: (id, quantity) =>
         set((state) => ({
           items: state.items.map((i) =>
-            i.id === id
-              ? { ...i, quantity, totalPrice: quantity * i.unitPrice }
-              : i,
+            i.id === id ? { ...i, quantity, totalPrice: quantity * i.unitPrice } : i,
           ),
         })),
 

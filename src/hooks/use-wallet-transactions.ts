@@ -32,7 +32,9 @@ export function useWalletTransactions(limit = 50) {
   } = useQuery<WalletTransaction[]>({
     queryKey: ["wallet", "transactions", limit],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return [];
 
       const { data: txs, error } = await supabase

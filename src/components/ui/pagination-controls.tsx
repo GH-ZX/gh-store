@@ -25,8 +25,8 @@ export function PaginationControls({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between pt-4 border-t">
-      <p className="text-xs text-muted-foreground">
+    <div className="flex items-center justify-between border-t pt-4">
+      <p className="text-muted-foreground text-xs">
         {isRtl
           ? `الصفحة ${currentPage} من ${totalPages} (${totalItems} ${currentPage === 1 && totalItems <= 20 ? label : labelPlural})`
           : `Page ${currentPage} of ${totalPages} (${totalItems} ${totalItems === 1 ? label : labelPlural})`}
@@ -51,7 +51,7 @@ export function PaginationControls({
           }, [])
           .map((item, ei) =>
             item === "ellipsis" ? (
-              <span key={`ellipsis-${ei}`} className="text-xs text-muted-foreground px-1">
+              <span key={`ellipsis-${ei}`} className="text-muted-foreground px-1 text-xs">
                 …
               </span>
             ) : (
@@ -65,7 +65,7 @@ export function PaginationControls({
               >
                 {item}
               </Button>
-            )
+            ),
           )}
         <Button
           variant="outline"
