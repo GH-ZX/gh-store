@@ -1,0 +1,12 @@
+allowBuilds:
+  '@parcel/watcher': false
+  '@swc/core': false
+  sharp: false
+  unrs-resolver: false
+minimumReleaseAgeExclude:
+  - '@supabase/auth-js@2.110.9'
+  - '@supabase/functions-js@2.110.9'
+  - '@supabase/postgrest-js@2.110.9'
+  - '@supabase/realtime-js@2.110.9'
+  - '@supabase/storage-js@2.110.9'
+  - '@supabase/supabase-js@2.110.9'
