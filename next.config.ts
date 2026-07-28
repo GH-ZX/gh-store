@@ -1,8 +1,14 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   // Enable React Strict Mode for development
   reactStrictMode: true,
+
+  // Fix Turbopack workspace root detection in pnpm monorepo-style setups
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
 
   // Image optimization configuration
   images: {
