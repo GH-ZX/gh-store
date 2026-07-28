@@ -8,7 +8,7 @@ import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@/lib/constants";
  * 2. Locale detection/redirect
  * 3. Admin route protection
  */
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // --- Locale handling ---
@@ -51,10 +51,6 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Match on path *segments* after the locale prefix, not substrings.
-  // `pathname.includes("/dashboard")` also matched e.g.
-  // `/ar/store/my-dashboard-theme`, and the `/auth/callback` early-return below
-  // matched `/ar/dashboard/auth/callback` — skipping the admin check entirely.
   const rest = pathname.slice(`/${pathLocale}`.length) || "/";
 
   const isProtectedRoute = [
@@ -68,7 +64,6 @@ export async function proxy(request: NextRequest) {
   const isAdminRoute = rest === "/dashboard" || rest.startsWith("/dashboard/");
 
   // Allow the callback route always (needed for OAuth code exchange).
-  // Checked against the exact segment so it cannot be used as a bypass prefix.
   if (rest === "/auth/callback") {
     return supabaseResponse;
   }
