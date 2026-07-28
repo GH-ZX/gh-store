@@ -4,11 +4,6 @@ const nextConfig: NextConfig = {
   // Enable React Strict Mode for development
   reactStrictMode: true,
 
-  // Enable TypeScript CLI for TS 7.x compatibility
-  experimental: {
-    useTypeScriptCli: true,
-  },
-
   // Image optimization configuration
   images: {
     remotePatterns: [

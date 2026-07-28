@@ -55,7 +55,13 @@ export async function middleware(request: NextRequest) {
     pathname.includes("/dashboard") ||
     pathname.includes("/orders") ||
     pathname.includes("/wallet") ||
-    pathname.includes("/checkout");
+    pathname.includes("/checkout") ||
+    pathname.includes("/profile");
+
+  // Allow callback route always (needed for OAuth code exchange)
+  if (pathname.includes("/auth/callback")) {
+    return supabaseResponse;
+  }
 
   const isAdminRoute = pathname.includes("/dashboard");
 

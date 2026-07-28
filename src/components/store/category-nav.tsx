@@ -14,43 +14,98 @@ interface Category {
 
 interface CategoryNavProps {
   categories: Category[];
+  /** When provided, uses click handlers instead of Link navigation for in-page filtering */
+  activeCategory?: string;
+  onCategoryChange?: (slug: string | undefined) => void;
 }
 
-export function CategoryNav({ categories }: CategoryNavProps) {
+export function CategoryNav({ categories, activeCategory, onCategoryChange }: CategoryNavProps) {
   const params = useParams<{ locale: string }>();
   const pathname = usePathname();
   const isRtl = params?.locale === "ar";
-  const currentCategory = pathname.split("/").pop();
+
+  // Determine the active category: from props (filter mode) or URL (navigation mode)
+  const isFilterMode = onCategoryChange !== undefined;
+  const currentCategory = isFilterMode
+    ? activeCategory
+    : pathname.split("/").pop();
+
+  const handleClick = (slug: string | undefined) => {
+    if (isFilterMode && onCategoryChange) {
+      onCategoryChange(slug);
+    }
+  };
+
+  const isActive = (slug?: string) => {
+    if (isFilterMode) {
+      return slug === currentCategory || (!slug && !currentCategory);
+    }
+    return slug
+      ? currentCategory === slug
+      : !currentCategory || currentCategory === "store";
+  };
 
   return (
     <ScrollArea className="w-full">
       <div className="flex gap-2 pb-2">
-        <Link
-          href={`/${params?.locale || "ar"}/store`}
-          className={cn(
-            "inline-flex shrink-0 items-center rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-accent",
-            !currentCategory || currentCategory === "store"
-              ? "bg-primary text-primary-foreground border-primary"
-              : "bg-background border-border",
-          )}
-        >
-          {isRtl ? "الكل" : "All"}
-        </Link>
-        {categories.map((category) => (
-          <Link
-            key={category.slug}
-            href={`/${params?.locale || "ar"}/store/${category.slug}`}
+        {/* "All" button */}
+        {isFilterMode ? (
+          <button
+            onClick={() => handleClick(undefined)}
             className={cn(
-              "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-accent",
-              currentCategory === category.slug
+              "shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-accent cursor-pointer",
+              isActive()
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-background border-border",
             )}
           >
-            {category.icon && <span className="text-base">{category.icon}</span>}
-            {isRtl ? category.nameAr : category.nameEn}
+            {isRtl ? "الكل" : "All"}
+          </button>
+        ) : (
+          <Link
+            href={`/${params?.locale || "ar"}/store`}
+            className={cn(
+              "shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-accent",
+              isActive()
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-background border-border",
+            )}
+          >
+            {isRtl ? "الكل" : "All"}
           </Link>
-        ))}
+        )}
+
+        {categories.map((category) =>
+          isFilterMode ? (
+            <button
+              key={category.slug}
+              onClick={() => handleClick(category.slug)}
+              className={cn(
+                "shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-accent cursor-pointer",
+                isActive(category.slug)
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background border-border",
+              )}
+            >
+              {category.icon && <span className="text-base mr-1">{category.icon}</span>}
+              {isRtl ? category.nameAr : category.nameEn}
+            </button>
+          ) : (
+            <Link
+              key={category.slug}
+              href={`/${params?.locale || "ar"}/store/${category.slug}`}
+              className={cn(
+                "shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-accent",
+                isActive(category.slug)
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background border-border",
+              )}
+            >
+              {category.icon && <span className="text-base mr-1">{category.icon}</span>}
+              {isRtl ? category.nameAr : category.nameEn}
+            </Link>
+          ),
+        )}
       </div>
       <ScrollBar orientation="horizontal" className="invisible" />
     </ScrollArea>

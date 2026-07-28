@@ -6,10 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "pnpm lint && pnpm typecheck && pnpm format:check"
   },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@11.17.0",
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "@hookform/resolvers": "^5.5.7",
@@ -19,6 +26,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "lucide-react": "^1.27.0",
     "next": "16.2.12",
@@ -33,14 +41,6 @@
     "zod": "^4.4.3",
     "zustand": "^5.0.14"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@parcel/watcher",
-      "@swc/core",
-      "sharp",
-      "unrs-resolver"
-    ]
-  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^22",
@@ -48,9 +48,10 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
+    "eslint-plugin-import": "^2.32.0",
     "prettier": "^3",
     "prettier-plugin-tailwindcss": "^0.6",
     "tailwindcss": "^4.3.3",
-    "typescript": "^7.0.2"
+    "typescript": "~5.9.3"
   }
 }
