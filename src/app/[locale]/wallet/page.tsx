@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import {
   Wallet as WalletIcon,
@@ -11,100 +11,23 @@ import {
   Plus,
   Eye,
   EyeOff,
+  Loader2,
+  AlertCircle,
+  RefreshCw,
+  CreditCard,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { cn } from "@/lib/utils";
-
-// ─── Mock Wallet Data ────────────────────────────────
-
-interface MockTransaction {
-  id: string;
-  type: "deposit" | "withdrawal" | "purchase" | "refund" | "admin_adjustment";
-  amount: number;
-  balanceBefore: number;
-  balanceAfter: number;
-  description: string;
-  createdAt: string;
-}
-
-const mockBalance = 142.50;
-
-const mockTransactions: MockTransaction[] = [
-  {
-    id: "tx-1",
-    type: "deposit",
-    amount: 100.00,
-    balanceBefore: 0,
-    balanceAfter: 100.00,
-    description: "Deposit via SAM API",
-    createdAt: "2026-07-25T10:30:00Z",
-  },
-  {
-    id: "tx-2",
-    type: "purchase",
-    amount: -14.97,
-    balanceBefore: 100.00,
-    balanceAfter: 85.03,
-    description: "PUBG Mobile - UC Top-Up",
-    createdAt: "2026-07-26T14:15:00Z",
-  },
-  {
-    id: "tx-3",
-    type: "deposit",
-    amount: 75.00,
-    balanceBefore: 85.03,
-    balanceAfter: 160.03,
-    description: "Deposit via SAM API",
-    createdAt: "2026-07-26T16:00:00Z",
-  },
-  {
-    id: "tx-4",
-    type: "purchase",
-    amount: -25.00,
-    balanceBefore: 160.03,
-    balanceAfter: 135.03,
-    description: "Google Play Gift Card",
-    createdAt: "2026-07-27T09:30:00Z",
-  },
-  {
-    id: "tx-5",
-    type: "refund",
-    amount: 12.99,
-    balanceBefore: 135.03,
-    balanceAfter: 148.02,
-    description: "Refund - Netflix Premium (Cancelled)",
-    createdAt: "2026-07-27T15:00:00Z",
-  },
-  {
-    id: "tx-6",
-    type: "purchase",
-    amount: -5.52,
-    balanceBefore: 148.02,
-    balanceAfter: 142.50,
-    description: "Free Fire - Diamonds × 2",
-    createdAt: "2026-07-28T10:30:00Z",
-  },
-  {
-    id: "tx-7",
-    type: "deposit",
-    amount: 50.00,
-    balanceBefore: 142.50,
-    balanceAfter: 192.50,
-    description: "Deposit via SAM API",
-    createdAt: "2026-07-28T12:00:00Z",
-  },
-  {
-    id: "tx-8",
-    type: "purchase",
-    amount: -50.00,
-    balanceBefore: 192.50,
-    balanceAfter: 142.50,
-    description: "PSN Gift Card",
-    createdAt: "2026-07-28T14:00:00Z",
-  },
-];
+import { useWalletBalance } from "@/hooks/use-wallet-balance";
+import { useWalletTransactions } from "@/hooks/use-wallet-transactions";
+import { useAdminProviderWallets } from "@/hooks/use-admin-wallets";
+import { useAuth } from "@/hooks/use-auth";
+import { Coins } from "lucide-react";
+import Link from "next/link";
+import type { WalletTransaction } from "@/hooks/use-wallet-transactions";
 
 // ─── Transaction Config ──────────────────────────────
 
@@ -141,6 +64,14 @@ const txConfig: Record<string, { labelAr: string; labelEn: string; icon: React.R
   },
 };
 
+const txBgColors: Record<string, string> = {
+  deposit: "bg-green-100 dark:bg-green-900/50",
+  purchase: "bg-orange-100 dark:bg-orange-900/50",
+  refund: "bg-blue-100 dark:bg-blue-900/50",
+  withdrawal: "bg-red-100 dark:bg-red-900/50",
+  admin_adjustment: "bg-purple-100 dark:bg-purple-900/50",
+};
+
 function formatDate(dateStr: string, locale: string): string {
   const date = new Date(dateStr);
   const now = new Date();
@@ -164,13 +95,55 @@ function formatDate(dateStr: string, locale: string): string {
   });
 }
 
+// ─── Component ───────────────────────────────────────
+
 export default function WalletPage() {
   const params = useParams<{ locale: string }>();
   const locale = params?.locale || "ar";
   const isRtl = locale === "ar";
   const [showBalance, setShowBalance] = useState(true);
-  const [isLoading] = useState(false);
+  const { isAdmin } = useAuth();
+  const { g2bulk, samWallets, samWalletsLoading, g2bulkLoading } = useAdminProviderWallets();
 
+  const {
+    balance,
+    currency,
+    isLoading: balanceLoading,
+    error: balanceError,
+    refetch: refetchBalance,
+  } = useWalletBalance();
+
+  const {
+    transactions,
+    isLoading: txLoading,
+    refetch: refetchTx,
+  } = useWalletTransactions(100);
+
+  // ─── Derived Stats ───────────────────────────────────
+  const stats = useMemo(() => {
+    let totalDeposited = 0;
+    let totalSpent = 0;
+
+    for (const tx of transactions) {
+      if (tx.amount > 0) {
+        totalDeposited += tx.amount;
+      } else {
+        totalSpent += Math.abs(tx.amount);
+      }
+    }
+
+    return {
+      totalDeposited,
+      totalSpent,
+      count: transactions.length,
+    };
+  }, [transactions]);
+
+  const isLoading = balanceLoading || txLoading;
+  const hasError = !!balanceError;
+  const isEmpty = !isLoading && !hasError && transactions.length === 0;
+
+  // ─── Loading State ───────────────────────────────────
   if (isLoading) {
     return (
       <main className="flex-1">
@@ -181,6 +154,33 @@ export default function WalletPage() {
               <div key={i} className="h-16 animate-pulse rounded-xl bg-muted" />
             ))}
           </div>
+        </div>
+      </main>
+    );
+  }
+
+  // ─── Error State ─────────────────────────────────────
+  if (hasError) {
+    return (
+      <main className="flex-1">
+        <div className="mx-auto max-w-4xl px-4 py-12">
+          <Card className="border-destructive/50">
+            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+              <AlertCircle className="size-14 text-destructive/30 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">
+                {isRtl ? "فشل تحميل المحفظة" : "Failed to load wallet"}
+              </h3>
+              <p className="text-sm text-muted-foreground max-w-md mb-6">
+                {isRtl
+                  ? "حدث خطأ أثناء تحميل بيانات المحفظة. حاول مرة أخرى."
+                  : "An error occurred while loading wallet data. Please try again."}
+              </p>
+              <Button onClick={() => { refetchBalance(); refetchTx(); }} variant="outline" className="gap-2">
+                <RefreshCw className="size-4" />
+                {isRtl ? "إعادة المحاولة" : "Retry"}
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </main>
     );
@@ -200,7 +200,7 @@ export default function WalletPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-4xl md:text-5xl font-bold tracking-tight">
-                    {showBalance ? `$${mockBalance.toFixed(2)}` : "••••••"}
+                    {showBalance ? `$${balance.toFixed(2)}` : "••••••"}
                   </span>
                   <button
                     onClick={() => setShowBalance(!showBalance)}
@@ -210,14 +210,20 @@ export default function WalletPage() {
                   </button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {isRtl ? "USD - دولار أمريكي" : "USD - US Dollar"}
+                  {currency} — {isRtl ? "دولار أمريكي" : "US Dollar"}
                 </p>
               </div>
 
               <div className="flex gap-2">
-                <Button size="sm" className="gap-1" onClick={() => console.log("Deposit clicked")}>
-                  <Plus className="size-4" />
-                  {isRtl ? "إيداع" : "Deposit"}
+                <Link href={`/${locale}/wallet/recharge`}>
+                  <Button size="sm" className="gap-1">
+                    <CreditCard className="size-3.5" />
+                    {isRtl ? "شحن" : "Recharge"}
+                  </Button>
+                </Link>
+                <Button size="sm" className="gap-1" variant="outline" onClick={() => refetchBalance()}>
+                  <RefreshCw className="size-3.5" />
+                  {isRtl ? "تحديث" : "Refresh"}
                 </Button>
               </div>
             </div>
@@ -228,14 +234,14 @@ export default function WalletPage() {
                 <p className="text-xs text-muted-foreground">
                   {isRtl ? "الرصيد الحالي" : "Current"}
                 </p>
-                <p className="text-sm font-bold">${mockBalance.toFixed(2)}</p>
+                <p className="text-sm font-bold">${balance.toFixed(2)}</p>
               </div>
               <div className="text-center">
                 <p className="text-xs text-muted-foreground">
                   {isRtl ? "المودع" : "Deposited"}
                 </p>
                 <p className="text-sm font-bold text-green-600 dark:text-green-400">
-                  +$225.00
+                  +${stats.totalDeposited.toFixed(2)}
                 </p>
               </div>
               <div className="text-center">
@@ -243,7 +249,7 @@ export default function WalletPage() {
                   {isRtl ? "المنفق" : "Spent"}
                 </p>
                 <p className="text-sm font-bold text-red-600 dark:text-red-400">
-                  -$95.49
+                  -${stats.totalSpent.toFixed(2)}
                 </p>
               </div>
             </div>
@@ -251,19 +257,27 @@ export default function WalletPage() {
         </Card>
 
         {/* ─── Transactions Header ──────────────────── */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold tracking-tight">
-            {isRtl ? "سجل المعاملات" : "Transaction History"}
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            {isRtl
-              ? `آخر ${mockTransactions.length} معاملة`
-              : `Last ${mockTransactions.length} transactions`}
-          </p>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold tracking-tight">
+              {isRtl ? "سجل المعاملات" : "Transaction History"}
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              {isRtl
+                ? `آخر ${stats.count} معاملة`
+                : `Last ${stats.count} transactions`}
+            </p>
+          </div>
+          {stats.count > 0 && (
+            <Button variant="ghost" size="sm" onClick={() => refetchTx()} className="gap-1.5">
+              <RefreshCw className="size-3.5" />
+              {isRtl ? "تحديث" : "Refresh"}
+            </Button>
+          )}
         </div>
 
         {/* ─── Transactions List ────────────────────── */}
-        {mockTransactions.length === 0 ? (
+        {isEmpty ? (
           <EmptyState
             icon={<WalletIcon className="size-8" />}
             title={isRtl ? "لا توجد معاملات" : "No transactions"}
@@ -277,7 +291,7 @@ export default function WalletPage() {
           />
         ) : (
           <div className="space-y-2">
-            {mockTransactions.map((tx) => {
+            {transactions.map((tx: WalletTransaction) => {
               const config = txConfig[tx.type];
               const isCredit = tx.amount > 0;
               const isDebit = tx.amount < 0;
@@ -290,27 +304,25 @@ export default function WalletPage() {
                   {/* Type icon */}
                   <div className={cn(
                     "flex size-10 shrink-0 items-center justify-center rounded-full",
-                    tx.type === "deposit" && "bg-green-100 dark:bg-green-900",
-                    tx.type === "purchase" && "bg-orange-100 dark:bg-orange-900",
-                    tx.type === "refund" && "bg-blue-100 dark:bg-blue-900",
-                    tx.type === "withdrawal" && "bg-red-100 dark:bg-red-900",
-                    tx.type === "admin_adjustment" && "bg-purple-100 dark:bg-purple-900",
+                    txBgColors[tx.type] || "bg-muted",
                   )}>
-                    <span className={cn("size-4", txConfig[tx.type]?.color)}>
-                      {txConfig[tx.type]?.icon}
+                    <span className={cn("size-4", config?.color)}>
+                      {config?.icon}
                     </span>
                   </div>
 
                   {/* Details */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium">{tx.description}</p>
+                    <p className="text-sm font-medium">
+                      {tx.description || (isRtl ? "معاملة" : "Transaction")}
+                    </p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className={cn("text-xs font-medium", txConfig[tx.type]?.color)}>
+                      <span className={cn("text-xs font-medium", config?.color)}>
                         {isRtl ? config?.labelAr : config?.labelEn}
                       </span>
                       <span className="text-xs text-muted-foreground">·</span>
                       <span className="text-xs text-muted-foreground">
-                        {formatDate(tx.createdAt, locale)}
+                        {formatDate(tx.created_at, locale)}
                       </span>
                     </div>
                   </div>
@@ -325,7 +337,7 @@ export default function WalletPage() {
                       {isCredit ? "+" : ""}${Math.abs(tx.amount).toFixed(2)}
                     </p>
                     <p className="text-xs text-muted-foreground tabular-nums">
-                      ${tx.balanceAfter.toFixed(2)}
+                      ${tx.balance_after.toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -333,6 +345,116 @@ export default function WalletPage() {
             })}
           </div>
         )}
+      </div>
+
+      {/* ─── SAM Provider Wallets ─── */}
+      <div className="mx-auto max-w-4xl px-4 pb-8">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold tracking-tight">
+              {isRtl ? "محافظ SAM API" : "SAM API Wallets"}
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              {samWalletsLoading
+                ? (isRtl ? "جاري التحميل..." : "Loading...")
+                : (isRtl
+                  ? "أرصدة محافظ الدفع الإلكتروني"
+                  : "E-wallet balances from SAM payment gateway")}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {samWalletsLoading ? (
+            /* Loading skeleton */
+            <>
+              <Card className="overflow-hidden animate-pulse">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="size-9 rounded-lg bg-muted" />
+                    <div className="space-y-1.5 flex-1">
+                      <div className="h-4 w-28 rounded bg-muted" />
+                      <div className="h-3 w-20 rounded bg-muted" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <div className="h-4 w-12 rounded bg-muted" />
+                      <div className="h-4 w-20 rounded bg-muted" />
+                    </div>
+                    <div className="flex justify-between">
+                      <div className="h-4 w-12 rounded bg-muted" />
+                      <div className="h-4 w-24 rounded bg-muted" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="overflow-hidden animate-pulse">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="size-9 rounded-lg bg-muted" />
+                    <div className="space-y-1.5 flex-1">
+                      <div className="h-4 w-28 rounded bg-muted" />
+                      <div className="h-3 w-20 rounded bg-muted" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <div className="h-4 w-12 rounded bg-muted" />
+                      <div className="h-4 w-20 rounded bg-muted" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          ) : samWallets.length > 0 ? (
+            samWallets.map((w) => (
+              <Card key={w.id} className="overflow-hidden">
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <Coins className="size-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold">{w.providerDisplayName}</p>
+                        <p className="text-xs text-muted-foreground">{w.label || w.phone || w.walletAddress?.slice(0, 16) || w.accountNumber?.slice(0, 16)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {w.balances && w.balances.length > 0 ? (
+                    <div className="space-y-1.5">
+                      {w.balances.map((b) => (
+                        <div key={b.currency} className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">{b.currency}</span>
+                          <span className={cn(
+                            "font-bold tabular-nums",
+                            Number(b.amount) > 0 ? "text-foreground" : "text-muted-foreground"
+                          )}>
+                            {b.currency === "SYP"
+                              ? `\u00a3S${Number(b.amount).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+                              : `$${Number(b.amount).toFixed(2)}`}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {isRtl ? "غير متاح" : "Unavailable"}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <div className="col-span-full">
+              <p className="text-sm text-muted-foreground text-center py-8">
+                {isRtl ? "انقر على 'تحديث' في لوحة تحكم SAM API لجلب المحافظ" : "Click 'Refresh' in the SAM API dashboard settings to fetch wallets"}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </main>
   );

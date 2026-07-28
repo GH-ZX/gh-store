@@ -12,10 +12,11 @@ export default async function HomePage({
   const { locale } = await params;
   const isRtl = locale === "ar";
 
-  // Fetch data server-side
-  const [featuredProducts, categories] = await Promise.all([
+  // Fetch data server-side — products show immediately on SSR, before TanStack Query loads
+  const [featuredProducts, categories, allProducts] = await Promise.all([
     ProductService.getFeaturedProducts(),
     ProductService.getCategories(),
+    ProductService.getProducts(),
   ]);
 
   return (
@@ -24,6 +25,7 @@ export default async function HomePage({
       isRtl={isRtl}
       initialFeatured={featuredProducts}
       initialCategories={categories}
+      initialProducts={allProducts}
     />
   );
 }

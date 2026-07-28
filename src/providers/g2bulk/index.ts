@@ -35,20 +35,10 @@ export class G2BulkProvider extends BaseProvider {
   private apiKey: string;
   private baseUrl: string;
 
-  constructor(info: ProviderInfo) {
+  constructor(info: ProviderInfo, apiKey?: string) {
     super(info);
-    this.apiKey = this.resolveApiKey();
+    this.apiKey = apiKey || "";
     this.baseUrl = G2BULK_API_BASE;
-  }
-
-  // ─── Auth ───────────────────────────────────────────
-
-  /**
-   * Resolve the API key from env vars or credentials.
-   * Priority: env var > database credentials > empty
-   */
-  private resolveApiKey(): string {
-    return process.env.G2BULK_API_KEY || "";
   }
 
   /**

@@ -1,9 +1,16 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ShoppingCart, Wallet, CreditCard, CheckCircle, Loader2 } from "lucide-react";
+import {
+  ShoppingCart,
+  Wallet,
+  CreditCard,
+  CheckCircle,
+  Loader2,
+  AlertCircle,
+  ExternalLink,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -14,6 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   RadioGroup,
   RadioGroupItem,
@@ -38,18 +46,67 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("wallet");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successOrderNumber, setSuccessOrderNumber] = useState("");
 
   const subtotal = useMemo(() => getCartTotal(items), [items]);
 
   const handleSubmitOrder = async () => {
     setIsSubmitting(true);
+    setErrorMsg(null);
+
     try {
-      // Simulate order processing
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      clearCart();
-      setIsSuccess(true);
+      const payload: Record<string, unknown> = {
+        paymentMethod,
+        items: items.map((item) => ({
+          productId: item.productId,
+          name: item.name,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          totalPrice: item.totalPrice,
+          fields: item.fields,
+        })),
+        subtotal,
+        total: subtotal,
+      };
+
+      const res = await fetch("/api/orders/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        setErrorMsg(data.message || (isRtl ? "فشل إنشاء الطلب" : "Failed to create order"));
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (paymentMethod === "wallet") {
+        // Wallet payment: success, update UI
+        clearCart();
+        setSuccessOrderNumber(data.orderNumber || "");
+        setIsSuccess(true);
+      } else if (paymentMethod === "sam" && data.paymentUrl) {
+        // SAM payment: redirect to payment URL
+        clearCart();
+        setSuccessOrderNumber(data.orderNumber || "");
+        setIsSuccess(true);
+
+        // Auto-redirect to SAM payment page after a short delay
+        setTimeout(() => {
+          window.open(data.paymentUrl, "_blank");
+        }, 500);
+      } else {
+        // SAM payment but no URL (unexpected)
+        clearCart();
+        setIsSuccess(true);
+      }
     } catch (err) {
-      console.error("Order failed:", err);
+      console.error("Order error:", err);
+      setErrorMsg(err instanceof Error ? err.message : "An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -92,11 +149,30 @@ export default function CheckoutPage() {
             <h1 className="text-3xl font-bold tracking-tight">
               {isRtl ? "تم تأكيد الطلب!" : "Order Confirmed!"}
             </h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {successOrderNumber && (
+                <span className="font-mono text-foreground">{successOrderNumber}</span>
+              )}
+            </p>
             <p className="mt-3 text-muted-foreground">
               {isRtl
-                ? "شكراً لك! تم استلام طلبك وسيتم معالجته قريباً. ستتلقى تأكيداً عبر البريد الإلكتروني."
-                : "Thank you! Your order has been received and will be processed shortly. You'll receive a confirmation email."}
+                ? "شكراً لك! تم استلام طلبك وسيتم معالجته قريباً."
+                : "Thank you! Your order has been received and will be processed shortly."}
             </p>
+
+            {paymentMethod === "sam" && (
+              <div className="mt-4 rounded-lg bg-primary/5 p-4 text-sm">
+                <p className="font-medium mb-1">
+                  {isRtl ? "🚀 تم فتح صفحة الدفع في نافذة جديدة" : "🚀 Payment page opened in a new window"}
+                </p>
+                <p className="text-muted-foreground">
+                  {isRtl
+                    ? "قم بإتمام الدفع عبر SAM API. بعد الدفع، سيتم تأكيد طلبك تلقائياً."
+                    : "Complete your payment via SAM API. Your order will be confirmed automatically after payment."}
+                </p>
+              </div>
+            )}
+
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Button onClick={() => router.push(`/${locale}/orders`)}>
                 {isRtl ? "عرض الطلبات" : "View Orders"}
@@ -148,6 +224,14 @@ export default function CheckoutPage() {
                   </Button>
                 </CardContent>
               </Card>
+            )}
+
+            {/* Error */}
+            {errorMsg && (
+              <Alert variant="destructive">
+                <AlertCircle className="size-4" />
+                <AlertDescription>{errorMsg}</AlertDescription>
+              </Alert>
             )}
 
             {/* Items preview */}
@@ -229,12 +313,23 @@ export default function CheckoutPage() {
                     <p className="text-sm font-medium">SAM API</p>
                     <p className="text-xs text-muted-foreground">
                       {isRtl
-                        ? "ادفع عبر بوابة الدفع SAM"
-                        : "Pay via SAM payment gateway"}
+                        ? "ادفع عبر ShamCash أو Syriatel Cash"
+                        : "Pay via ShamCash or Syriatel Cash"}
                     </p>
                   </div>
                 </Label>
               </RadioGroup>
+
+              {/* SAM info note */}
+              {paymentMethod === "sam" && (
+                <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+                  <p className="text-sm text-muted-foreground">
+                    {isRtl
+                      ? "سيتم توجيهك إلى بوابة الدفع SAM API عند تأكيد الطلب. اختر طريقة الدفع المناسبة (ShamCash أو Syriatel Cash) في صفحة الدفع."
+                      : "You will be redirected to the SAM API payment gateway after placing your order. Select your preferred payment method (ShamCash or Syriatel Cash) on the payment page."}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -297,8 +392,14 @@ export default function CheckoutPage() {
                   </>
                 ) : (
                   <>
-                    <CheckCircle className="size-4" />
-                    {isRtl ? "تأكيد الطلب" : "Place Order"}
+                    {paymentMethod === "sam" ? (
+                      <ExternalLink className="size-4" />
+                    ) : (
+                      <CheckCircle className="size-4" />
+                    )}
+                    {paymentMethod === "sam"
+                      ? (isRtl ? "الدفع عبر SAM" : "Pay with SAM")
+                      : (isRtl ? "تأكيد الطلب" : "Place Order")}
                   </>
                 )}
               </Button>

@@ -9,23 +9,10 @@ const CREDENTIAL_KEY = "api_key";
  * GET /api/g2bulk/settings
  *
  * Returns whether an API key is configured and a masked version of it.
- * Never exposes the full key.
+ * Never exposes the full key. Only reads from the provider_credentials table.
  */
 export async function GET() {
   try {
-    // First check env var
-    const envKey = process.env.G2BULK_API_KEY;
-    if (envKey) {
-      const masked = envKey.slice(0, 6) + "..." + envKey.slice(-4);
-      return NextResponse.json({
-        success: true,
-        keySet: true,
-        maskedKey: masked,
-        source: "env",
-      });
-    }
-
-    // Fall back to DB credentials
     const supabase = createSupabaseAdminClient();
     const providerId = await ensureG2BulkProvider(supabase);
 
@@ -38,7 +25,7 @@ export async function GET() {
       .maybeSingle();
 
     if (cred?.value) {
-      const masked = cred.value.slice(0, 6) + "..." + cred.value.slice(-4);
+      const masked = (cred.value as string).slice(0, 6) + "..." + (cred.value as string).slice(-4);
       return NextResponse.json({
         success: true,
         keySet: true,

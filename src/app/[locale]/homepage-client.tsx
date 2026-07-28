@@ -18,6 +18,7 @@ interface HomepageClientProps {
   isRtl: boolean;
   initialFeatured: StoreProduct[];
   initialCategories: StoreCategory[];
+  initialProducts: StoreProduct[];
 }
 
 export function HomepageClient({
@@ -25,6 +26,7 @@ export function HomepageClient({
   isRtl,
   initialFeatured,
   initialCategories,
+  initialProducts,
 }: HomepageClientProps) {
   const { data: featuredData } = useFeaturedProducts();
   const { data: categoriesData } = useCategories();
@@ -38,7 +40,12 @@ export function HomepageClient({
   const categories =
     categoriesData && categoriesData.length > 0 ? categoriesData : initialCategories;
 
-  const allProducts = allProductsData && allProductsData.length > 0 ? allProductsData : undefined;
+  // Use server-fetched products immediately, then upgrade to client-fetched when ready
+  const allProducts = allProductsData && allProductsData.length > 0
+    ? allProductsData
+    : initialProducts.length > 0
+      ? initialProducts
+      : undefined;
 
   // ─── Carousel ────────────────────────────────────
   const carouselProducts =

@@ -8,7 +8,7 @@ import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@/lib/constants";
  * 2. Locale detection/redirect
  * 3. Admin route protection
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // --- Locale handling ---

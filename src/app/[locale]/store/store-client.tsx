@@ -23,15 +23,17 @@ interface StoreClientProps {
   isRtl: boolean;
   initialProducts: MockProduct[];
   initialCategories: MockCategory[];
+  initialSearchQuery?: string;
+  initialType?: string;
 }
 
 const ITEMS_PER_PAGE = 12;
 
 type SortOption = "default" | "price-asc" | "price-desc" | "name-asc" | "name-desc" | "rating-desc";
 
-export function StoreClient({ locale, isRtl, initialProducts, initialCategories }: StoreClientProps) {
+export function StoreClient({ locale, isRtl, initialProducts, initialCategories, initialSearchQuery = "", initialType }: StoreClientProps) {
   // ─── State ──────────────────────────────────────────
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [activeCategory, setActiveCategory] = useState<string | undefined>();
   const [sortBy, setSortBy] = useState<SortOption>("default");
   const [currentPage, setCurrentPage] = useState(1);

@@ -93,9 +93,16 @@ export class ProviderRegistry {
       config: provider.config,
     };
 
+    // Extract credentials from the joined provider_credentials
+    const creds: { key: string; value: string; is_active: boolean }[] =
+      (provider as any).provider_credentials || [];
+    const apiKey = creds.find(
+      (c: any) => c.key === "api_key" && c.is_active,
+    )?.value;
+
     switch (provider.slug) {
       case "g2bulk":
-        return new G2BulkProvider(info);
+        return new G2BulkProvider(info, apiKey);
       // Future providers will be added here
       // case "sam":
       //   return new SAMProvider(info);

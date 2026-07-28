@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
@@ -12,74 +12,44 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
+  Loader2,
+  RefreshCw,
+  Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
+import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
-// ─── Mock Order Data ─────────────────────────────────
+// ─── Types ────────────────────────────────────────────
 
-interface MockOrderItem {
-  name: string;
-  quantity: number;
-  price: number;
-}
-
-interface MockOrder {
+interface OrderItem {
   id: string;
-  orderNumber: string;
-  status: "pending" | "processing" | "completed" | "cancelled" | "refunded";
-  createdAt: string;
-  total: number;
-  items: MockOrderItem[];
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  dynamic_fields: Record<string, string>;
+  status: string;
 }
 
-const mockOrders: MockOrder[] = [
-  {
-    id: "o-1",
-    orderNumber: "GH-20260728-001",
-    status: "completed",
-    createdAt: "2026-07-28T10:30:00Z",
-    total: 14.97,
-    items: [
-      { name: "PUBG Mobile - UC Top-Up", quantity: 3, price: 4.99 },
-    ],
-  },
-  {
-    id: "o-2",
-    orderNumber: "GH-20260727-002",
-    status: "processing",
-    createdAt: "2026-07-27T15:45:00Z",
-    total: 25.00,
-    items: [
-      { name: "Google Play Gift Card", quantity: 1, price: 25.00 },
-    ],
-  },
-  {
-    id: "o-3",
-    orderNumber: "GH-20260725-003",
-    status: "completed",
-    createdAt: "2026-07-25T09:15:00Z",
-    total: 59.98,
-    items: [
-      { name: "Windows 11 Pro - License", quantity: 1, price: 29.99 },
-      { name: "ChatGPT Plus - 1 Month", quantity: 1, price: 20.00 },
-      { name: "Free Fire - Diamonds", quantity: 2, price: 4.99 },
-    ],
-  },
-  {
-    id: "o-4",
-    orderNumber: "GH-20260720-004",
-    status: "cancelled",
-    createdAt: "2026-07-20T14:00:00Z",
-    total: 12.99,
-    items: [
-      { name: "Netflix Premium - 1 Month", quantity: 1, price: 12.99 },
-    ],
-  },
-];
+interface Order {
+  id: string;
+  order_number: string;
+  status: "pending" | "processing" | "completed" | "cancelled" | "refunded";
+  subtotal: number;
+  discount: number;
+  total: number;
+  payment_method: string;
+  payment_status: string;
+  notes: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  order_items: OrderItem[];
+}
 
 // ─── Status Config ───────────────────────────────────
 
@@ -88,6 +58,13 @@ const statusConfig: Record<string, { labelAr: string; labelEn: string; variant: 
   processing: { labelAr: "قيد المعالجة", labelEn: "Processing", variant: "secondary" },
   completed: { labelAr: "مكتمل", labelEn: "Completed", variant: "default" },
   cancelled: { labelAr: "ملغي", labelEn: "Cancelled", variant: "destructive" },
+  refunded: { labelAr: "مسترجع", labelEn: "Refunded", variant: "outline" },
+};
+
+const paymentStatusConfig: Record<string, { labelAr: string; labelEn: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+  pending: { labelAr: "قيد الدفع", labelEn: "Pending", variant: "outline" },
+  paid: { labelAr: "تم الدفع", labelEn: "Paid", variant: "default" },
+  failed: { labelAr: "فشل الدفع", labelEn: "Failed", variant: "destructive" },
   refunded: { labelAr: "مسترجع", labelEn: "Refunded", variant: "outline" },
 };
 
@@ -100,13 +77,51 @@ function formatDate(dateStr: string, locale: string): string {
   });
 }
 
+function formatTime(dateStr: string, locale: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleTimeString(locale === "ar" ? "ar-SA" : "en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export default function OrdersPage() {
   const params = useParams<{ locale: string }>();
   const locale = params?.locale || "ar";
   const isRtl = locale === "ar";
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [isLoading] = useState(false);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { isAuthenticated } = useAuth();
 
+  const fetchOrders = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/orders/list");
+      const data = await res.json();
+      if (data.success) {
+        setOrders(data.orders || []);
+      } else {
+        setError(data.message || "Failed to fetch orders");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch orders");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchOrders();
+    } else {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated]);
+
+  // ─── Loading State ───────────────────────────────
   if (isLoading) {
     return (
       <main className="flex-1">
@@ -121,7 +136,33 @@ export default function OrdersPage() {
     );
   }
 
-  if (mockOrders.length === 0) {
+  // ─── Error State ─────────────────────────────────
+  if (error) {
+    return (
+      <main className="flex-1">
+        <div className="mx-auto max-w-4xl px-4 py-16">
+          <Card className="border-destructive/50">
+            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+              <AlertCircle className="size-14 text-destructive/30 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">
+                {isRtl ? "فشل تحميل الطلبات" : "Failed to load orders"}
+              </h3>
+              <p className="text-sm text-muted-foreground max-w-md mb-6">
+                {error}
+              </p>
+              <Button onClick={fetchOrders} variant="outline" className="gap-2">
+                <RefreshCw className="size-4" />
+                {isRtl ? "إعادة المحاولة" : "Retry"}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    );
+  }
+
+  // ─── Empty State ─────────────────────────────────
+  if (orders.length === 0) {
     return (
       <main className="flex-1">
         <div className="mx-auto max-w-4xl px-4 py-16">
@@ -149,21 +190,29 @@ export default function OrdersPage() {
     <main className="flex-1">
       <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
         {/* ─── Header ──────────────────────────────── */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">
-            {isRtl ? "طلباتي" : "My Orders"}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {isRtl
-              ? `عرض ${mockOrders.length} طلب`
-              : `Viewing ${mockOrders.length} orders`}
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {isRtl ? "طلباتي" : "My Orders"}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {isRtl
+                ? `عرض ${orders.length} طلب`
+                : `Viewing ${orders.length} orders`}
+            </p>
+          </div>
+
+          <Button variant="ghost" size="sm" onClick={fetchOrders} className="gap-1.5">
+            <RefreshCw className="size-3.5" />
+            {isRtl ? "تحديث" : "Refresh"}
+          </Button>
         </div>
 
         {/* ─── Order Cards ─────────────────────────── */}
         <div className="space-y-4">
-          {mockOrders.map((order) => {
-            const status = statusConfig[order.status];
+          {orders.map((order) => {
+            const status = statusConfig[order.status] || statusConfig.pending;
+            const payStatus = paymentStatusConfig[order.payment_status] || paymentStatusConfig.pending;
             const isExpanded = expandedId === order.id;
 
             return (
@@ -192,21 +241,34 @@ export default function OrdersPage() {
                   {/* Details */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-semibold">{order.orderNumber}</span>
+                      <span className="text-sm font-semibold">{order.order_number}</span>
                       <Badge variant={status.variant} className="text-[10px]">
                         {isRtl ? status.labelAr : status.labelEn}
                       </Badge>
+                      <Badge variant={payStatus.variant} className="text-[10px]">
+                        {isRtl ? payStatus.labelAr : payStatus.labelEn}
+                      </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {formatDate(order.createdAt, locale)}
-                      {" · "}
-                      {order.items.length} {isRtl ? "منتج" : "items"}
-                    </p>
+                    <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+                      <span>{formatDate(order.created_at, locale)}</span>
+                      <span>·</span>
+                      <span>{formatTime(order.created_at, locale)}</span>
+                      <span>·</span>
+                      <span>
+                        {order.payment_method === "wallet"
+                          ? (isRtl ? "محفظة" : "Wallet")
+                          : "SAM API"}
+                      </span>
+                      <span>·</span>
+                      <span>
+                        {order.order_items?.length || 0} {isRtl ? "منتج" : "items"}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Total + Expand */}
                   <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-base font-bold">${order.total.toFixed(2)}</span>
+                    <span className="text-base font-bold">${Number(order.total).toFixed(2)}</span>
                     {isExpanded ? (
                       <ChevronUp className="size-4 text-muted-foreground" />
                     ) : (
@@ -218,26 +280,58 @@ export default function OrdersPage() {
                 {/* Expanded items */}
                 {isExpanded && (
                   <div className="border-t px-5 py-4 space-y-3">
-                    {order.items.map((item, i) => (
-                      <div key={i} className="flex items-center justify-between text-sm">
+                    {order.order_items?.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-3">
                           <div className="flex size-8 items-center justify-center rounded-lg bg-muted">
                             <Package className="size-4 text-muted-foreground" />
                           </div>
                           <div>
-                            <p className="font-medium">{item.name}</p>
+                            <p className="font-medium">
+                              {(item.dynamic_fields as Record<string, string>)?.product_name || (isRtl ? `منتج #${item.product_id.slice(0, 8)}` : `Product #${item.product_id.slice(0, 8)}`)}
+                            </p>
                             <p className="text-xs text-muted-foreground">
                               {isRtl ? `الكمية: ${item.quantity}` : `Qty: ${item.quantity}`}
                             </p>
                           </div>
                         </div>
-                        <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                        <span className="font-medium">${Number(item.total_price).toFixed(2)}</span>
                       </div>
                     ))}
 
+                    {/* Payment & Order Details */}
+                    <div className="border-t pt-3 space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          {isRtl ? "طريقة الدفع" : "Payment Method"}
+                        </span>
+                        <span className="font-medium">
+                          {order.payment_method === "wallet"
+                            ? (isRtl ? "المحفظة" : "Wallet")
+                            : "SAM API"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          {isRtl ? "حالة الدفع" : "Payment Status"}
+                        </span>
+                        <Badge variant={payStatus.variant} className="text-[10px]">
+                          {isRtl ? payStatus.labelAr : payStatus.labelEn}
+                        </Badge>
+                      </div>
+                      {order.notes && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            {isRtl ? "ملاحظات" : "Notes"}
+                          </span>
+                          <span className="font-medium">{order.notes}</span>
+                        </div>
+                      )}
+                    </div>
+
                     <div className="flex justify-between border-t pt-3 text-sm font-semibold">
                       <span>{isRtl ? "الإجمالي" : "Total"}</span>
-                      <span>${order.total.toFixed(2)}</span>
+                      <span>${Number(order.total).toFixed(2)}</span>
                     </div>
                   </div>
                 )}

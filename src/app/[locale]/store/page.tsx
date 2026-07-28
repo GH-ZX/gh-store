@@ -7,10 +7,13 @@ import { StoreClient } from "./store-client";
  */
 export default async function StorePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ q?: string; type?: string }>;
 }) {
   const { locale } = await params;
+  const { q, type } = await searchParams;
   const isRtl = locale === "ar";
 
   const [products, categories] = await Promise.all([
@@ -24,6 +27,8 @@ export default async function StorePage({
       isRtl={isRtl}
       initialProducts={products}
       initialCategories={categories}
+      initialSearchQuery={q || ""}
+      initialType={type || ""}
     />
   );
 }

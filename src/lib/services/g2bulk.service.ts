@@ -32,20 +32,12 @@ export async function ensureG2BulkProvider(
 }
 
 /**
- * Resolve the G2Bulk API key: check env var first, then DB credentials.
+ * Resolve the G2Bulk API key from the provider_credentials table.
+ * The key is stored in Supabase by the admin via the dashboard settings.
  *
- * Priority:
- * 1. process.env.G2BULK_API_KEY (set in .env.local)
- * 2. provider_credentials table (set via /api/g2bulk/settings POST)
- *
- * Returns null if no key is configured anywhere.
+ * Returns null if no key is configured.
  */
 export async function resolveG2BulkApiKey(): Promise<string | null> {
-  // Priority 1: Env var (highest — overrides DB for local dev)
-  const envKey = process.env.G2BULK_API_KEY;
-  if (envKey) return envKey;
-
-  // Priority 2: DB provider_credentials (set via dashboard API key editor)
   try {
     const supabase = createSupabaseAdminClient();
     const { data: provider } = await supabase
