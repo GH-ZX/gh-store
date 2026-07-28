@@ -7,8 +7,14 @@ export interface CartItem {
   name: string;
   imageUrl?: string;
   quantity: number;
+  /**
+   * Display price only. The server re-derives the authoritative price from the
+   * `products` table at checkout — never trust these values for billing.
+   */
   unitPrice: number;
   totalPrice: number;
+  /** Gift-card amount id or top-up catalogue id; sent to the server to price the line. */
+  variantId?: string | null;
   fields?: Record<string, string>;
 }
 

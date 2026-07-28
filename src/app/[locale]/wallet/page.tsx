@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
   Wallet as WalletIcon,
@@ -16,18 +17,16 @@ import {
   RefreshCw,
   CreditCard,
   ExternalLink,
-} from "lucide-react";
+ Coins } from "lucide-react";
+import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { EmptyState } from "@/components/shared/empty-state";
-import { cn } from "@/lib/utils";
-import { useWalletBalance } from "@/hooks/use-wallet-balance";
-import { useWalletTransactions } from "@/hooks/use-wallet-transactions";
 import { useAdminProviderWallets } from "@/hooks/use-admin-wallets";
 import { useAuth } from "@/hooks/use-auth";
-import { Coins } from "lucide-react";
-import Link from "next/link";
+import { useWalletBalance } from "@/hooks/use-wallet-balance";
+import { useWalletTransactions } from "@/hooks/use-wallet-transactions";
 import type { WalletTransaction } from "@/hooks/use-wallet-transactions";
+import { cn } from "@/lib/utils";
 
 // ─── Transaction Config ──────────────────────────────
 

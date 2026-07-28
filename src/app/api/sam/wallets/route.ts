@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { resolveSAMApiKey, SAM_API_BASE } from "@/lib/services/sam.service";
+import { requireApiAdmin } from "@/lib/utils/api-auth";
 import { createSupabaseAdminClient } from "@/lib/utils/supabase";
 
 async function fetchBalance(apiKey: string, wallet: {
@@ -33,6 +34,9 @@ async function fetchBalance(apiKey: string, wallet: {
 }
 
 export async function GET() {
+  const guard = await requireApiAdmin();
+  if (guard.error) return guard.error;
+
   try {
     const apiKey = await resolveSAMApiKey();
     if (!apiKey) {
@@ -50,9 +54,10 @@ export async function GET() {
     });
 
     if (!res.ok) {
-      const errorText = await res.text();
+      const errorText = await res.text().catch(() => "");
+      console.error(`SAM wallets upstream error (${res.status}):`, errorText);
       return NextResponse.json(
-        { success: false, message: `SAM API error (${res.status}): ${errorText}` },
+        { success: false, message: `SAM API request failed (${res.status})` },
         { status: res.status },
       );
     }
@@ -87,8 +92,11 @@ export async function GET() {
           cash_code: String(wallet.cashCode || ""),
           region: String(wallet.region || ""),
           status: String(wallet.status || "active"),
-          balances: JSON.stringify(wallet.balances || []),
-          raw_data: JSON.stringify(wallet),
+          // These columns are JSONB — pass the objects directly. Calling
+          // JSON.stringify here stored a JSON *string* scalar instead, so
+          // readers expecting an array got a string back.
+          balances: wallet.balances ?? [],
+          raw_data: wallet,
           last_synced_at: new Date().toISOString(),
         };
 
@@ -108,7 +116,10 @@ export async function GET() {
 
     return NextResponse.json({ success: true, wallets: walletsWithBalance });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Failed to fetch wallets";
-    return NextResponse.json({ success: false, message }, { status: 500 });
+    console.error("SAM wallets GET error:", err);
+    return NextResponse.json(
+      { success: false, message: "Failed to fetch wallets" },
+      { status: 500 },
+    );
   }
 }

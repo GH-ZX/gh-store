@@ -4,8 +4,9 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Star, ShoppingCart, Check, Shield, Truck, ArrowLeft, ArrowRight, Gamepad2, Gift } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ProductGrid } from "@/components/store/product-grid";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -15,11 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProductGrid } from "@/components/store/product-grid";
-import { useCartStore } from "@/stores/cart-store";
-import { cn } from "@/lib/utils";
-import { toGridProduct } from "@/lib/data/to-grid-product";
 import type { StoreProduct } from "@/hooks/use-products";
+import { toGridProduct } from "@/lib/data/to-grid-product";
+import { cn } from "@/lib/utils";
+import { useCartStore } from "@/stores/cart-store";
 
 interface ProductDetailClientProps {
   product: StoreProduct;
@@ -117,6 +117,14 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
         ? `${product.nameEn} - ${selectedAmount.title}`
         : product.nameEn;
 
+    // The variant id is what the server uses to price this line; unitPrice
+    // below is for display only.
+    const variantId = isTopup
+      ? (selectedItem?.id != null ? String(selectedItem.id) : null)
+      : isGiftCard
+        ? (selectedAmount?.id != null ? String(selectedAmount.id) : null)
+        : null;
+
     addItem({
       id: cartItemId,
       productId: product.id,
@@ -125,6 +133,7 @@ export function ProductDetailClient({ product, relatedProducts, locale, isRtl }:
       quantity: 1,
       unitPrice: displayPrice,
       totalPrice: displayPrice,
+      variantId,
       fields: Object.keys(fieldValues).length > 0 ? fieldValues : undefined,
     });
 

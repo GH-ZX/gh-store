@@ -1,6 +1,6 @@
+import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
 
 /**
  * Creates a Supabase client for use in Server Components and Route Handlers.

@@ -1,13 +1,20 @@
 import { NextResponse } from "next/server";
 import { resolveG2BulkApiKey } from "@/lib/services/g2bulk.service";
+import { requireApiAdmin } from "@/lib/utils/api-auth";
 
 /**
  * GET /api/g2bulk/catalog
  *
  * Proxies G2Bulk products and games data to the client.
  * The API key stays on the server — the client never sees it.
+ *
+ * Admin-only: this burns quota on a paid upstream account and returns that
+ * account's balance and username.
  */
 export async function GET() {
+  const guard = await requireApiAdmin();
+  if (guard.error) return guard.error;
+
   try {
     const apiKey = await resolveG2BulkApiKey();
 
@@ -117,11 +124,13 @@ export async function GET() {
       },
     });
   } catch (err) {
+    // Log the detail server-side; return a generic message so upstream/Postgres
+    // internals never reach the browser.
     console.error("G2Bulk catalog fetch error:", err);
     return NextResponse.json(
       {
         success: false,
-        message: err instanceof Error ? err.message : "Failed to fetch catalog",
+        message: "Failed to fetch catalog",
         products: [],
         games: [],
       },

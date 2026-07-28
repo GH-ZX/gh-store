@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils";
-import { ProductCard } from "@/components/store/product-card";
 import { ProductCardSkeleton } from "@/components/shared/loading";
+import { ProductCard } from "@/components/store/product-card";
+import { cn } from "@/lib/utils";
 
 interface Product {
   id: string;

@@ -4,13 +4,13 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ShoppingCart, Trash2, ArrowLeft, ArrowRight, Tag } from "lucide-react";
+import { EmptyState } from "@/components/shared/empty-state";
+import { CartItem } from "@/components/store/cart-item";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { EmptyState } from "@/components/shared/empty-state";
-import { CartItem } from "@/components/store/cart-item";
-import { useCartStore, getCartItemCount, getCartTotal } from "@/stores/cart-store";
 import { cn } from "@/lib/utils";
+import { useCartStore, getCartItemCount, getCartTotal } from "@/stores/cart-store";
 
 export default function CartPage() {
   const params = useParams<{ locale: string }>();

@@ -1,17 +1,6 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { Chart } from "@/components/dashboard/chart";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   DollarSign,
   ShoppingBag,
@@ -22,6 +11,17 @@ import {
   Package,
   Activity,
 } from "lucide-react";
+import { Chart } from "@/components/dashboard/chart";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 // ─── Mock Dashboard Data ─────────────────────────────
 

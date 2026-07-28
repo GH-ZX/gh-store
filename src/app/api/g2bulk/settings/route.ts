@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { createSupabaseAdminClient } from "@/lib/utils/supabase";
 import { ensureG2BulkProvider } from "@/lib/services/g2bulk.service";
+import { requireApiAdmin } from "@/lib/utils/api-auth";
+import { createSupabaseAdminClient } from "@/lib/utils/supabase";
+import { apiKeySchema } from "@/lib/validation/provider.schema";
 
 const CREDENTIAL_KEY = "api_key";
 
@@ -10,8 +12,13 @@ const CREDENTIAL_KEY = "api_key";
  *
  * Returns whether an API key is configured and a masked version of it.
  * Never exposes the full key. Only reads from the provider_credentials table.
+ *
+ * Admin-only: uses the service-role client, which bypasses RLS.
  */
 export async function GET() {
+  const guard = await requireApiAdmin();
+  if (guard.error) return guard.error;
+
   try {
     const supabase = createSupabaseAdminClient();
     const providerId = await ensureG2BulkProvider(supabase);
@@ -25,7 +32,9 @@ export async function GET() {
       .maybeSingle();
 
     if (cred?.value) {
-      const masked = (cred.value as string).slice(0, 6) + "..." + (cred.value as string).slice(-4);
+      // Only the last 4 characters — enough to confirm which key is configured
+      // without handing out usable key material.
+      const masked = "••••" + (cred.value as string).slice(-4);
       return NextResponse.json({
         success: true,
         keySet: true,
@@ -43,10 +52,7 @@ export async function GET() {
   } catch (err) {
     console.error("G2Bulk settings GET error:", err);
     return NextResponse.json(
-      {
-        success: false,
-        message: err instanceof Error ? err.message : "Failed to read settings",
-      },
+      { success: false, message: "Failed to read settings" },
       { status: 500 },
     );
   }
@@ -59,18 +65,19 @@ export async function GET() {
  * Body: { apiKey: string }
  */
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { apiKey } = body as { apiKey?: string };
+  const guard = await requireApiAdmin();
+  if (guard.error) return guard.error;
 
-    if (!apiKey || typeof apiKey !== "string" || !apiKey.trim()) {
+  try {
+    const parsed = apiKeySchema.safeParse(await request.json());
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, message: "API key is required" },
+        { success: false, message: parsed.error.issues[0]?.message ?? "Invalid request" },
         { status: 400 },
       );
     }
 
-    const trimmedKey = apiKey.trim();
+    const trimmedKey = parsed.data.apiKey;
 
     const supabase = createSupabaseAdminClient();
     const providerId = await ensureG2BulkProvider(supabase);
@@ -93,22 +100,17 @@ export async function POST(request: NextRequest) {
     // Invalidate any cached provider state in the registry
     // (The G2BulkProvider will lazy-resolve from DB on next request)
 
-    const masked = trimmedKey.slice(0, 6) + "..." + trimmedKey.slice(-4);
-
     return NextResponse.json({
       success: true,
       message: "API key saved successfully",
       keySet: true,
-      maskedKey: masked,
+      maskedKey: "••••" + trimmedKey.slice(-4),
       source: "db",
     });
   } catch (err) {
     console.error("G2Bulk settings POST error:", err);
     return NextResponse.json(
-      {
-        success: false,
-        message: err instanceof Error ? err.message : "Failed to save settings",
-      },
+      { success: false, message: "Failed to save settings" },
       { status: 500 },
     );
   }

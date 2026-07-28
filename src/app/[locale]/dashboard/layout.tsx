@@ -1,54 +1,44 @@
-"use client";
-
 import { type ReactNode } from "react";
-import { useParams } from "next/navigation";
-import { DashboardSidebar } from "@/components/layout/sidebar";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Menu, LayoutDashboard } from "lucide-react";
+import { redirect } from "next/navigation";
+import { createSupabaseServerClient } from "@/lib/utils/supabase";
+import { DashboardShell } from "./dashboard-shell";
 
 /**
- * Admin Dashboard Layout.
+ * Admin Dashboard Layout (Server Component).
  *
- * Renders the sidebar on large screens and a Sheet-based mobile nav trigger.
- * Already protected by middleware (requires admin role).
+ * Enforces the admin role server-side. `src/proxy.ts` also gates `/dashboard`,
+ * but relying on it alone is a single point of failure — and its matcher
+ * excludes `/api/*` entirely, so the data behind this UI needs its own guards
+ * regardless (see `src/lib/utils/api-auth.ts`).
  */
-export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const params = useParams<{ locale: string }>();
-  const isRtl = params?.locale === "ar";
+export default async function DashboardLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const supabase = await createSupabaseServerClient();
 
-  return (
-    <div className="flex min-h-screen">
-      {/* Desktop sidebar */}
-      <DashboardSidebar className="hidden lg:flex shrink-0" />
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-      {/* Mobile content */}
-      <div className="flex flex-1 flex-col">
-        {/* Mobile top bar with nav trigger */}
-        <div className="lg:hidden flex items-center gap-2 border-b px-4 h-14">
-          <Sheet>
-            <SheetTrigger
-              render={<Button variant="ghost" size="icon" className="size-8" />}
-            >
-              <Menu className="size-5" />
-            </SheetTrigger>
-            <SheetContent side={isRtl ? "right" : "left"} className="w-72 p-0">
-              <DashboardSidebar className="!flex !w-full border-none h-full" />
-            </SheetContent>
-          </Sheet>
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            <LayoutDashboard className="size-4 text-muted-foreground" />
-            <span>{isRtl ? "لوحة التحكم" : "Dashboard"}</span>
-          </div>
-        </div>
+  if (!user) {
+    redirect(`/${locale}/auth/login?redirect=/${locale}/dashboard`);
+  }
 
-        {/* Main content area */}
-        <main className="flex-1 overflow-x-auto bg-background">
-          <div className="mx-auto max-w-7xl p-6 md:p-8">
-            {children}
-          </div>
-        </main>
-      </div>
-    </div>
-  );
+  // Anon-key client, so this SELECT is subject to RLS — as intended.
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "admin") {
+    redirect(`/${locale}`);
+  }
+
+  return <DashboardShell>{children}</DashboardShell>;
 }

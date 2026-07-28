@@ -1,17 +1,15 @@
+import {
+  getOrCreateCategory,
+  upsertProduct,
+  deactivateMissingProducts,
+  recordSyncLog,
+} from "@/lib/services/g2bulk-sync.service";
+import { ensureG2BulkProvider } from "@/lib/services/g2bulk.service";
+import { createSupabaseAdminClient } from "@/lib/utils/supabase";
 import { BaseProvider } from "../base-provider";
-import type {
-  ProviderInfo,
-  ProviderTestResult,
-  SyncResult,
-  OrderResult,
-  OrderStatusResult,
-  ProviderBalance,
-  SyncedProduct,
-} from "../types";
 import {
   G2BULK_API_BASE,
   type G2BulkUser,
-  type G2BulkCategory,
   type G2BulkProduct,
   type G2BulkGame,
   type G2BulkCatalogueItem,
@@ -19,6 +17,14 @@ import {
   type G2BulkTopupResponse,
   type G2BulkDeliveryResponse,
 } from "./types";
+import type {
+  ProviderInfo,
+  ProviderTestResult,
+  SyncResult,
+  OrderResult,
+  OrderStatusResult,
+  ProviderBalance,
+} from "../types";
 
 /**
  * G2Bulk Provider Adapter.
@@ -114,47 +120,178 @@ export class G2BulkProvider extends BaseProvider {
     };
   }
 
+  /**
+   * Sync the full G2Bulk catalogue into Supabase.
+   *
+   * Voucher categories and games each become ONE product carrying their price
+   * options in `metadata` (`amounts` / `catalogue`), which is what
+   * `pricing.service.ts` reads to price an order server-side. Products that
+   * disappear upstream are deactivated, never deleted — `order_items`
+   * references them with ON DELETE RESTRICT.
+   */
   async syncCatalog(): Promise<SyncResult> {
     const startedAt = new Date().toISOString();
     const errors: string[] = [];
+    const seenSlugs: string[] = [];
     let created = 0;
     let updated = 0;
     let deactivated = 0;
 
+    const supabase = createSupabaseAdminClient();
+    const providerId = await ensureG2BulkProvider(supabase);
+
+    // ─── Vouchers, grouped into one product per category ───
     try {
-      // Step 1: Fetch products (voucher codes / gift cards)
-      try {
-        const products = await this.request<G2BulkProduct[]>("/products");
-        for (const product of products) {
-          // Map to SyncedProduct and upsert into DB
-          // TODO: Implement DB upsert in a separate sync service
-          console.log(`Product: ${product.title} ($${product.unit_price})`);
-        }
-        created += products.length;
-      } catch (err) {
-        errors.push(`Products sync failed: ${err instanceof Error ? err.message : "Unknown"}`);
+      const result = await this.request<{ products?: G2BulkProduct[] }>("/products");
+      const products = result?.products ?? [];
+
+      const byCategory = new Map<number, G2BulkProduct[]>();
+      for (const p of products) {
+        const catId = Number(p.category_id);
+        if (!Number.isFinite(catId)) continue;
+        if (!byCategory.has(catId)) byCategory.set(catId, []);
+        byCategory.get(catId)!.push(p);
       }
 
-      // Step 2: Fetch games (top-ups)
-      try {
-        const games = await this.request<G2BulkGame[]>("/games");
-        for (const game of games) {
-          // Fetch catalogue for each game
-          const catalogue = await this.request<G2BulkCatalogueItem[]>(
-            `/games/${game.code}/catalogue`,
-          );
-          console.log(`Game: ${game.name} (${catalogue.length} items)`);
+      if (byCategory.size > 0) {
+        const storeCat = await getOrCreateCategory(supabase, "vouchers", "قسائم", "Vouchers");
+
+        for (const [catId, group] of byCategory) {
+          const slug = `g2bulk-voucher-${catId}`;
+          try {
+            const amounts = group
+              .map((p) => ({
+                id: Number(p.id),
+                title: String(p.title ?? ""),
+                unit_price: Number(p.unit_price ?? 0),
+                face_value: p.face_value != null ? Number(p.face_value) : null,
+                stock: p.stock != null ? Number(p.stock) : -1,
+              }))
+              .sort((a, b) => a.unit_price - b.unit_price);
+
+            const minPrice = Math.min(...amounts.map((a) => a.unit_price));
+            const maxFaceValue = Math.max(...amounts.map((a) => a.face_value ?? 0), 0);
+            const title = String(group[0].category_title || `Category ${catId}`);
+
+            const { created: wasCreated } = await upsertProduct(supabase, slug, {
+              slug,
+              category_id: storeCat.id,
+              provider_id: providerId,
+              name_ar: title,
+              name_en: title,
+              description_ar: `قسائم ${title} — ${amounts.length} فئة سعرية`,
+              description_en: `${title} vouchers — ${amounts.length} price options`,
+              base_price: minPrice,
+              original_price: maxFaceValue > minPrice ? maxFaceValue : null,
+              type: "gift_card",
+              status: "active",
+              provider_product_id: `g2bulk-cat-${catId}`,
+              sort_order: catId,
+              metadata: { g2bulk_category_id: catId, amounts },
+            });
+
+            seenSlugs.push(slug);
+            if (wasCreated) created++;
+            else updated++;
+          } catch (err) {
+            errors.push(`Category ${catId}: ${err instanceof Error ? err.message : "Unknown"}`);
+          }
         }
-        created += games.length;
-      } catch (err) {
-        errors.push(`Games sync failed: ${err instanceof Error ? err.message : "Unknown"}`);
       }
     } catch (err) {
-      errors.push(`Catalog sync error: ${err instanceof Error ? err.message : "Unknown"}`);
+      errors.push(`Products sync failed: ${err instanceof Error ? err.message : "Unknown"}`);
     }
 
+    // ─── Games, one product per game with its catalogue ───
+    try {
+      const result = await this.request<{ games?: G2BulkGame[] }>("/games");
+      const games = result?.games ?? [];
+
+      if (games.length > 0) {
+        const storeCat = await getOrCreateCategory(supabase, "games", "الألعاب", "Games");
+
+        for (const game of games) {
+          const slug = `g2bulk-game-${game.code}`;
+          try {
+            const catResult = await this.request<{ catalogues?: G2BulkCatalogueItem[] }>(
+              `/games/${encodeURIComponent(game.code)}/catalogue`,
+            );
+            const catalogue = (catResult?.catalogues ?? []).map((item) => ({
+              id: Number(item.id),
+              name: String(item.name ?? ""),
+              amount: Number(item.amount ?? 0),
+            }));
+
+            const minPrice =
+              catalogue.length > 0 ? Math.min(...catalogue.map((c) => c.amount)) : 0;
+
+            const { created: wasCreated } = await upsertProduct(supabase, slug, {
+              slug,
+              category_id: storeCat.id,
+              provider_id: providerId,
+              name_ar: game.name,
+              name_en: game.name,
+              description_ar: game.description || `${game.name} — توب أب`,
+              description_en: game.description || `${game.name} — Top-Up`,
+              image_url: game.image_url || null,
+              base_price: minPrice,
+              type: "topup",
+              status: "active",
+              provider_product_id: slug,
+              sort_order: 0,
+              metadata: {
+                game_code: game.code,
+                game_name: game.name,
+                game_image: game.image_url || null,
+                catalogue,
+                fields: [
+                  { key: "player_id", labelAr: "معرف اللاعب (UID)", labelEn: "Player ID (UID)", type: "text", required: true },
+                  { key: "server_id", labelAr: "الخادم (اختياري)", labelEn: "Server (optional)", type: "text", required: false },
+                  { key: "charname", labelAr: "اسم الشخصية (اختياري)", labelEn: "Character Name (optional)", type: "text", required: false },
+                ],
+              },
+            });
+
+            seenSlugs.push(slug);
+            if (wasCreated) created++;
+            else updated++;
+          } catch (err) {
+            errors.push(`Game ${game.code}: ${err instanceof Error ? err.message : "Unknown"}`);
+          }
+        }
+      }
+    } catch (err) {
+      errors.push(`Games sync failed: ${err instanceof Error ? err.message : "Unknown"}`);
+    }
+
+    // ─── Retire products no longer offered upstream ───
+    // Only when at least one item synced — an upstream outage that returns an
+    // empty catalogue must not deactivate the entire store.
+    if (seenSlugs.length > 0) {
+      try {
+        deactivated = await deactivateMissingProducts(supabase, providerId, seenSlugs);
+      } catch (err) {
+        errors.push(`Deactivation failed: ${err instanceof Error ? err.message : "Unknown"}`);
+      }
+    }
+
+    const touched = created + updated;
+    const status: SyncResult["status"] =
+      errors.length > 0 && touched === 0 ? "failed" : errors.length > 0 ? "partial" : "completed";
+
+    await recordSyncLog(supabase, {
+      providerId,
+      type: "scheduled",
+      status,
+      productsCreated: created,
+      productsUpdated: updated,
+      productsDeactivated: deactivated,
+      errors,
+      startedAt,
+    });
+
     return {
-      status: errors.length > 0 && created === 0 ? "failed" : errors.length > 0 ? "partial" : "completed",
+      status,
       productsCreated: created,
       productsUpdated: updated,
       productsDeactivated: deactivated,

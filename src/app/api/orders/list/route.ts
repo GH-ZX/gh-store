@@ -25,8 +25,16 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 100);
-    const offset = Math.max(parseInt(searchParams.get("offset") || "0", 10), 0);
+    // `parseInt("abc")` is NaN, and Math.min(NaN, 100) stays NaN — which
+    // produced `.range(0, NaN)` and a 500. Fall back to the default instead.
+    const parseBounded = (raw: string | null, fallback: number, max: number) => {
+      const n = Number.parseInt(raw ?? "", 10);
+      if (!Number.isFinite(n)) return fallback;
+      return Math.min(Math.max(n, 0), max);
+    };
+
+    const limit = parseBounded(searchParams.get("limit"), 20, 100);
+    const offset = parseBounded(searchParams.get("offset"), 0, 100_000);
     const statusFilter = searchParams.get("status");
 
     let query = supabase

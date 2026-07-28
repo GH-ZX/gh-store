@@ -1,19 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/use-auth";
-import { useTranslations } from "@/hooks/use-translations";
-import { createSupabaseBrowserClient } from "@/lib/utils/supabase-client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LoadingPage } from "@/components/shared/loading";
-import { EmptyState } from "@/components/shared/empty-state";
 import {
   User,
   Mail,
@@ -30,7 +19,18 @@ import {
   Globe,
   CreditCard,
 } from "lucide-react";
-import Link from "next/link";
+import { EmptyState } from "@/components/shared/empty-state";
+import { LoadingPage } from "@/components/shared/loading";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/hooks/use-auth";
+import { useTranslations } from "@/hooks/use-translations";
+import { createSupabaseBrowserClient } from "@/lib/utils/supabase-client";
 
 export default function ProfilePage() {
   const router = useRouter();

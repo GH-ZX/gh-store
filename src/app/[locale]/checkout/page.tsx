@@ -11,9 +11,9 @@ import {
   AlertCircle,
   ExternalLink,
 } from "lucide-react";
+import { EmptyState } from "@/components/shared/empty-state";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import {
   Card,
   CardContent,
@@ -21,15 +21,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Label } from "@/components/ui/label";
 import {
   RadioGroup,
   RadioGroupItem,
 } from "@/components/ui/radio-group";
-import { EmptyState } from "@/components/shared/empty-state";
+import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/use-auth";
-import { useCartStore, getCartTotal } from "@/stores/cart-store";
 import { cn } from "@/lib/utils";
+import { useCartStore, getCartTotal } from "@/stores/cart-store";
 
 type PaymentMethod = "wallet" | "sam";
 
@@ -56,18 +56,17 @@ export default function CheckoutPage() {
     setErrorMsg(null);
 
     try {
+      // No price fields: the server prices the order from the products table.
+      // Anything sent here would be ignored, so sending it would only be
+      // misleading.
       const payload: Record<string, unknown> = {
         paymentMethod,
         items: items.map((item) => ({
           productId: item.productId,
-          name: item.name,
           quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          totalPrice: item.totalPrice,
+          variantId: item.variantId ?? null,
           fields: item.fields,
         })),
-        subtotal,
-        total: subtotal,
       };
 
       const res = await fetch("/api/orders/create", {

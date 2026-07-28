@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { ShoppingCart, Heart, Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useParams, useRouter } from "next/navigation";
+import { ShoppingCart, Heart, Star, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useCartStore } from "@/stores/cart-store";
+import { useWishlistStore } from "@/stores/wishlist-store";
 
 interface ProductCardProps {
   id: string;
@@ -20,10 +23,17 @@ interface ProductCardProps {
   originalPrice?: number;
   rating?: number;
   isActive: boolean;
+  /**
+   * True when the buyer must choose a variant or fill required fields before
+   * this product can be added to the cart — quick-add sends them to the
+   * detail page instead of guessing a selection.
+   */
+  requiresSelection?: boolean;
   className?: string;
 }
 
 export function ProductCard({
+  id,
   slug,
   nameAr,
   nameEn,
@@ -34,11 +44,44 @@ export function ProductCard({
   originalPrice,
   rating,
   isActive,
+  requiresSelection = false,
   className,
 }: ProductCardProps) {
   const params = useParams<{ locale: string }>();
-  const isRtl = params?.locale === "ar";
+  const router = useRouter();
+  const locale = params?.locale || "ar";
+  const isRtl = locale === "ar";
   const hasDiscount = originalPrice && originalPrice > price;
+
+  const addItem = useCartStore((s) => s.addItem);
+  const toggleWishlist = useWishlistStore((s) => s.toggle);
+  // Select the derived boolean directly so the card re-renders on change.
+  const isWishlisted = useWishlistStore((s) => s.productIds.includes(id));
+  const [justAdded, setJustAdded] = useState(false);
+
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (requiresSelection) {
+      router.push(`/${locale}/store/${slug}`);
+      return;
+    }
+
+    addItem({
+      id,
+      productId: id,
+      name: isRtl ? nameAr : nameEn,
+      imageUrl,
+      quantity: 1,
+      unitPrice: price,
+      totalPrice: price,
+      variantId: null,
+    });
+
+    setJustAdded(true);
+    setTimeout(() => setJustAdded(false), 2000);
+  };
 
   return (
     <Card
@@ -77,13 +120,32 @@ export function ProductCard({
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-3 right-3 size-8 rounded-full bg-background/60 opacity-0 transition-opacity group-hover:opacity-100 backdrop-blur-sm"
+            aria-label={
+              isWishlisted
+                ? isRtl
+                  ? "إزالة من المفضلة"
+                  : "Remove from wishlist"
+                : isRtl
+                  ? "أضف إلى المفضلة"
+                  : "Add to wishlist"
+            }
+            aria-pressed={isWishlisted}
+            className={cn(
+              "absolute top-3 right-3 size-8 rounded-full bg-background/60 backdrop-blur-sm transition-opacity",
+              // Stay visible once saved, otherwise reveal on hover/focus
+              isWishlisted
+                ? "opacity-100"
+                : "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+            )}
             onClick={(e) => {
               e.preventDefault();
-              // TODO: add to wishlist
+              e.stopPropagation();
+              toggleWishlist(id);
             }}
           >
-            <Heart className="size-4" />
+            <Heart
+              className={cn("size-4", isWishlisted && "fill-red-500 text-red-500")}
+            />
           </Button>
         </div>
 
@@ -123,14 +185,31 @@ export function ProductCard({
       <div className="px-4 pb-4">
         <Button
           size="sm"
-          className="w-full gap-2 opacity-0 transition-opacity group-hover:opacity-100"
-          onClick={(e) => {
-            e.preventDefault();
-            // TODO: quick add to cart
-          }}
+          disabled={!isActive}
+          className="w-full gap-2 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+          onClick={handleQuickAdd}
         >
-          <ShoppingCart className="size-4" />
-          {isRtl ? "أضف إلى السلة" : "Add to Cart"}
+          {justAdded ? (
+            <>
+              <Check className="size-4" />
+              {isRtl ? "تمت الإضافة" : "Added"}
+            </>
+          ) : (
+            <>
+              <ShoppingCart className="size-4" />
+              {!isActive
+                ? isRtl
+                  ? "غير متوفر"
+                  : "Unavailable"
+                : requiresSelection
+                  ? isRtl
+                    ? "اختر الخيارات"
+                    : "Choose Options"
+                  : isRtl
+                    ? "أضف إلى السلة"
+                    : "Add to Cart"}
+            </>
+          )}
         </Button>
       </div>
     </Card>

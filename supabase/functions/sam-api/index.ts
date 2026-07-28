@@ -160,7 +160,7 @@ Deno.serve(async (req) => {
       // Find order by SAM invoice ID stored in order.metadata
       const { data: order, error: findError } = await serviceClient
         .from('orders')
-        .select('id, profile_id, total, payment_status')
+        .select('id, profile_id, total, payment_status, metadata')
         .filter('metadata->>sam_invoice_id', 'eq', invoiceId)
         .maybeSingle();
 
@@ -195,41 +195,42 @@ Deno.serve(async (req) => {
           reason: 'Payment confirmed via SAM API webhook',
         });
 
-      // Credit customer wallet with the payment amount (deposit)
-      // The customer paid SAM, we credit their GH-Store wallet
-      const { data: wallet } = await serviceClient
-        .from('wallet_balances')
-        .select('balance, version')
-        .eq('profile_id', order.profile_id)
-        .maybeSingle();
+      // Only a wallet TOP-UP credits the wallet.
+      //
+      // A normal purchase invoice is the customer *paying for goods* — crediting
+      // their wallet by the same amount would hand back the full purchase price
+      // and make every SAM order free. Top-ups are created by
+      // /api/wallet/recharge and tagged with metadata.kind = 'wallet_topup'.
+      const isTopup =
+        (order.metadata as Record<string, unknown> | null)?.kind === 'wallet_topup';
 
-      if (wallet) {
-        const oldBalance = Number(wallet.balance) || 0;
-        const newBalance = oldBalance + Number(order.total);
+      if (isTopup) {
+        const { data: credited, error: creditErr } = await serviceClient.rpc(
+          'credit_wallet_balance',
+          {
+            p_profile_id: order.profile_id,
+            p_amount: Number(order.total),
+            p_description: 'Wallet top-up via SAM API',
+            p_reference_type: 'order',
+            p_reference_id: order.id,
+          },
+        );
 
-        await serviceClient
-          .from('wallet_balances')
-          .update({ balance: newBalance, version: (wallet.version || 0) + 1, updated_at: new Date().toISOString() })
-          .eq('profile_id', order.profile_id);
-
-        // Record deposit transaction
-        await serviceClient
-          .from('wallet_transactions')
-          .insert({
-            profile_id: order.profile_id,
-            type: 'deposit',
-            amount: Number(order.total),
-            balance_before: oldBalance,
-            balance_after: newBalance,
-            description: `SAM payment for order`,
-            reference_type: 'order',
-            reference_id: order.id,
-          });
+        if (creditErr || !(credited as Record<string, unknown>)?.success) {
+          console.error(
+            'Webhook: failed to credit wallet for order',
+            order.id,
+            creditErr?.message ?? credited,
+          );
+          return jsonResponse({ success: false, message: 'Failed to credit wallet' }, 500);
+        }
       }
 
       return jsonResponse({
         success: true,
-        message: 'Payment confirmed, order updated, wallet credited',
+        message: isTopup
+          ? 'Payment confirmed, wallet credited'
+          : 'Payment confirmed, order updated',
         event,
         invoiceId,
         orderId: order.id,

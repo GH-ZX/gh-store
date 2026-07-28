@@ -1,11 +1,11 @@
 "use client";
 
 import { useCallback } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createSupabaseBrowserClient } from "@/lib/utils/supabase-client";
-import type { User } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import type { User } from "@supabase/supabase-js";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 

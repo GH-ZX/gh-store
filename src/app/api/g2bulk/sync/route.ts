@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { createSupabaseAdminClient } from "@/lib/utils/supabase";
+import {
+  getOrCreateCategory,
+  upsertProduct,
+  recordSyncLog,
+} from "@/lib/services/g2bulk-sync.service";
 import { resolveG2BulkApiKey, ensureG2BulkProvider } from "@/lib/services/g2bulk.service";
+import { requireApiAdmin } from "@/lib/utils/api-auth";
+import { createSupabaseAdminClient } from "@/lib/utils/supabase";
+import { g2bulkSyncSchema } from "@/lib/validation/provider.schema";
 import type { G2BulkGame } from "@/providers/g2bulk/types";
 
 /**
@@ -22,36 +29,6 @@ import type { G2BulkGame } from "@/providers/g2bulk/types";
 
 // ─── Helpers ──────────────────────────────────────────
 
-async function getOrCreateCategory(
-  supabase: ReturnType<typeof createSupabaseAdminClient>,
-  slug: string,
-  nameAr: string,
-  nameEn: string,
-): Promise<{ id: string; created: boolean }> {
-  const { data: existing } = await supabase
-    .from("categories")
-    .select("id")
-    .eq("slug", slug)
-    .maybeSingle();
-
-  if (existing) return { id: existing.id, created: false };
-
-  const { data: created } = await supabase
-    .from("categories")
-    .insert({
-      slug,
-      name_ar: nameAr,
-      name_en: nameEn,
-      is_active: true,
-      sort_order: 0,
-    })
-    .select("id")
-    .single();
-
-  if (!created) throw new Error(`Failed to create category: ${slug}`);
-  return { id: created.id, created: true };
-}
-
 async function testG2BulkConnection(apiKey: string): Promise<{ success: boolean; message: string }> {
   try {
     const res = await fetch("https://api.g2bulk.com/v1/getMe", {
@@ -61,11 +38,10 @@ async function testG2BulkConnection(apiKey: string): Promise<{ success: boolean;
       const text = await res.text().catch(() => "");
       return { success: false, message: `HTTP ${res.status}: ${text || res.statusText}` };
     }
-    const data = await res.json();
-    return {
-      success: true,
-      message: `Connected as ${data.first_name} (@${data.username}), balance: $${data.balance}`,
-    };
+    // Deliberately does not echo the upstream account's name, username, or
+    // balance — this message is returned to the browser.
+    await res.json().catch(() => null);
+    return { success: true, message: "Connected to G2Bulk successfully" };
   } catch (err) {
     return {
       success: false,
@@ -74,48 +50,26 @@ async function testG2BulkConnection(apiKey: string): Promise<{ success: boolean;
   }
 }
 
-async function upsertProduct(
-  supabase: ReturnType<typeof createSupabaseAdminClient>,
-  slug: string,
-  data: Record<string, unknown>,
-): Promise<{ created: boolean }> {
-  const { data: existing } = await supabase
-    .from("products")
-    .select("id")
-    .eq("slug", slug)
-    .maybeSingle();
-
-  if (existing) {
-    await supabase
-      .from("products")
-      .update({ ...data, updated_at: new Date().toISOString() })
-      .eq("id", existing.id);
-    return { created: false };
-  }
-
-  await supabase.from("products").insert(data);
-  return { created: true };
-}
+// getOrCreateCategory / upsertProduct live in g2bulk-sync.service so this
+// route and G2BulkProvider.syncCatalog() write products identically.
 
 // ─── Route ───────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
+  const guard = await requireApiAdmin();
+  if (guard.error) return guard.error;
+
   const syncStartedAt = Date.now();
 
   try {
-    const body = await request.json();
-    const { categories, products: productIds, games } = body as {
-      categories?: number[];
-      products?: number[];
-      games?: string[];
-    };
-
-    if (!categories?.length && !productIds?.length && !games?.length) {
+    const parsed = g2bulkSyncSchema.safeParse(await request.json());
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, message: "Select at least one category, product, or game to sync" },
+        { success: false, message: parsed.error.issues[0]?.message ?? "Invalid request" },
         { status: 400 },
       );
     }
+    const { categories, products: productIds, games } = parsed.data;
 
     const supabase = createSupabaseAdminClient();
     const providerId = await ensureG2BulkProvider(supabase);
@@ -411,6 +365,17 @@ export async function POST(request: NextRequest) {
     const duration = Date.now() - syncStartedAt;
     const hasSuccess = results.productsCreated > 0 || results.productsUpdated > 0;
     const hasErrors = results.errors.length > 0;
+
+    await recordSyncLog(supabase, {
+      providerId,
+      type: "manual",
+      status: hasErrors && !hasSuccess ? "failed" : hasErrors ? "partial" : "completed",
+      productsCreated: results.productsCreated,
+      productsUpdated: results.productsUpdated,
+      productsDeactivated: 0,
+      errors: results.errors,
+      startedAt: new Date(syncStartedAt).toISOString(),
+    });
 
     return NextResponse.json({
       success: hasSuccess || !hasErrors,

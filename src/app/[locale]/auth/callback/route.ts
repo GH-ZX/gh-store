@@ -4,6 +4,30 @@ import { createServerClient } from "@supabase/ssr";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@/lib/constants";
 
 /**
+ * Restrict `next` to a same-origin path.
+ *
+ * A bare `startsWith("/")` check is not enough: `//evil.com` and `/\evil.com`
+ * both start with a slash but resolve to a different origin when passed to
+ * `new URL(next, origin)`, turning this route into an open redirect.
+ */
+function sanitizeNext(raw: string | null, locale: string): string {
+  const fallback = `/${locale}`;
+  if (!raw) return fallback;
+
+  // Must be a single leading slash not followed by another slash or backslash.
+  if (!/^\/(?![/\\])/.test(raw)) return fallback;
+
+  // Reject anything that still parses as an absolute URL (e.g. "/\/evil.com").
+  try {
+    if (new URL(raw, "http://localhost").origin !== "http://localhost") return fallback;
+  } catch {
+    return fallback;
+  }
+
+  return raw;
+}
+
+/**
  * Auth callback Route Handler.
  * Supabase redirects here after:
  * - Email confirmation (sign up)
@@ -24,12 +48,7 @@ export async function GET(request: NextRequest) {
 
   // Get the auth code and next redirect from the URL
   const code = searchParams.get("code");
-  let next = searchParams.get("next") || `/${locale}`;
-
-  // Ensure `next` is absolute or at least starts with /
-  if (!next.startsWith("/")) {
-    next = `/${locale}/${next}`;
-  }
+  const next = sanitizeNext(searchParams.get("next"), locale);
 
   if (code) {
     // Create a response to set cookies
@@ -44,7 +63,7 @@ export async function GET(request: NextRequest) {
             return request.cookies.getAll();
           },
           setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) =>
+            cookiesToSet.forEach(({ name, value }) =>
               request.cookies.set(name, value),
             );
             response = NextResponse.redirect(new URL(next, origin));

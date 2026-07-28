@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft, ArrowRight, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ProductGrid } from "@/components/store/product-grid";
-import { CategoryNav } from "@/components/store/category-nav";
 import { EmptyState } from "@/components/shared/empty-state";
-import { cn } from "@/lib/utils";
-import { toGridProduct } from "@/lib/data/to-grid-product";
+import { CategoryNav } from "@/components/store/category-nav";
+import { ProductGrid } from "@/components/store/product-grid";
+import { Button } from "@/components/ui/button";
 import type { MockProduct, MockCategory } from "@/lib/data/mock-products";
+import { toGridProduct } from "@/lib/data/to-grid-product";
+import { cn } from "@/lib/utils";
 
 interface ProductSectionProps {
   titleAr: string;

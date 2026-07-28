@@ -2,8 +2,11 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { Search, SlidersHorizontal, X, ArrowUpDown } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { EmptyState } from "@/components/shared/empty-state";
+import { CategoryNav } from "@/components/store/category-nav";
+import { ProductGrid } from "@/components/store/product-grid";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -11,12 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProductGrid } from "@/components/store/product-grid";
-import { CategoryNav } from "@/components/store/category-nav";
-import { EmptyState } from "@/components/shared/empty-state";
-import { cn } from "@/lib/utils";
-import { toGridProduct } from "@/lib/data/to-grid-product";
 import type { MockProduct, MockCategory } from "@/lib/data/mock-products";
+import { toGridProduct } from "@/lib/data/to-grid-product";
+import { cn } from "@/lib/utils";
 
 interface StoreClientProps {
   locale: string;

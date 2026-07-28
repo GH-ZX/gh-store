@@ -1,24 +1,16 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { priceOrder } from "@/lib/services/pricing.service";
+import {
+  resolveSAMApiKey,
+  resolveSAMReceivingWallet,
+  resolveSAMWebhookUrl,
+  createSAMInvoice,
+  type SamReceivingWallet,
+} from "@/lib/services/sam.service";
+import { requireApiAuth } from "@/lib/utils/api-auth";
 import { createSupabaseAdminClient } from "@/lib/utils/supabase";
-import { createSupabaseServerClient } from "@/lib/utils/supabase";
-
-interface CreateOrderItem {
-  productId: string;
-  name: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  fields?: Record<string, string>;
-}
-
-interface CreateOrderRequest {
-  paymentMethod: "wallet" | "sam";
-  items: CreateOrderItem[];
-  subtotal: number;
-  total: number;
-  notes?: string;
-}
+import { createOrderSchema } from "@/lib/validation/provider.schema";
 
 /**
  * POST /api/orders/create
@@ -26,87 +18,43 @@ interface CreateOrderRequest {
  * Creates an order in the database and handles payment:
  * - wallet: deducts wallet balance and marks order as paid
  * - sam: creates SAM invoice and returns payment URL for redirect
+ *
+ * Pricing is resolved server-side from the `products` table — the request body
+ * carries no price fields.
  */
 export async function POST(request: NextRequest) {
+  const guard = await requireApiAuth();
+  if (guard.error) return guard.error;
+  const user = guard.user;
+
   try {
-    // Authenticate user
-    const supabaseServer = await createSupabaseServerClient();
-    const { data: { user }, error: authError } = await supabaseServer.auth.getUser();
-
-    if (authError || !user) {
+    const parsed = createOrderSchema.safeParse(await request.json());
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, message: "Authentication required" },
-        { status: 401 },
-      );
-    }
-
-    const body: CreateOrderRequest = await request.json();
-
-    // ─── Validate ───────────────────────────────────
-    if (!body.items || body.items.length === 0) {
-      return NextResponse.json(
-        { success: false, message: "Cart is empty" },
+        { success: false, message: parsed.error.issues[0]?.message ?? "Invalid request" },
         { status: 400 },
       );
     }
+    const body = parsed.data;
 
-    if (!["wallet", "sam"].includes(body.paymentMethod)) {
-      return NextResponse.json(
-        { success: false, message: "Invalid payment method" },
-        { status: 400 },
-      );
+    // ─── Authoritative pricing ──────────────────────
+    const pricing = await priceOrder(body.items);
+    if ("error" in pricing) {
+      return NextResponse.json({ success: false, message: pricing.error }, { status: 400 });
     }
 
     const adminClient = createSupabaseAdminClient();
 
-    // For SAM, pre-fetch the default wallet config from DB
-    let samConfig: {
-      method: "shamcash" | "syriatel";
-      identifier: string;
-    } | null = null;
+    // For SAM, resolve the merchant receiving wallet before creating anything.
+    let samConfig: SamReceivingWallet | null = null;
 
     if (body.paymentMethod === "sam") {
-      const { data: provider } = await adminClient
-        .from("providers")
-        .select("id")
-        .eq("slug", "sam-api")
-        .maybeSingle();
+      samConfig = await resolveSAMReceivingWallet(adminClient);
 
-      if (provider) {
-        // Get the advanced config for default wallet
-        const { data: providerConfig } = await adminClient
-          .from("provider_config")
-          .select("value")
-          .eq("provider_id", provider.id)
-          .eq("key", "payment_config")
-          .maybeSingle();
-
-        if (providerConfig?.value) {
-          const config = providerConfig.value as Record<string, unknown>;
-          const defaultWalletId = String(config.defaultWalletId || "");
-
-          if (defaultWalletId) {
-            // Fetch the wallet details to get the identifier
-            const { data: wallet } = await adminClient
-              .from("sam_wallets")
-              .select("provider, wallet_address, phone, cash_code")
-              .eq("id", defaultWalletId)
-              .maybeSingle();
-
-            if (wallet) {
-              samConfig = {
-                method: (wallet.provider === "syriatel" ? "syriatel" : "shamcash") as "shamcash" | "syriatel",
-                identifier: String(wallet.wallet_address || wallet.phone || wallet.cash_code || ""),
-              };
-            }
-          }
-        }
-      }
-
-      if (!samConfig?.identifier) {
+      if (!samConfig) {
         return NextResponse.json(
-          { success: false, message: "SAM API receiving wallet not configured. Please configure a default wallet in the SAM API settings." },
-          { status: 400 },
+          { success: false, message: "Payments are not configured yet" },
+          { status: 503 },
         );
       }
     }
@@ -122,9 +70,9 @@ export async function POST(request: NextRequest) {
         order_number: orderNumber,
         profile_id: user.id,
         status: "pending",
-        subtotal: body.subtotal || body.total,
+        subtotal: pricing.subtotal,
         discount: 0,
-        total: body.total,
+        total: pricing.total,
         payment_method: body.paymentMethod,
         payment_status: "pending",
         notes: body.notes || null,
@@ -142,15 +90,17 @@ export async function POST(request: NextRequest) {
     }
 
     // ─── Create Order Items ─────────────────────────
-    const orderItems = body.items.map((item) => ({
+    const orderItems = pricing.items.map((item) => ({
       order_id: order.id,
       product_id: item.productId,
       quantity: item.quantity,
       unit_price: item.unitPrice,
       total_price: item.totalPrice,
       dynamic_fields: {
-        ...(item.fields || {}),
+        ...item.fields,
         product_name: item.name,
+        ...(item.variantId ? { variant_id: item.variantId } : {}),
+        ...(item.variantLabel ? { variant_label: item.variantLabel } : {}),
       },
     }));
 
@@ -184,7 +134,7 @@ export async function POST(request: NextRequest) {
     if (body.paymentMethod === "wallet") {
       const { data: deductResult } = await adminClient.rpc("deduct_wallet_balance", {
         p_profile_id: user.id,
-        p_amount: body.total,
+        p_amount: pricing.total,
         p_description: `Payment for order ${orderNumber}`,
         p_reference_type: "order",
         p_reference_id: order.id,
@@ -234,99 +184,40 @@ export async function POST(request: NextRequest) {
     // ─── SAM PAYMENT ────────────────────────────
     if (body.paymentMethod === "sam") {
       // We need the SAM API key and webhook URL to create the invoice
-      // First find the SAM provider
-      const { data: provider } = await adminClient
-        .from("providers")
-        .select("id")
-        .eq("slug", "sam-api")
-        .maybeSingle();
+      const samApiKey = await resolveSAMApiKey();
 
-      if (!provider) {
-        await adminClient.from("orders").delete().eq("id", order.id);
+      if (!samApiKey) {
         await adminClient.from("order_items").delete().eq("order_id", order.id);
+        await adminClient.from("orders").delete().eq("id", order.id);
         return NextResponse.json(
-          { success: false, message: "SAM API provider not configured" },
-          { status: 400 },
+          { success: false, message: "Payments are not configured yet" },
+          { status: 503 },
         );
       }
 
-      // Get the webhook secret
-      const { data: webhookSecret } = await adminClient
-        .from("provider_credentials")
-        .select("value")
-        .eq("provider_id", provider.id)
-        .eq("key", "webhook_secret")
-        .eq("is_active", true)
-        .maybeSingle();
+      let invoiceId: string;
+      let paymentUrl: string;
 
-      const { data: apiKeyCred } = await adminClient
-        .from("provider_credentials")
-        .select("value")
-        .eq("provider_id", provider.id)
-        .eq("key", "api_key")
-        .eq("is_active", true)
-        .maybeSingle();
-
-      if (!apiKeyCred?.value) {
-        await adminClient.from("orders").delete().eq("id", order.id);
+      try {
+        const invoice = await createSAMInvoice({
+          apiKey: samApiKey,
+          wallet: samConfig!,
+          amount: pricing.total,
+          webhookUrl: await resolveSAMWebhookUrl(adminClient),
+        });
+        invoiceId = invoice.invoiceId;
+        paymentUrl = invoice.paymentUrl;
+      } catch (err) {
+        // Compensate: the order is unpaid and unusable without an invoice.
+        console.error("SAM invoice creation failed:", err);
         await adminClient.from("order_items").delete().eq("order_id", order.id);
-        return NextResponse.json(
-          { success: false, message: "SAM API key not configured" },
-          { status: 400 },
-        );
-      }
-
-      // Build the webhook URL
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-      let webhookUrl = "";
-      if (webhookSecret?.value && supabaseUrl) {
-        const base = supabaseUrl.replace(/\/$/, "");
-        webhookUrl = `${base}/functions/v1/sam-api?token=${encodeURIComponent(String(webhookSecret.value))}`;
-      }
-
-      // Use pre-fetched SAM config
-      const samApiKey = String(apiKeyCred.value);
-      const SAM_API_BASE = "https://sam-api.pro/api";
-
-      const invoicePayload: Record<string, string> = {
-        method: samConfig!.method,
-        identifier: samConfig!.identifier,
-        amount: String(body.total),
-        currency: "USD",
-      };
-
-      if (webhookUrl) {
-        invoicePayload.webhookUrl = webhookUrl;
-      }
-
-      const samRes = await fetch(`${SAM_API_BASE}/v1/invoices`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${samApiKey}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(invoicePayload),
-      });
-
-      const samData = await samRes.json();
-
-      if (!samRes.ok) {
-        // Clean up order since invoice creation failed
         await adminClient.from("orders").delete().eq("id", order.id);
-        await adminClient.from("order_items").delete().eq("order_id", order.id);
 
         return NextResponse.json(
-          {
-            success: false,
-            message: `SAM payment failed: ${samData.message || samData.error || "Unknown error"}`,
-          },
-          { status: 400 },
+          { success: false, message: "Payment provider rejected the request" },
+          { status: 502 },
         );
       }
-
-      const invoiceId = String(samData.invoiceId || "");
-      const paymentUrl = String(samData.paymentUrl || "");
 
       // Store invoice ID in order metadata
       if (invoiceId) {
@@ -362,7 +253,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error("Order creation error:", err);
     return NextResponse.json(
-      { success: false, message: err instanceof Error ? err.message : "Failed to create order" },
+      { success: false, message: "Failed to create order" },
       { status: 500 },
     );
   }

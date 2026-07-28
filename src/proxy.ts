@@ -51,19 +51,27 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isProtectedRoute =
-    pathname.includes("/dashboard") ||
-    pathname.includes("/orders") ||
-    pathname.includes("/wallet") ||
-    pathname.includes("/checkout") ||
-    pathname.includes("/profile");
+  // Match on path *segments* after the locale prefix, not substrings.
+  // `pathname.includes("/dashboard")` also matched e.g.
+  // `/ar/store/my-dashboard-theme`, and the `/auth/callback` early-return below
+  // matched `/ar/dashboard/auth/callback` — skipping the admin check entirely.
+  const rest = pathname.slice(`/${pathLocale}`.length) || "/";
 
-  // Allow callback route always (needed for OAuth code exchange)
-  if (pathname.includes("/auth/callback")) {
+  const isProtectedRoute = [
+    "/dashboard",
+    "/orders",
+    "/wallet",
+    "/checkout",
+    "/profile",
+  ].some((route) => rest === route || rest.startsWith(`${route}/`));
+
+  const isAdminRoute = rest === "/dashboard" || rest.startsWith("/dashboard/");
+
+  // Allow the callback route always (needed for OAuth code exchange).
+  // Checked against the exact segment so it cannot be used as a bypass prefix.
+  if (rest === "/auth/callback") {
     return supabaseResponse;
   }
-
-  const isAdminRoute = pathname.includes("/dashboard");
 
   if (isProtectedRoute && !user) {
     const loginUrl = new URL(`/${pathLocale}/auth/login`, request.url);

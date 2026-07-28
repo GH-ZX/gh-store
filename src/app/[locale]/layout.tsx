@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
-import { DEFAULT_LOCALE } from "@/lib/constants";
-import { QueryProvider } from "@/components/shared/query-provider";
-import { ThemeProvider } from "@/lib/theme";
-import { AuthProvider } from "@/components/shared/auth-provider";
-import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
+import { AuthProvider } from "@/components/shared/auth-provider";
+import { QueryProvider } from "@/components/shared/query-provider";
 import { Toaster } from "@/components/ui/toast";
+import { DEFAULT_LOCALE } from "@/lib/constants";
+import { ThemeProvider } from "@/lib/theme";
+import type { Metadata } from "next";
 import "../globals.css";
 
 export const metadata: Metadata = {

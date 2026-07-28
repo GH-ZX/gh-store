@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Gift } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { StoreProduct } from "@/hooks/use-products";
+import { cn } from "@/lib/utils";
 
 interface GiftCardScrollerProps {
   /** Gift card / voucher products to display */

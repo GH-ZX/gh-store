@@ -1,8 +1,10 @@
+import { randomBytes } from "crypto";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { randomBytes } from "crypto";
-import { createSupabaseAdminClient } from "@/lib/utils/supabase";
 import { ensureSAMProvider } from "@/lib/services/sam.service";
+import { requireApiAdmin } from "@/lib/utils/api-auth";
+import { createSupabaseAdminClient } from "@/lib/utils/supabase";
+import { samSettingsSchema } from "@/lib/validation/provider.schema";
 
 const CREDENTIAL_KEY = "api_key";
 const WEBHOOK_SECRET_KEY = "webhook_secret";
@@ -108,21 +110,27 @@ async function regenerateWebhookSecret(
   supabase: ReturnType<typeof createSupabaseAdminClient>,
   providerId: string,
 ): Promise<string> {
-  // Deactivate old secrets
-  await supabase
+  // Delete rather than deactivate: provider_credentials has
+  // UNIQUE(provider_id, key), so leaving a deactivated row in place made every
+  // rotation after the first fail on the unique constraint. Deleting matches
+  // what the edge function and the save_sam_api_settings RPC already do.
+  const { error: deleteError } = await supabase
     .from("provider_credentials")
-    .update({ is_active: false })
+    .delete()
     .eq("provider_id", providerId)
     .eq("key", WEBHOOK_SECRET_KEY);
 
-  // Insert new secret
+  if (deleteError) throw new Error(`Failed to clear old webhook secret: ${deleteError.message}`);
+
   const newSecret = generateSecret();
-  await supabase.from("provider_credentials").insert({
+  const { error: insertError } = await supabase.from("provider_credentials").insert({
     provider_id: providerId,
     key: WEBHOOK_SECRET_KEY,
     value: newSecret,
     is_active: true,
   });
+
+  if (insertError) throw new Error(`Failed to store webhook secret: ${insertError.message}`);
 
   return newSecret;
 }
@@ -135,6 +143,9 @@ async function regenerateWebhookSecret(
  * Returns API key status + advanced config + webhook URL.
  */
 export async function GET() {
+  const guard = await requireApiAdmin();
+  if (guard.error) return guard.error;
+
   try {
     const supabase = createSupabaseAdminClient();
     const providerId = await getProviderId();
@@ -155,7 +166,7 @@ export async function GET() {
 
     if (cred?.value) {
       keySet = true;
-      maskedKey = (cred.value as string).slice(0, 6) + "..." + (cred.value as string).slice(-4);
+      maskedKey = "••••" + (cred.value as string).slice(-4);
     }
 
     // Fetch advanced config
@@ -185,7 +196,7 @@ export async function GET() {
   } catch (err) {
     console.error("SAM settings GET error:", err);
     return NextResponse.json(
-      { success: false, message: err instanceof Error ? err.message : "Failed to read settings" },
+      { success: false, message: "Failed to read settings" },
       { status: 500 },
     );
   }
@@ -200,20 +211,26 @@ export async function GET() {
  * - If { regenerateWebhook: true } → generates new webhook secret
  */
 export async function POST(request: NextRequest) {
+  const guard = await requireApiAdmin();
+  if (guard.error) return guard.error;
+
   try {
-    const body = await request.json();
+    const parsed = samSettingsSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json(
+        { success: false, message: parsed.error.issues[0]?.message ?? "Invalid request" },
+        { status: 400 },
+      );
+    }
+    const body = parsed.data;
+
     const supabase = createSupabaseAdminClient();
     const providerId = await getProviderId();
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 
     // ─── Save API key ───────────────────────────────
     if (body.apiKey) {
-      const { apiKey } = body as { apiKey?: string };
-      if (typeof apiKey !== "string" || !apiKey.trim()) {
-        return NextResponse.json({ success: false, message: "API key is required" }, { status: 400 });
-      }
-
-      const trimmedKey = apiKey.trim();
+      const trimmedKey = body.apiKey;
 
       await supabase
         .from("provider_credentials")
@@ -221,20 +238,20 @@ export async function POST(request: NextRequest) {
         .eq("provider_id", providerId)
         .eq("key", CREDENTIAL_KEY);
 
-      await supabase.from("provider_credentials").insert({
+      const { error: insertError } = await supabase.from("provider_credentials").insert({
         provider_id: providerId,
         key: CREDENTIAL_KEY,
         value: trimmedKey,
         is_active: true,
       });
 
-      const masked = trimmedKey.slice(0, 6) + "..." + trimmedKey.slice(-4);
+      if (insertError) throw new Error(`Failed to store API key: ${insertError.message}`);
 
       return NextResponse.json({
         success: true,
         message: "API key saved successfully",
         keySet: true,
-        maskedKey: masked,
+        maskedKey: "••••" + trimmedKey.slice(-4),
         source: "db",
       });
     }
@@ -244,6 +261,8 @@ export async function POST(request: NextRequest) {
       const newSecret = await regenerateWebhookSecret(supabase, providerId);
       const webhookUrl = buildWebhookUrl(supabaseUrl, newSecret);
 
+      // Returned once, at the moment of rotation, to an authenticated admin —
+      // this is the only path that exposes the full webhook URL.
       return NextResponse.json({
         success: true,
         message: "Webhook secret regenerated successfully",
@@ -254,27 +273,8 @@ export async function POST(request: NextRequest) {
 
     // ─── Save advanced config ───────────────────────
     if (body.config) {
-      const config = body.config as Partial<SAMAdvancedConfig>;
       const existing = await getConfig(supabase, providerId);
-
-      const merged: SAMAdvancedConfig = {
-        ...existing,
-        ...config,
-      };
-
-      // Validate
-      if (typeof merged.profitMargin !== "number" || merged.profitMargin < 0 || merged.profitMargin > 100) {
-        return NextResponse.json(
-          { success: false, message: "Profit margin must be between 0 and 100" },
-          { status: 400 },
-        );
-      }
-      if (!["USD", "SYP", "EUR"].includes(merged.defaultCurrency)) {
-        return NextResponse.json(
-          { success: false, message: "Currency must be USD, SYP, or EUR" },
-          { status: 400 },
-        );
-      }
+      const merged: SAMAdvancedConfig = { ...existing, ...body.config };
 
       // Refresh webhook URL from DB
       const webhookSecret = await getWebhookSecret(supabase, providerId);
@@ -298,7 +298,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error("SAM settings POST error:", err);
     return NextResponse.json(
-      { success: false, message: err instanceof Error ? err.message : "Failed to save settings" },
+      { success: false, message: "Failed to save settings" },
       { status: 500 },
     );
   }

@@ -1,5 +1,4 @@
-import { createSupabaseServerClient } from "@/lib/utils/supabase";
-import { createSupabaseAdminClient } from "@/lib/utils/supabase";
+import { createSupabaseServerClient , createSupabaseAdminClient } from "@/lib/utils/supabase";
 import type { Database } from "@/types/database";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];

@@ -3,15 +3,15 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Gamepad2, Gift } from "lucide-react";
-import { HeroCarousel } from "@/components/store/hero-carousel";
-import { QuickActions } from "@/components/store/quick-actions";
-import { GiftCardScroller } from "@/components/store/gift-card-scroller";
-import { ProductSection } from "@/components/store/product-section";
 import { EmptyState } from "@/components/shared/empty-state";
-import { useProducts, useFeaturedProducts, useCategories } from "@/hooks/use-products";
+import { GiftCardScroller } from "@/components/store/gift-card-scroller";
+import { HeroCarousel } from "@/components/store/hero-carousel";
+import { ProductSection } from "@/components/store/product-section";
+import { QuickActions } from "@/components/store/quick-actions";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { useProducts, useFeaturedProducts, useCategories } from "@/hooks/use-products";
 import type { StoreProduct, StoreCategory } from "@/hooks/use-products";
+import { cn } from "@/lib/utils";
 
 interface HomepageClientProps {
   locale: string;

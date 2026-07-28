@@ -1,17 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { CreditCard, ExternalLink, Loader2, AlertCircle, CheckCircle, ArrowLeft } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 
 export default function RechargePage() {
   const params = useParams<{ locale: string }>();
@@ -37,10 +37,28 @@ export default function RechargePage() {
     setErrorMsg(null);
 
     try {
-      // For now, show a placeholder success
-      // In the future, this will call SAM API to create a recharge invoice
-      await new Promise((r) => setTimeout(r, 1000));
+      const res = await fetch("/api/wallet/recharge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: numAmount, method: paymentMethod }),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        setErrorMsg(
+          data.message || (isRtl ? "فشل إنشاء طلب الشحن" : "Failed to start recharge"),
+        );
+        return;
+      }
+
+      // The balance is credited only after SAM confirms payment via webhook.
+      setPaymentUrl(data.paymentUrl || null);
       setIsSuccess(true);
+
+      if (data.paymentUrl) {
+        window.open(data.paymentUrl, "_blank", "noopener,noreferrer");
+      }
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : "Recharge failed");
     } finally {
@@ -63,8 +81,25 @@ export default function RechargePage() {
               ? "سيتم إضافة الرصيد إلى محفظتك بعد تأكيد الدفع"
               : "Funds will be added to your wallet after payment confirmation"}
           </p>
+
+          {/* The popup may have been blocked — always offer the link. */}
+          {paymentUrl && (
+            <Button
+              className="mt-6 w-full sm:w-auto"
+              render={
+                <a href={paymentUrl} target="_blank" rel="noopener noreferrer" />
+              }
+            >
+              <ExternalLink className="size-4" />
+              {isRtl ? "إتمام الدفع" : "Complete Payment"}
+            </Button>
+          )}
+
           <div className="mt-6 flex justify-center gap-3">
-            <Button onClick={() => router.push(`/${locale}/wallet`)}>
+            <Button
+              variant={paymentUrl ? "outline" : "default"}
+              onClick={() => router.push(`/${locale}/wallet`)}
+            >
               {isRtl ? "العودة للمحفظة" : "Back to Wallet"}
             </Button>
             <Button variant="outline" onClick={() => router.push(`/${locale}/store`)}>
