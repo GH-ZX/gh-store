@@ -54,24 +54,26 @@ export async function GET(request: NextRequest) {
     // Create a response to set cookies
     let response = NextResponse.redirect(new URL(next, origin));
 
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll();
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-            response = NextResponse.redirect(new URL(next, origin));
-            cookiesToSet.forEach(({ name, value, options }) =>
-              response.cookies.set(name, value, options),
-            );
-          },
+    const supabaseUrl =
+      process.env.NEXT_PUBLIC_SUPABASE_URL || "https://rbabtwjkqqzsbshzsgvz.supabase.co";
+    const supabaseKey =
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiYWJ0d2prcXF6c2JzaHpzZ3Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxODkwMTAsImV4cCI6MjEwMDc2NTAxMH0.gzMCy3Xww7-nNznrZSL6l91KApeJhFkIF3PoPNmfeIU";
+
+    const supabase = createServerClient(supabaseUrl, supabaseKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          response = NextResponse.redirect(new URL(next, origin));
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options),
+          );
         },
       },
-    );
+    });
 
     // Exchange the code for a session
     const { error } = await supabase.auth.exchangeCodeForSession(code);
