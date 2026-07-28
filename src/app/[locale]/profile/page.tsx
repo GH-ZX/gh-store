@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -34,8 +34,7 @@ import { createSupabaseBrowserClient } from "@/lib/utils/supabase-client";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const supabaseRef = useRef(createSupabaseBrowserClient());
-  const supabase = supabaseRef.current;
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const {
     user,
     profile,

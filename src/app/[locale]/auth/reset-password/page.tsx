@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useState, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,7 +39,7 @@ export default function ResetPasswordPageWrapper() {
 function ResetPasswordPageInner() {
   const searchParams = useSearchParams();
   const isRecovery = searchParams.has("code") || searchParams.has("token");
-  const supabaseRef = useRef(createSupabaseBrowserClient());
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const { t, locale, isRtl } = useTranslations("auth");
 
   // ─── Email Step ───────────────────────────────────────
@@ -53,7 +53,6 @@ function ResetPasswordPageInner() {
   });
 
   const onSendResetLink = async (data: ResetPasswordFormData) => {
-    const supabase = supabaseRef.current;
     setIsSending(true);
     setEmailError(null);
     try {
@@ -80,7 +79,6 @@ function ResetPasswordPageInner() {
   });
 
   const onSaveNewPassword = async (data: NewPasswordFormData) => {
-    const supabase = supabaseRef.current;
     setIsChanging(true);
     setPasswordError(null);
     try {

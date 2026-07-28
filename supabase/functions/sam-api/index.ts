@@ -348,14 +348,12 @@ Deno.serve(async (req) => {
         .eq("key", "webhook_secret");
 
       // Insert new secret with provider_id
-      await serviceClient
-        .from("provider_credentials")
-        .insert({
-          provider_id: samProviderId,
-          key: "webhook_secret",
-          value: newSecret,
-          is_active: true,
-        });
+      await serviceClient.from("provider_credentials").insert({
+        provider_id: samProviderId,
+        key: "webhook_secret",
+        value: newSecret,
+        is_active: true,
+      });
     }
 
     const apiKey = await resolveSamApiKey(serviceClient, samProviderId);

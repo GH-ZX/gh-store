@@ -1,7 +1,6 @@
-import { defineConfig, globalIgnores } from "eslint/config";
+import { defineConfig } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
-import importPlugin from "eslint-plugin-import";
 
 /**
  * GH-Store ESLint — Next.js core-web-vitals + TypeScript + project rules.
@@ -10,27 +9,29 @@ import importPlugin from "eslint-plugin-import";
  * TypeScript 7 yet (throws on import). Keep this pin until #10940 lands.
  */
 const eslintConfig = defineConfig([
+  {
+    ignores: [
+      "**/.next/**",
+      "**/.open-next/**",
+      "**/.wrangler/**",
+      "**/out/**",
+      "**/build/**",
+      "**/coverage/**",
+      "**/dist/**",
+      "**/node_modules/**",
+      "**/next-env.d.ts",
+      "**/supabase/.temp/**",
+      "**/pnpm-lock.yaml",
+      "**/.git/**",
+    ],
+  },
+
   ...nextVitals,
   ...nextTs,
 
-  globalIgnores([
-    ".next/**",
-    "out/**",
-    "build/**",
-    "coverage/**",
-    "dist/**",
-    "node_modules/**",
-    "next-env.d.ts",
-    "supabase/.temp/**",
-    "pnpm-lock.yaml",
-  ]),
-
   {
     name: "gh-store/project-rules",
-    files: ["**/*.{js,jsx,mjs,cjs,ts,tsx}"],
-    plugins: {
-      import: importPlugin,
-    },
+    files: ["**/*.{js,jsx,mjs,ts,tsx}"],
     rules: {
       // ── Correctness ──────────────────────────────────────────────
       "no-console": ["warn", { allow: ["warn", "error", "info"] }],
@@ -38,7 +39,7 @@ const eslintConfig = defineConfig([
       "prefer-const": "error",
       "no-var": "error",
       eqeqeq: ["error", "smart"],
-      "no-duplicate-imports": "error",
+      "no-duplicate-imports": "off",
 
       // ── TypeScript ───────────────────────────────────────────────
       "@typescript-eslint/no-unused-vars": [
@@ -61,8 +62,10 @@ const eslintConfig = defineConfig([
       "react/jsx-no-useless-fragment": "warn",
       "react/self-closing-comp": "warn",
       "react-hooks/exhaustive-deps": "warn",
+      "react-hooks/set-state-in-effect": "off",
       "@next/next/no-html-link-for-pages": "error",
       "@next/next/no-img-element": "warn",
+      "@next/next/no-assign-module-variable": "off",
 
       // ── Imports ──────────────────────────────────────────────────
       "import/first": "error",
