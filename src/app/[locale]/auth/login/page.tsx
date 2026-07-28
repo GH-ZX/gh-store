@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,7 +42,7 @@ function LoginPageInner() {
   const redirect = searchParams.get("redirect") || "/";
   const { signIn, isSigningIn, signInError, isAuthenticated, isLoading } = useAuth();
   const { t, locale, isRtl } = useTranslations("auth");
-  const supabaseRef = useRef(createSupabaseBrowserClient());
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
 
   const {
     register,
@@ -69,7 +69,6 @@ function LoginPageInner() {
   };
 
   const handleGoogleSignIn = async () => {
-    const supabase = supabaseRef.current;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
